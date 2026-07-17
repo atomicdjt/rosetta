@@ -85,7 +85,7 @@ Prerequisite: Rosetta Prep Steps.
 
 - APPLY PHASE `testgen-flow-requirements-document-generation.md`
 - Input: raw-data.md + analysis.md + answers.md. Output: `plans/testgen-{TICKET-KEY}/requirements.md`.
-- **WAIT FOR USER** to review `requirements.md` before Phase 5 (phase-file gate, step 4.4) — present a summary and require explicit confirmation; per-phase confirmation per `<orchestration_and_escalation>` priority (3).
+- Present a summary and require explicit confirmation.
 - Required skills: `qa-knowledge` (`synthesis` mode)
 - Update `testgen-state.md`; Phase 4 is not complete until its output spot-check passes.
 

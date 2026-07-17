@@ -277,8 +277,7 @@ TC-003: Viewer cannot create Job Post
 <update_state step="5.9">
 1. Update `plans/testgen-{TICKET-KEY}/testgen-state.md` with Phase 5 complete and metrics (total test cases, merged count, priority breakdown, coverage)
 2. Tell user: "Phase 5 complete. Generated [X] test cases ([Y] merged for efficiency). All requirements covered."
-3. Ask: "Please review `test-scenarios.md`. Ready to proceed to Phase 6 (TMS Export)?"
-4. **STOP AND WAIT for explicit user confirmation. DO NOT PROCEED to Phase 6 until the user confirms.** Only an exact confirmation token (`yes` / `proceed`) unblocks Phase 6 — no `"or equivalent"` / `"or similar"` phrasing extends it; treat ambiguous responses (questions, suggestions, silence) as not confirmed and re-ask. This is a **priority-(3) per-phase confirmation** per `testgen-flow.md` `<orchestration_and_escalation>`.
+3. Ask user "Please review `test-scenarios.md`.", HITL required with exact confirmation token (`yes` / `approved` / `proceed`).
 </update_state>
 
 <validation_checklist>

@@ -24,6 +24,7 @@ Prerequisite: Rosetta Prep Steps.
 **Execution cadence:**
 - All Rosetta prep steps MUST be FULLY completed, USE SKILL `load-project-context` loaded and fully executed.
 - Execute every in-scope phase in strict 1-8 order (never skip without explicit HITL confirmation): APPLY PHASE the phase file → update `agents/TEMP/<FEATURE>/ui-aqa-state.md` → next; never start a phase until the previous is marked done in `ui-aqa-state.md`.
+- MUST follow JIT phase-by-phase: do not load/act IN ADVANCE.
 - Skip gates, transitions, and escalation → `<orchestration_and_escalation>`.
 - MUST use todo tasks; prioritize ACCURACY over SPEED.
 

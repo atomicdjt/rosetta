@@ -51,6 +51,7 @@ This block owns ONLY the api-aqa-flow-specific skip rules below: a set of **alwa
 
 <execution_policy>
 - If user did not specify preferences, perform all steps except optional.
+- MUST follow JIT phase-by-phase: do not load/act IN ADVANCE.
 - User CAN customize: specific phases, already-done phases, specific goals, specific cases — LISTEN and ADOPT.
 - USE SKILL `coding` before implementation or correction work that touches repository test code or shared utilities.
 - **Repository coding standards:** follow `<coding_standards_precedence>`.

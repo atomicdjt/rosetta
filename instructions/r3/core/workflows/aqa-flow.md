@@ -29,6 +29,7 @@ Classify the user's request and route (invoke the target flow with the user's or
 - **Mixed request** (e.g. both UI and API automation): name the split, propose running the flows sequentially, and let the user pick the order.
 - **Unclear request** (no reliable signal): ASK the user which flow applies — present the three options with a one-line description each. Do NOT guess; the flows write different artifact sets.
 - Route exactly once; the target flow owns everything downstream (phases, state, HITL gates).
+— You MUST fully execute loaded workflow following its entire definition for all request sizes, workflow WAS created to fix your failure modes (deviations, and weak process adherence, and shallow analysis), workflow is PRIMARY deterministic process to resolve the original user request
 
 </routing>
 

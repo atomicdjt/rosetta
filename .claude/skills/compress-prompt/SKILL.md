@@ -13,8 +13,13 @@ disable-model-invocation: true
 - CAPS = importance. Word count is an OUTCOME, never a target.
 - INVARIANT ≠ STEP. Invariants (always-on constraints) → declare ONCE, flag always-on. Steps → ordered, run once. NEVER re-assert an invariant as per-step reminders — that's the echo authors reflexively add; compress hoists + cuts it.
 - GOLDEN RULE: NEVER trade a high-value token for a few saved words (unless it is repeatedly used and overall gives high results, we can loose 2% of value overall).
-- BULLETS vs ORDERED: convert bullets to ordered lists, if work is sequential or can be sequential. Reason: aligns with AI sequential token generation.
-- DENSIFY each rule.
+- BULLETS vs ORDERED: ALWAYS convert bullets to ordered lists, if work is sequential or can be sequential. Reason: aligns with AI sequential token generation.
+- DENSIFY EVERY rule.
+- Take time to think during reasoning, take different options, iterate multiple times TRANSFORM.
+- Your task is MAXIMUM compression, not just low hanging fruits!
+- NO rush, TAKE time
+- Don't bring this skill terms or meta-thinking
+- Identify what is load bearing
 
 ## Allowed reads — read-only, NEVER adjust
 Read ONLY: the target artifact + its type schema + the grammar below. Nothing else. Stay focused.
@@ -44,7 +49,7 @@ Grammar — directive commands the system ACTS ON; protect verbatim + their args
 | `ACQUIRE <path> FROM KB` | MCP-only, generated shells: `query_instructions(tags="<path>")` |
 
 ## KEEP verbatim (never shrink / drop)
-- XML scope tags `<…>` + nesting — structure is signal; schema defines required scopes.
+- MANDATORY scope tags + nesting — structure is signal. OPTIONAL scopes EARN keep (load-bearing audit).
 - Grammar commands above + their args: file / skill / tool / model names, paths, section anchors.
 - CAPS importance markers: MUST · NEVER · DO NOT · HALT · WAIT · SELF-CHECK · HITL …
 - Per-scope / per-step instructions, kept IN their scope (e.g. update-state, gate notes).
@@ -55,9 +60,15 @@ Grammar — directive commands the system ACTS ON; protect verbatim + their args
 - Pointer-echo → info already reachable via a named cite (invariant · `## scope` · file · skill) → NEVER re-assert or re-summarize it inline. Invariants → hoist to ONE always-on block; other echoes → cut. The pointer IS the content.
 - Meta-commentary explaining the prompt's own notation / convention to a reader.
 - Stale / orphaned items → reference a scheme, attribute, or value no longer present.
-- Duplicate scopes (e.g. a references index that re-lists inline content).
+- WHOLE-SCOPE echo → CUT the scope, not just its lines.
+- LOAD-BEARING test: delete scope → agent acts differently? No ⇒ cut.
+- Audit EACH scope, esp. references · best_practices · validation · pitfalls.
+- Keep ONLY signal unreachable elsewhere in-file / via cite.
+- Mandatory-but-echo scope → shrink to minimum unique nugget.
+- Lone nugget → hoist to load-bearing home, drop wrapper.
 - Repeated literals → define once as a short alias (e.g. `OUT/ = <long/path>`), reuse everywhere.
-- Cut the fluff
+- Cut the fluff.
+- Restated the same thing in different ways.
 
 ## COMPRESS
 - HARD CAP: every rule / bullet line < 10 words.
@@ -76,10 +87,11 @@ Grammar — directive commands the system ACTS ON; protect verbatim + their args
 - Drop CAPS / grammar commands / per-step instructions / distinctions to hit a number.
 - Remove a schema-mandatory scope, or edit any schema / `ARCHITECTURE.md` file.
 - Re-inject your own explanations while compressing.
+- Remove items which sole purpose is process adherence, but you can compress it. Example "4. Update state file based on current state `file path`." in each phase => compress to `4. Update state`
 
-## Transform — ordered passes, LOOP to fixpoint
+## TRANSFORM — ordered passes, LOOP until iteration cannot compress any more
 INVARIANTS (always-on, declared once): `## KEEP verbatim` + `## NEVER`. Run passes IN ORDER; skip none.
-1. **CUT** — easy structural wins first → `## CUT`.
+1. **CUT** — FIRST whole-scope load-bearing audit, THEN line/rule cuts → `## CUT`.
 2. **GROUP + REPHRASE** — cluster same-topic rules → merge → rephrase clearly → output as SEPARATE lines. NEVER defer duplication to a later pass.
 3. **COMPRESS** — densify → `## COMPRESS`.
 4. **HARD CAP** — every rule/bullet line < 10 words; NO line-splitting to cheat; NEVER drop signal for the cap; whole file MAY add ≤ 10 lines.
@@ -87,13 +99,17 @@ INVARIANTS (always-on, declared once): `## KEEP verbatim` + `## NEVER`. Run pass
 
 ## Process (HITL)
 1. Read target + its type schema + the grammar above. Nothing else.
-2. Inventory: per-scope purpose + list of duplications, stale items, repeated literals.
+2. Inventory: per-scope purpose + LOAD-BEARING verdict (keep/shrink/cut) + duplications, stale items, repeated literals.
 3. Draft the compressed artifact as file next to current one, running `## Transform` to fixpoint. Do not overwrite yet.
 4. HITL: present to the user → word Δ (before→after, %) + where the cuts came from + your reasoned take on the subagent findings.
 5. VERIFY via subagent — `INVOKE SUBAGENT` (Sonnet-5 class, low reasoning (!), e.g. `claude-sonnet-5`) with a fresh read of OLD vs NEW, asking only:
    - Does anything change in an executing agent's understanding or behavior?
    - Is anything now ambiguous, underspecified, or lost?
    - Any rule / gate / distinction present in OLD but missing or weaker in NEW?
+   - Any whole scope that only rephrases other scopes? → cut.
+   - Anything else can be compressed? Anything you feel like you already know?
+   - Any rules or phrases too verbose?
+   - Anything that is obvious?
 6. Do NOT auto-apply the subagent's output. CRITICALLY evaluate its findings — decide which are real vs noise, and why; adjust the draft only where a finding is genuine.
 7. HITL: present to the user → proposed artifact + word Δ (before→after, %) + where the cuts came from + your reasoned take on the subagent findings.
 8. On explicit user approval → write the TARGET file only.

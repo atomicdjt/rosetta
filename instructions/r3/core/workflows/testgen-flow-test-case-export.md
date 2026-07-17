@@ -30,7 +30,7 @@ Export test cases from `test-scenarios.md` to a Test Management System (TMS) via
 4. Parse test cases from markdown
 5. Map to TMS format using skill mappings
 5b. Destructive-write gate: dedup pre-scan + confirm-before-write (step 6.4b)
-6. Export test cases via TMS MCP
+6. Export test cases via TMS MCP (remember to put pre-conditions, if not possible - create zero step as pre-conditions)
 7. Update documents with TMS IDs
 8. Write `export-report.md` (TMS IDs/URLs, per-case status, timestamp)
 9. Update state file

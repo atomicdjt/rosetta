@@ -75,7 +75,7 @@ Prerequisite: Rosetta Prep Steps.
 
 - APPLY PHASE `testgen-flow-question-generation.md`
 - Input: analysis.md. Output: `plans/testgen-{TICKET-KEY}/questions.md`, `plans/testgen-{TICKET-KEY}/answers.md`.
-- **WAIT FOR USER** to fill answers in questions.md. Explicit approval required.
+- **WAIT FOR USER** to fill answers in questions.md. Explicit approval required. Note, ask user to fill it in, not ask yourself.
 - Recommended skills: `questioning`
 - Update `testgen-state.md`; Phase 3 is not complete until its output spot-check passes.
 

@@ -67,8 +67,10 @@ R3 advances Rosetta from governed assistance to deterministic, self-guarding exe
 - Cross IDE hooks runtime with a self-reviewable dangerous-actions gate and advisory nudges
 - GitNexus code graph integration for architecture aware navigation and automatic reindexing
 - Roughly 57% smaller bootstrap through skill extraction and de-duplication
+- Stays out of your way by default: a plain message no longer auto-triggers the full guided workflow; ask for it explicitly with `/rosetta` (or any specific flow) when you want it
+- Easier to customize: skills, workflows, and rules are local files via plugins, so teams can write their own with the `coding-agents-prompt-authoring` flow, something the MCP-only model never allowed
 - Public OSS MCP and RAGFlow deployment plus GitHub authentication
-- Foundations for role specific workflows (IaC, discovery, mobile, automated QA)
+- IaC and automated QA / test generation workflows delivered; foundations laid for discovery and mobile
 
 ### Detailed Changes
 
@@ -100,7 +102,7 @@ R3 advances Rosetta from governed assistance to deterministic, self-guarding exe
 #### Release Model and Upcoming Work
 
 - **Rolling releases going forward.** R3 is the last large, version-branch style release. From here Rosetta moves to a rolling model — changes ship continuously in small, incremental releases rather than long-lived branches and major cutovers like v3.
-- **Incremental workflow delivery.** The v3 Workflows track has delivered an IaC workflow and SpecFlow integration. The remaining workflows — discovery, mobile apps, test harness engineering, and automated QA / test generation — will arrive through these smaller releases rather than a single shift.
+- **Incremental workflow delivery.** The v3 Workflows track has delivered an IaC workflow, SpecFlow integration, and automated QA / test generation (ui-aqa-flow, api-aqa-flow, testgen-flow, with an `aqa-flow` router kept for backward compatibility). The remaining workflows — discovery, mobile apps, and test harness engineering — will arrive through these smaller releases rather than a single shift.
 
 #### Platform and Deployment
 
@@ -113,6 +115,52 @@ R3 advances Rosetta from governed assistance to deterministic, self-guarding exe
 ## Weekly Change Log
 
 *Release scope: **R2** is the live, served release. **R3** is the next release, still in development and not yet served. Other tags are release-agnostic: **Tooling** (plugin generator, rosettify), **Server** (MCP server, Helm), **Hooks**, **CI**, **Docs**.*
+
+### Week Mon 13.07 – Sun 19.07
+
+A workflow-consolidation and hardening week. Test automation split into three dedicated R3 workflows backed by new QA reference knowledge (#129, #131). Live testing on Curiocity caught and fixed real correctness bugs: an approval-gate hang, a false-positive verification check, and truncated judge scoring. A stream of init-workspace and orchestration fixes tightened agent discipline based on real usage, and a new compress-prompt skill lets contributors shrink Rosetta's own instruction files without losing behavior. rosettify-prompts and rosettify-plugins both gained small but real usability upgrades, and dependency and documentation fixes rounded out the week. Separately, a large release-cutover batch was prepared (not merged) on a staging branch for the eventual v3 publish.
+
+**Highlights**
+
+- Test automation split into three R3 workflows (ui-aqa-flow, api-aqa-flow, testgen-flow) backed by new QA reference knowledge; `aqa-flow` kept as a backward-compatible router (#129, #131)
+- Curiocity fixes from live testing: approval-gate hang on multi-step questions, false-positive manual-QA verification, judge-scoring truncation on long runs; adds a permanent results-history archive and an on-demand end-to-end comparison workflow
+- New compress-prompt skill lets contributors shrink Rosetta's own skill/workflow/rule files while preserving every behavior-changing instruction
+- Init-workspace and orchestration hardening from real usage: faster discovery, no orchestration overhead on trivial requests, enforced per-phase model/effort assignment, auto-mode no longer skips user-facing questions
+- rosettify-prompts optimize gained interactive clarifying questions and readable colored terminal output; rosettify-plugins gained a per-run `--deterministic-hooks` override (FR-CLI-0012)
+- New model tiers added across the canonical catalog and every R3 workflow phase (GPT-5.6 sol/terra/luna, Grok-4.5, Cursor Composer-2.5)
+- R3's cumulative bootstrap and skill-compression work across recent weeks has cut total per-session context overhead to roughly 3.6K tokens, down from around 40K originally
+- Dependency and doc fixes: esbuild and other Dependabot alerts closed (#134), a Traefik middleware namespace bug fixed (#124), broken links fixed across docs (#132), Antigravity/OpenCode docs corrected to say native hooks aren't supported yet, only MCP integration (#126)
+- A large release-cutover batch is staged (not merged) on the `on-v3-release` branch (draft PR #130): MCP's write-tool surface cut to read-only (3 tools left), `ims-mcp-server` renamed to `rosetta-mcp-server`/`rosetta_mcp` as the primary package, plugins repositioned as the recommended install path with MCP framed as evaluation/self-hosted only, and the R2 → R3 default-release cutover prepared. Gated until v3 publish.
+
+#### Test automation split into three R3 workflows (#129, #131)
+
+- **Change.** `[R3]` Added QA reference knowledge to the `qa-knowledge` skill: Given/When/Then spec format, synthesis and gap-analysis catalogs, implementation examples, TestRail export mapping, and a vendor-fork guide for other test-management tools (#129, Svetozar Lashin). Split the single, blended `aqa-flow` workflow into two dedicated ones, `ui-aqa-flow` and `api-aqa-flow`, and rewrote `testgen-flow` to lean on the shared `qa-knowledge` material instead of duplicating logic inline. `aqa-flow.md` now just routes to whichever of the three applies, kept for backward compatibility (#131, plus follow-up fixes, Igor Solomatov).
+- **Why it helps.** The old blended workflow mixed UI and API test automation with no clear entry point and duplicated logic across flows. Separate flows plus one shared knowledge base cut that duplication; existing `/aqa-flow` calls keep working through the router.
+
+#### Curiocity: real-session testing surfaces and fixes correctness bugs
+
+- **Change.** `[Tooling]` Fixed Curiocity only watching for the first approval question in a session, which froze any workflow with a second approval gate. Fixed manual-QA verification: escaped success text (e.g. `"status":"UP"`) in transcripts never matched, and the check wasn't scoped to the actual live response, so a run could pass even with a wrong result. Fixed the trajectory judge's 8,000-character cap silently dropping the end of longer runs; it's now 16,000 characters split between start and end. Added a git-tracked `results-history` archive that snapshots each completed run for over-time comparison, and a manually-triggered end-to-end GitHub Actions workflow that runs Curiocity's suite against plain Claude Code, Claude Code with Rosetta plugins, and a full vanilla variant side by side. (Igor Solomatov)
+- **Why it helps.** These were real bugs caught by running the harness against live coding-agent sessions rather than trusting it blind: a frozen multi-step approval, a verification check that could rubber-stamp a wrong answer, and a judge that couldn't see whether a long run actually finished cleanly. The new archive and CI workflow make regressions in Curiocity or the plugins visible over time instead of anecdotal.
+
+#### New compress-prompt skill, init-workspace and orchestration hardening
+
+- **Change.** `[R3]` Added `compress-prompt`, a contributor-facing skill that strips structural filler from Rosetta's own skill/workflow/rule files while preserving every instruction that changes agent behavior, gated by a HITL review and an independent verification pass. Fixed several init-workspace bugs found in real use: the large-workspace file counter was counting configs and assets instead of just source files, discovery was doing one-by-one directory listing instead of a single filtered scan, the shell-config phase was over-thinking a purely mechanical step, and auto-mode was letting agents skip the final wrap-up questions that are meant for the user directly regardless of mode. Orchestration no longer engages on trivial one-line requests, and orchestrators now explicitly enforce each phase's assigned subagent model and effort level instead of drifting to a default. (Igor Solomatov)
+- **Why it helps.** Contributors get a systematic way to shrink instruction files without guessing what's safe to cut. The init-workspace and orchestration fixes come straight from watching real runs: wrong thresholds, slow discovery, wasted process overhead on trivial work, and questions silently skipped are the kind of small drift that erodes reliability over time.
+
+#### rosettify-prompts and rosettify-plugins usability
+
+- **Change.** `[Tooling]` rosettify-prompts' `optimize` command can now pause mid-pipeline to ask up to 3 clarifying questions when genuinely blocked (opt-in via `--enable-questions`), recorded in a new Q&A table in the run report; terminal output is now color-coded with whole-second durations and a running cost total instead of raw millisecond logs. rosettify-plugins gained a `--deterministic-hooks true|false` per-run override (FR-CLI-0012) that flips a release's advisory-hooks default for a single build without defining a new release descriptor. (Igor Solomatov)
+- **Why it helps.** Clarifying questions stop the optimizer from guessing past a genuine ambiguity, and readable output makes a live run easier to follow. The hooks override lets an engineer test, say, r3 without its advisory hooks without forking a release definition just for that.
+
+#### Dependencies, infrastructure, and documentation fixes
+
+- **Change.** `[Server]` Fixed a Traefik ingress bug where the rate-limit middleware name was missing its namespace prefix, which could point Traefik at the wrong middleware in multi-namespace clusters (#124, Konstantin Khristenko). `[Tooling]` Closed Dependabot alerts: esbuild's dev-server arbitrary-file-read on Windows across hooks, rosettify-plugins, and curiocity, and further runtime-dependency alerts in rosettify and rosettify-plugins (#134, Olha Maiesh). `[Docs]` Fixed broken links across docs and instructions: stale `docs.claude.com` paths, the moved goose docs, personal absolute paths, and a wrong PR reference (#132, Olha Maiesh). Corrected Antigravity/OpenCode documentation to state native hook support isn't currently tested or supported for them, only MCP integration is (#126, @ebbsanchez). `[Tooling]` Extended `run-tests.sh`/`validate-types.sh` to also cover curiocity and rosettify-plugins/rosettify-prompts (previously only rosettify and hooks ran), and quieted structured logging to warnings/errors by default via `ROSETTIFY_PLUGINS_LOG_LEVEL`/`CURIOCITY_LOG_LEVEL`. (Igor Solomatov)
+- **Why it helps.** The middleware fix prevents cross-namespace Traefik misconfiguration. Closed Dependabot alerts keep the security backlog at zero. Fixed links mean docs actually resolve. The Antigravity correction stops the docs overclaiming hook parity across every IDE. Broader test/typecheck coverage and quieter logs make local validation runs faster to read and less likely to miss a tool's own regressions.
+
+#### Staged for v3 publish: MCP read-only cutover, package rename, plugins-first docs (on-v3-release, PR #130, not yet merged)
+
+- **Change.** `[R3 — staged, unmerged]` On the draft `on-v3-release` branch (merges only at v3 publish), prepared a release-cutover batch: removed the 5 remaining write/state MCP tools (submit_feedback, query_project_context, store_project_context, discover_projects, plan_manager) and their full dependency graph, leaving the self-hosted MCP server with exactly 3 read-only tools (get_context_instructions, query_instructions, list_instructions) plus one resource reader; dropped the matching write_policy/allowed_scopes/invite_emails/plan_ttl_days config. Renamed the primary Python package from `ims-mcp-server`/`ims_mcp` to `rosetta-mcp-server`/`rosetta_mcp`, keeping `ims-mcp-server` as a thin two-file alias. Restructured documentation so plugins are the recommended, no-server install path and MCP is explicitly secondary: hosted MCP is marked evaluation-only (with a warning against pointing production traffic at the public demo endpoint), and MCP-only content moved into new `docs/MCP-ARCHITECTURE.md`, `docs/MCP-CONTEXT.md`, and a `docs/mcp/` folder. Flipped rosettify-plugins' default `--release` flag from r2 to r3, retired R1, and moved R2 to support-only across docs vocabulary. (Igor Solomatov)
+- **Why it helps.** None of this is live: main's plugin default is still r2 and the MCP server still carries the full tool surface, exactly as this CHANGELOG's own R2/R3 sections describe today. The batch exists so the actual v3 cutover, whenever the team publishes it, is a fast merge instead of weeks of rework. Read-only MCP removes a real risk (a shared instructions server that can also be written to), the package rename gives R3's primary transport a name that matches what it now is, and steering users to plugins first keeps production traffic off a demo-only hosted endpoint.
 
 ### Week Mon 06.07 – Sun 12.07
 

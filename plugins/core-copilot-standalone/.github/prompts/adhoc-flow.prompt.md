@@ -12,7 +12,7 @@ baseSchema: docs/schemas/workflow.md
 <description_and_purpose>
 
 Problem: Fixed workflows cannot cover the combinatorial space of real requests; orchestrators lock into rigid classification.
-Solution: Meta-workflow — construct a bespoke plan from building blocks, persist via the session EXECUTION_CONTROLLER plan, review, execute with tracking. Each user turn can extend, adapt, or restart.
+Solution: Meta-workflow — construct a bespoke plan from building blocks, review, execute with tracking. Each user turn can extend, adapt, or restart.
 
 If request is trivial / one-liner AND you confirmed it is true (by checking code / instructions fallback to ask user) only then you are allowed to just directly execute it without extra complications of this skill => otherwise you must fully follow this and orchestration skills.
 
@@ -30,7 +30,7 @@ Match to cognitive demand. Match to current tool.
 
 <orchestration severity="CRITICAL">
 
-MUST USE SKILL `orchestration` FULLY — including BOTH assets `o-team-manager.md` and `o-session-execution-controller.md` (session EXECUTION_CONTROLLER): team management + plan-driven execution control are the core mechanism of this workflow.
+MUST USE SKILL `orchestration` with team management, which is the core mechanism of this workflow.
 
 </orchestration>
 
@@ -41,7 +41,7 @@ Compose any of these (not limited) into plan phases/steps to build any execution
 - **discover-research**: scan project context and KB; research external knowledge if needed; deliver summarized references
 - **requirements-capture**: reverse-engineer or interrogate requirements; persist intent as source of truth
 - **reasoning-decomposition**: USE SKILL `reasoning` (8D) to decompose into sub-problems with decisions and trade-offs
-- **plan-wbs**: USE SKILL `planning` to build sequenced WBS; persist via EXECUTION_CONTROLLER `upsert` with subagent/role/model
+- **plan-wbs**: USE SKILL `planning` to build sequenced WBS
 - **tech-specs**: USE SKILL `tech-specs` to generate target technical implementation specs; makes AI to figure out entire solution, instead of discovering something as a surprise
 - **subagent-delegation**: provide role + context/refs; route parallel/sequential; enforce focus — report back if off-plan
 - **delegate-but-verify**: use subagent delegation, but verify both reasoning and results
@@ -65,7 +65,7 @@ Compose any of these (not limited) into plan phases/steps to build any execution
 <prerequisites phase="1" applies="ALL">
 
 1. All Rosetta prep steps MUST be FULLY completed
-2. MUST USE SKILL `load-project-context`, `orchestration` (with team manager and execution controller), `hitl`
+2. MUST USE SKILL `load-project-context`, `orchestration` (with team manager, execution controller is size dependent), `hitl`
 3. MUST ALWAYS use todo tasks ledger, ASAP. Phases are sequential. Independent tasks can run in parallel.
 3. MUST use available MCPs, tools, skills and agents.
 4. You will FOR SURE run out of LLM context, leading to loss of information, delegate to subagents!

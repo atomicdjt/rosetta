@@ -104,6 +104,10 @@ flowchart LR
 
 Higher layers propagate to every project automatically; teams customize without forking. Everything is authored in markdown and versioned in Git.
 
+## Tech Demo
+
+https://github.com/user-attachments/assets/fc0ef06a-2f9c-49fa-bc05-68001dadd286
+
 ## Why not just use IDE rules?
 
 IDE rules (`.cursorrules`, `CLAUDE.md`, Copilot custom instructions) are useful, but they are usually local to one tool, one repo, or one developer. Rosetta makes instructions layered, versioned, reusable, and portable across agents and IDEs — organization standards flow into every project, while project-specific context stays local and customizable. On top of that, Rosetta adds the workflows, guardrails, and approval gates that flat rules files do not provide.

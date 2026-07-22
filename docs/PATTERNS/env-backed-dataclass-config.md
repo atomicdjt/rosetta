@@ -17,7 +17,7 @@ Scattered `os.getenv()` calls throughout service code make configuration hard to
 # constants.py — env var name constants
 ENV_ROSETTA_SERVER_URL = "ROSETTA_SERVER_URL"
 ENV_REDIS_URL = "REDIS_URL"
-DEFAULT_VERSION = "r2"
+DEFAULT_VERSION = "r3"
 
 # config.py
 @dataclass
@@ -56,7 +56,7 @@ Helper functions in `config.py` normalize raw string inputs before storing:
 
 ## Occurrences
 
-- `src/ims-mcp-server/ims_mcp/config.py` — `RosettaConfig`, all parse helpers
-- `src/ims-mcp-server/ims_mcp/constants.py` — all `ENV_*` and `DEFAULT_*` constants
-- `src/ims-mcp-server/ims_mcp/server.py` — `_CONFIG = RosettaConfig.from_env()`
-- `src/ims-mcp-server/tests/test_config.py` — config validation tests
+- `src/rosetta-mcp-server/rosetta_mcp/config.py` — `RosettaConfig`, all parse helpers
+- `src/rosetta-mcp-server/rosetta_mcp/constants.py` — all `ENV_*` and `DEFAULT_*` constants
+- `src/rosetta-mcp-server/rosetta_mcp/server.py` — `_CONFIG = RosettaConfig.from_env()`
+- `src/rosetta-mcp-server/tests/test_config.py` — config validation tests

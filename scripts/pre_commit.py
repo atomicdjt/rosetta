@@ -12,8 +12,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
-TYPECHECK_SCRIPT = REPO_ROOT / "validate-types.sh"
-TEST_SCRIPT = REPO_ROOT / "run-tests.sh"
+TYPECHECK_SCRIPT = REPO_ROOT / "src" / "validate-types.sh"
+TEST_SCRIPT = REPO_ROOT / "src" / "run-tests.sh"
 MYPY_CONFIG = REPO_ROOT / "mypy.ini"
 @dataclass(frozen=True)
 class Check:
@@ -81,7 +81,7 @@ def run_tests() -> int:
 def main() -> int:
     checks = [
         Check(name="hooks build",     runner=build_hooks),
-        Check(name="plugin sync",     runner=lambda: run_command(["npx", "-y", "rosettify-plugins@latest"])),
+        Check(name="plugin sync",     runner=lambda: run_command(["npx", "-y", "rosettify-plugins@latest", "--release", "r3", "--deterministic-hooks", "false"])),
         Check(name="type validation", runner=run_type_validation),
         Check(name="tests",           runner=run_tests),
     ]

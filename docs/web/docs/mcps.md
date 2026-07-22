@@ -6,20 +6,23 @@ permalink: /docs/mcps/
 
 # MCPs Installation
 
-**Who is this for?** New users setting up Rosetta for the first time.
-**When should I read this?** When you want to go from zero to a working setup.
+**Who is this for?** Teams that specifically need MCP: your IDE has no Rosetta plugin (Windsurf, Junie, Antigravity, OpenCode, or another MCP-compatible agent), or you need centrally-managed, always-fresh instructions with nothing copied into the repo. If your IDE supports [Plugins](/rosetta/docs/plugins/), start there instead — most teams don't need MCP.
+**When should I read this?** When you've decided MCP is the right fit and want to go from zero to a working setup.
 
 ---
 
 > [!CAUTION]
-> You must receive a prior approval from your manager and company to use it.
+> You must receive prior approval from your manager and company to use it.
 
 > [!WARNING]
-> Use **Sonnet 5**, **GPT-5.4-medium**, **gemini-3.1-pro** or better models. Avoid Auto model selection.
+> Use **Sonnet 5 medium**, **GPT-5.4-medium**, **gemini-3.1-pro** or newer models. Avoid Auto model selection.
 
 > [!NOTE]
 > Rosetta is designed to never use or see data or IP.
 > Instead it uses inversion of control, by providing a "menu" to AI coding agents.
+
+> [!NOTE]
+> The endpoint below (`mcp.rosetta.griddynamics.net`) is a **public hosted instance for evaluation only** — do not point production or sensitive repositories at it. Production use of MCP means deploying your own MCP server and RAGFlow inside your organization's perimeter — see [Deployment Guide](/rosetta/docs/deployment/).
 
 ## Step 1: Connect Rosetta MCP
 
@@ -172,18 +175,18 @@ Add to `opencode.json`:
 
 ## Step 2: Add Bootstrap Rule
 
-Download [bootstrap.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r2/core/rules/bootstrap.md?plain=1) and add it to your IDE's instruction file (keep entire contents, including YAML frontmatter):
+Download [mcp-files-mode.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r3/core/rules/mcp-files-mode.md?plain=1) and add it to your IDE's instruction file (keep entire contents, including YAML frontmatter):
 
-| IDE                        | Destination                       |
-| -------------------------- | --------------------------------- |
-| Cursor                     | `.cursor/rules/bootstrap.mdc`     |
-| Claude Code                | `.claude/claude.md`               |
-| VS Code / GitHub Copilot   | `.github/copilot-instructions.md` |
-| GitHub Copilot (JetBrains) | `.github/copilot-instructions.md` |
-| JetBrains Junie            | `.junie/guidelines.md`            |
-| Windsurf                   | `.windsurf/rules/bootstrap.md`    |
-| Antigravity                | `.agent/rules/bootstrap.md`       |
-| OpenCode/Cursor            | `AGENTS.md`                       |
+| IDE                        | Destination                            |
+| -------------------------- | -------------------------------------- |
+| Cursor                     | `.cursor/rules/mcp-files-mode.mdc`     |
+| Claude Code                | `.claude/claude.md`                    |
+| VS Code / GitHub Copilot   | `.github/copilot-instructions.md`      |
+| GitHub Copilot (JetBrains) | `.github/copilot-instructions.md`      |
+| JetBrains Junie            | `.junie/guidelines.md`                 |
+| Windsurf                   | `.windsurf/rules/mcp-files-mode.md`    |
+| Antigravity                | `.agent/rules/mcp-files-mode.md`       |
+| OpenCode/Cursor            | `AGENTS.md`                            |
 
 ## Step 3: Verify
 
@@ -199,9 +202,9 @@ It should use Rosetta MCP to retrieve agents, guardrails, and instructions:
 
 ## Common Issues
 
-- **OAuth prompt does not appear:** restart your IDE and retry the connection. Read more in [Troubleshooting — Connection & Authentication](/rosetta/docs/troubleshooting/#connection--authentication).
+- **OAuth prompt does not appear:** restart your IDE and retry the connection. Read more in [Troubleshooting — Connection & Authentication](/rosetta/docs/troubleshooting/#connection--authentication-mcp).
 - **Agent ignores Rosetta tools:** confirm the MCP server shows as connected in your IDE's MCP settings. Add a [bootstrap rule](/rosetta/docs/installation/) if the agent still skips Rosetta. Read more in [Troubleshooting — Agent Not Using Rosetta](/rosetta/docs/troubleshooting/#agent-not-using-rosetta).
-- **Slow or empty responses:** check your network can reach your Rosetta MCP host. See [TROUBLESHOOTING.md](/rosetta/docs/troubleshooting/#slow-or-empty-responses).
+- **Slow or empty responses:** check your network can reach your Rosetta MCP host. See [TROUBLESHOOTING.md](/rosetta/docs/troubleshooting/#slow-or-empty-responses-mcp).
 
 ## Next Steps
 
@@ -214,13 +217,13 @@ Once the MCP is verified:
 
 - [Usage Guide](/rosetta/docs/usage-guide/) — how to use Rosetta flows
 - [Overview](/rosetta/docs/overview/) — mental model and terminology
-- [Deployment Guide](/rosetta/docs/deployment/) — org-wide deployment
 - [Contributing](/rosetta/docs/contributing/) — make your first contribution
 - [Architecture](/rosetta/docs/architecture/) — system internals
+- [Deployment Guide](/rosetta/docs/deployment/) — self-hosted MCP (optional, rarely needed)
 
 ## Video Tutorials
 
+- [Install without MCP](https://vimeo.com/1174124213/c50179147c?fl=ml&fe=ec) — limited internet access
 - [Install Using MCP](https://vimeo.com/1174124251/f38e017d8d?fl=ml&fe=ec) — step-by-step setup
-- [Install without MCP](https://vimeo.com/1174124213/c50179147c?fl=ml&fe=ec) — air-gapped environments
 - [Initialize with Antigravity](https://vimeo.com/1174124165/8f5fbd7775?fl=ml&fe=ec) — project initialization
 - [Subagents and Workflows in Claude Code](https://vimeo.com/1174124272/96056d5cc5?fl=ml&fe=ec) — advanced configuration

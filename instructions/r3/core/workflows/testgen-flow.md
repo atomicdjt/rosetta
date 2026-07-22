@@ -21,7 +21,8 @@ Prerequisite: Rosetta Prep Steps.
 
 <workflow_phases>
 
-- All Rosetta prep steps MUST be FULLY completed, SKILL `load-project-context` loaded and fully executed.
+- All Rosetta prep steps MUST be FULLY completed
+- USE SKILL `load-project-context`, `orchestration`, `hitl`
 - **ONE PHASE AT A TIME:** APPLY PHASE the phase file, execute, update state, move to next. **JIT**: phase-by-phase: do not load/act IN ADVANCE.
 - **DO NOT SKIP PHASES:** Each builds on the previous. Skip gates: only with **explicit user instruction**, **or** when `testgen-state.md` marks the phase complete **and** its expected output file exists under `plans/testgen-{TICKET-KEY}/`; otherwise resume from the earliest incomplete phase. The **explicit user instruction** skip NEVER applies to the Phase 3 / Phase 6 HITL gates — those are rule 2 of `<orchestration_and_escalation>` and are never overridden.
 - **Phase-file load failure:** if APPLY PHASE for a phase file returns nothing, retry once, then HALT and report — do not improvise the phase.
@@ -29,7 +30,7 @@ Prerequisite: Rosetta Prep Steps.
 - **STATE TRACKING:** Update `plans/testgen-{TICKET-KEY}/testgen-state.md` after each phase.
 - **SELF-CHECK BETWEEN PHASES:** Before advancing, verify the state row was updated, the expected output file exists and is non-empty, the phase's `## Metrics` count is populated (a thin `0`/`1` → re-check the artifact), and any HITL approval (Phase 3, 6) is recorded.
 - When a phase delegates work to subagents, dispatch per USE SKILL `orchestration`.
-- MUST use todo tasks. Prioritize ACCURACY over SPEED. Proactively use available tools/MCPs, if question can be answered from code or MCP call - do that first.
+- MUST ALWAYS use todo tasks ledger, ASAP. Prioritize ACCURACY over SPEED. Proactively use available tools/MCPs, if question can be answered from code or MCP call - do that first.
 - MUST create output directory `plans/testgen-{TICKET-KEY}/` at start.
 - **Trigger prompt example:** `Analyze requirements for PROJ-123` (also: bare key `PROJ-123`, full ticket URL). Ticket-only and ticket+Wiki input formats are enumerated in `testgen-flow-project-config-loading.md` step 0.1.
 - **Per-phase failure cases — owned by phase files:**

@@ -17,10 +17,9 @@ Every plugin supports two installation methods:
 > You must receive prior approval from your manager and company to use Rosetta.
 
 > [!WARNING]
-> Use **Sonnet 5**, **GPT-5.4-medium**, **gemini-3.1-pro** or better models. Avoid Auto model selection.
+> Use **Sonnet 5 medium**, **GPT-5.4-medium**, **gemini-3.1-pro** or newer models. Avoid Auto model selection.
 
 > [!NOTE]
-> This is pre-release, but it already works.
 > There will be conflict if you have similar plugins installed: JUXT, Superpowers, GSD, AI-DevKit. Use the ones you have the most experience with.
 
 ## Step 1: Install Plugin
@@ -48,7 +47,7 @@ claude plugin install rosetta@rosetta
 > [!NOTE]
 > To add the plugin you need to have the appropriate Cursor plans, such as Teams and Enterprise.
 
-To Import the Rosetta github repository to your team/compnay internal marketplace:
+To Import the Rosetta github repository to your team/company internal marketplace:
 * Use the following repository: https://github.com/griddynamics/rosetta
 
 For detailed setup instructions, see the Cursor documentation:

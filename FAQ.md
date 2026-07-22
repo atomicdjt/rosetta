@@ -21,13 +21,13 @@ See the [Quick Start Guide](QUICKSTART.md) for the fastest path, or [INSTALLATIO
 
 **Which Rosetta release should I use?**
 
-**R2** is the current stable release — use it for production work.
+**R3** is the current release — use it for production work. R2 is the previous release, still supported and receiving backported fixes only.
 
-Rosetta supports the current release and the one before it (N-1) so when a new release ships, the previous one keeps working while you migrate. See [OVERVIEW.md](OVERVIEW.md) for the rationale.
+R3 is the final numbered release — changes ship as incremental updates within it, so there is no future release to migrate to. R2 keeps working with backported fixes while you move to R3. See [OVERVIEW.md](OVERVIEW.md) for the rationale.
 
-**How do I upgrade from R1 to R2?**
+**How do I upgrade to R3?**
 
-Open a new chat in your IDE and type: `Initialize this repository using the respective Rosetta workflow (upgrade R1 to R2)`. Rosetta will detect the existing R1 layout and migrate it.
+Open a new chat in your IDE and type: `Initialize this repository using the respective Rosetta workflow (upgrade to R3)`. Rosetta will detect the existing layout and migrate it.
 
 **Plugin install or MCP install — which should I use?**
 
@@ -78,6 +78,14 @@ Pick a **medium** model — **Sonnet 5**, **GPT-5.4-medium**, or **gemini-3.1-pr
 - **Letting Auto pick the model.** Auto often downgrades to a weaker model mid-task, producing low-quality results. Choose the model explicitly.
 
 See the model guidance in [QUICKSTART.md](QUICKSTART.md).
+
+**How do I reduce token cost?**
+
+Save cost — add the line below to your workspace AGENTS.md/CLAUDE.md to cut model output tokens:
+
+`MUST ALWAYS think, reason, plan, chat, document in compressed/terse/unicode chars/terms/always/no hieroglyphs; Exclude final artifacts, any tool calls, all code, etc.`
+
+Second, use a flat-rate subscription (e.g. Claude Pro/Max, ChatGPT Plus/Pro) instead of pay-per-token API billing.
 
 ---
 

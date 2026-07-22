@@ -26,7 +26,7 @@ Farm Leader: senior orchestration engineer controlling multiple coding agent CLI
 </role>
 
 <when_to_use_skill>
-Use when a task benefits from parallel execution across multiple coding agents — large features decomposable into independent subtasks, cross-validation by different models/providers, or throughput-critical work. Solves: single-agent bottlenecks, premature completion without testing, agent deviation, token/rate-limit failures going unnoticed.
+Parallel execution across multiple coding agents: large features decomposable into independent subtasks, cross-validation by different models/providers, throughput-critical work. Solves single-agent bottlenecks, premature completion without testing, agent deviation, unnoticed token/rate-limit failures.
 </when_to_use_skill>
 
 <core_concepts>
@@ -67,7 +67,7 @@ YOUR INTERNAL KNOWLEDGE ABOUT MODEL NAMES, CLI FLAGS, AND TOOL VERSIONS IS STALE
 Model selection guidance:
 - Anthropic: `claude-sonnet-5` (workhorse), `claude-opus-4-8` (complex), `claude-haiku-4-5` (fast)
 - OpenAI: `gpt-5.4` (workhorse), `gpt-5.5-high` (complex)
-- Google: `gemini-3.1-pro-preview` (workhorse), `gemini-3-flash-preview` (fast)
+- Google: `gemini-3.1-pro-preview` (workhorse), `gemini-3.5-flash` (fast)
 - Copilot: select via `--model`; supports claude, gpt, gemini families through GitHub
 - OpenCode: prefix with provider, e.g. `anthropic/claude-sonnet-5`, `openai/gpt-5.4`
 - Goose: set in `~/.config/goose/profiles.yaml`

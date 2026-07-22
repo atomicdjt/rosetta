@@ -2,6 +2,8 @@
 name: modernization-flow-implement
 description: "Phase 8 Implementation of modernization-flow"
 alwaysApply: false
+disable-model-invocation: true
+user-invocable: false
 baseSchema: docs/schemas/phase.md
 ---
 
@@ -21,7 +23,7 @@ baseSchema: docs/schemas/phase.md
 - **MUST** write tests based on original code understanding
 - **MUST** validate against original specs
 - **MUST** achieve 80% minimum code coverage per project
-- **MUST** USE WORKFLOW `coding-flow.md` for actual implementation
+- **MUST** USE FLOW `coding-flow.md` for actual implementation
 
 ## DOs AND DON'Ts FOR MODERNIZATION
 

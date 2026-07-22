@@ -5,11 +5,11 @@
   </picture>
   <p><strong>Engineering governance and context for AI coding agents — shared instructions, architecture, standards, workflows, and guardrails in every session.</strong></p>
   <p>
-    <a href="https://pypi.org/project/ims-mcp/"><img src="https://img.shields.io/pypi/v/ims-mcp.svg" alt="MCP"></a>
-    <a href="https://pypi.org/project/ims-mcp/"><img src="https://img.shields.io/pypi/dm/ims-mcp.svg" alt="Downloads"></a>
+    <a href="https://pypi.org/project/rosetta-mcp/"><img src="https://img.shields.io/pypi/v/rosetta-mcp.svg" alt="MCP"></a>
+    <a href="https://pypi.org/project/rosetta-mcp/"><img src="https://img.shields.io/pypi/dm/rosetta-mcp.svg" alt="Downloads"></a>
     <a href="https://pypi.org/project/rosetta-cli/"><img src="https://img.shields.io/pypi/v/rosetta-cli.svg" alt="CLI"></a>
     <a href="https://pypi.org/project/rosetta-cli/"><img src="https://img.shields.io/pypi/dm/rosetta-cli.svg" alt="Downloads"></a>
-    <a href="https://github.com/griddynamics/rosetta/actions/workflows/publish-ims-mcp.yml"><img src="https://github.com/griddynamics/rosetta/actions/workflows/publish-ims-mcp.yml/badge.svg" alt="Rosetta MCP"></a>
+    <a href="https://github.com/griddynamics/rosetta/actions/workflows/publish-rosetta-mcp.yml"><img src="https://github.com/griddynamics/rosetta/actions/workflows/publish-rosetta-mcp.yml/badge.svg" alt="Rosetta MCP"></a>
     <a href="https://github.com/griddynamics/rosetta/actions/workflows/publish-rosetta-cli.yml"><img src="https://github.com/griddynamics/rosetta/actions/workflows/publish-rosetta-cli.yml/badge.svg" alt="Rosetta CLI"></a>
     <a href="https://github.com/griddynamics/rosetta/actions/workflows/publish-instructions.yml"><img src="https://github.com/griddynamics/rosetta/actions/workflows/publish-instructions.yml/badge.svg" alt="Instructions"></a>
     <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.12+-blue.svg" alt="Python 3.12+"></a>
@@ -58,9 +58,11 @@ Rosetta-guided work follows five phases — **Prepare → Research → Plan → 
 
 | Option                              | Best for                                                                       |
 | ----------------------------------- | ------------------------------------------------------------------------------ |
-| **[Plugins](PLUGINS.md)** — recommended | Day-to-day developer use (Claude Code · Cursor · Copilot · Codex)          |
-| **[Hosted MCP](MCPs.md)**           | Fast evaluation for Windsurf · Junie · Antigravity · OpenCode · any MCP-compatible agent |
-| **[Self-hosted MCP](DEPLOYMENT_GUIDE.md)** | Enterprise / air-gapped deployment of the same MCP-compatible setup |
+| **[Plugins](PLUGINS.md)** — recommended | Everyone with a supported IDE (Claude Code · Cursor · Copilot · Codex). Files install locally — no server, no live connection needed. |
+| **[Hosted MCP](MCPs.md)** — evaluation only | Try Rosetta with zero setup, or use any other MCP-compatible agent (Windsurf · Junie · Antigravity · OpenCode). Public demo endpoint — do not point production or sensitive repos at it. |
+| **[Self-hosted MCP](docs/mcp/DEPLOYMENT_GUIDE.md)** — optional | MCP in production: your own MCP server and RAGFlow inside your perimeter. Only needed if you specifically require centrally-managed, always-fresh instructions with nothing copied into repos — most teams don't. |
+
+MCP is a secondary, optional delivery mode. If your IDE supports plugins, start there.
 
 **2. Initialize** — ask the agent in chat once per repo, and Rosetta does the rest:
 
@@ -69,7 +71,7 @@ flowchart LR
     D["ask to initialize<br/>in chat"] --> A["Rosetta detects mode<br/>and analyzes your repo"]
     A --> W["creates workspace baseline<br/>TECHSTACK · CODEMAP · DEPENDENCIES · CONTEXT · ARCHITECTURE"]
     W --> Q["asks gap-filling<br/>questions"]
-    Q --> S["you build with<br/>/coding-flow · /aqa-flow · …"]
+    Q --> S["you build with<br/>/coding-flow · /ui-aqa-flow · …"]
 
     classDef step fill:#1f6feb,stroke:#1b4fb8,color:#ffffff;
     class D,A,W,Q,S step
@@ -115,7 +117,7 @@ IDE rules (`.cursorrules`, `CLAUDE.md`, Copilot custom instructions) are useful,
 | **Ready-made flows** — coding, testing, AQA, research, and more | **Versioned control** — review, approve, and roll back instructions in Git |
 | **Plans and approval gates** before code, not after the damage | **Knowledge captured once** — out of senior engineers' heads |
 | **Fresh-context review** and execution-backed validation | **Cross-project intelligence** _(opt-in)_ — agents see the system, not just one repo |
-| **Less babysitting** — fewer wrong turns to catch and re-prompt | **Runs inside your perimeter** — air-gap capable; no source code leaves |
+| **Less babysitting** — fewer wrong turns to catch and re-prompt | **Runs inside your perimeter** — works with limited internet access; no source code leaves |
 
 See [how Rosetta fits your workflow](OVERVIEW.md#how-rosetta-fits-into-your-workflow) and [how it protects you](USAGE_GUIDE.md#how-rosetta-protects-you).
 
@@ -132,7 +134,7 @@ AI coding agents can read code, generate code, and run commands. But that is onl
 
 1. **Deep project context instead of blind guessing.** Without structured context, coding agents read a few line ranges around the problem and guess the rest. They do not know the architecture, the business rules, the conventions, or the dependencies. They assume. The result is code that appears correct on the surface but violates constraints the agent never knew existed. Imagine hiring a developer from outside your organization, handing them ten lines of code with zero documentation, and asking them to fix the system properly. That is how every coding agent works by default. Planning mode partially addresses this — at much higher token cost — and the agent still has to guess the purpose and target because it has no business context.
 
-   Rosetta instructions reverse this. During repository initialization, the agent — guided by Rosetta — reverse-engineers the project's architecture, tech stack, business context, coding patterns, and dependencies into structured workspace files. The agent reads these before every task. Context loads progressively — bootstrap rules first, then project context, then only the skills and workflow the current task needs. When a query returns more than five documents, Rosetta MCP switches to a listing so the agent picks exactly what it needs. Context stays lean. Reasoning stays sharp. Token efficiency is high because the agent is not loading irrelevant material or re-discovering the project from scratch on every request.
+   Rosetta instructions reverse this. During repository initialization, the agent — guided by Rosetta — reverse-engineers the project's architecture, tech stack, business context, coding patterns, and dependencies into structured workspace files. The agent reads these before every task. Context loads progressively — bootstrap rules first, then project context, then only the skills and workflow the current task needs. Context stays lean. Reasoning stays sharp. Token efficiency is high because the agent is not loading irrelevant material or re-discovering the project from scratch on every request.
 
 2. **Guardrails and enforced safe behavior.** Coding agents rarely question their own actions. They do not question their understanding. They do not think about whether something is right or wrong. They just do it. They do not reliably assess what they have access to — databases, cloud services, S3 buckets. They do not handle sensitive data with care. They can copy personal data, credentials, and regulated information into logs, messages, and outputs without a second thought. They rarely evaluate whether an action is dangerous or irreversible.
 
@@ -170,11 +172,11 @@ AI coding agents can read code, generate code, and run commands. But that is onl
 
     Rosetta instructs the agent to write execution state — plans, specs, phase progress, flow status — to disk files. If a session fails, the next session resumes from the last recorded checkpoint. Medium and large tasks become resumable multi-session workflows instead of all-or-nothing gambles.
 
-11. **Security by design — no source code leaves your perimeter.** Instruction delivery is deterministic: the agent requests content by tag, not by sending source code for analysis. There is no semantic search over your codebase. No code transfers to Rosetta servers. Write mode is disabled by default and requires explicit deployment configuration to enable. Schema-strict input validation rejects any unexpected payloads. The architecture is air-gap capable and runs entirely inside your organization's perimeter.
+11. **Security by design — no source code leaves your perimeter.** Instruction delivery is deterministic: the agent requests content by tag, not by sending source code for analysis. There is no semantic search over your codebase. No code transfers to Rosetta servers. Write mode is disabled by default and requires explicit deployment configuration to enable. Schema-strict input validation rejects any unexpected payloads. The architecture works with limited internet access and runs entirely inside your organization's perimeter.
 
 12. **One system, every AI tool, customizable at every level.** Rosetta works across Cursor, Claude Code, VS Code, JetBrains, Windsurf, Codex, Antigravity, OpenCode, and any MCP-compatible IDE. Instructions are written once and adapt to each environment. Organizations that switch between AI tools or use multiple tools simultaneously keep their entire instruction investment intact. No vendor lock-in. No per-tool maintenance.
 
-    Three layers merge at runtime: core (universal best practices shipped with Rosetta), organization (your company's conventions and policies), and project (local constraints and context). Teams customize without forking. Improvements to higher layers propagate to every project automatically. Release-based versioning (r1, r2, r3) lets instruction authors develop and test new versions without breaking agents on stable releases. Rollback is immediate. AI behavior is authored in markdown, version-controlled in Git, reviewed in pull requests, and approved before deployment — the same engineering rigor applied to the instructions that control your AI agents.
+    Three layers merge at runtime: core (universal best practices shipped with Rosetta), organization (your company's conventions and policies), and project (local constraints and context). Teams customize without forking. Improvements to higher layers propagate to every project automatically. Instructions are versioned in place: R3 is the current release and evolves through incremental, reviewed updates without breaking agents on it. Rollback is immediate. AI behavior is authored in markdown, version-controlled in Git, reviewed in pull requests, and approved before deployment — the same engineering rigor applied to the instructions that control your AI agents.
 
 </details>
 
@@ -189,16 +191,18 @@ Contributions welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for workflow and e
 | I want to...                                         | Read                                       |
 | ---------------------------------------------------- | ------------------------------------------ |
 | Set up Rosetta                                       | [QUICKSTART.md](QUICKSTART.md)             |
+| Install as a plugin (recommended)                    | [PLUGINS.md](PLUGINS.md)                   |
+| Connect over MCP (optional, secondary)               | [MCPs.md](MCPs.md)                         |
 | Configure your coding-agent workspace                | [CONFIGURATION.md](CONFIGURATION.md)       |
 | Understand what Rosetta is and how to think about it | [OVERVIEW.md](OVERVIEW.md)                 |
 | Learn how to use Rosetta flows                       | [USAGE_GUIDE.md](USAGE_GUIDE.md)           |
-| Deploy Rosetta for my organization                   | [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) |
 | Understand the system architecture                   | [ARCHITECTURE.md](docs/ARCHITECTURE.md)    |
 | Navigate the codebase                                | [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md)   |
 | Contribute a change                                  | [CONTRIBUTING.md](CONTRIBUTING.md)         |
 | Debug a problem                                      | [TROUBLESHOOTING.md](TROUBLESHOOTING.md)   |
 | See release history                                  | [CHANGELOG.md](CHANGELOG.md)               |
 | Security Policy                                      | [SECURITY.md](SECURITY.md)                 |
+| Self-host MCP for my organization (optional, rare)   | [DEPLOYMENT_GUIDE.md](docs/mcp/DEPLOYMENT_GUIDE.md) |
 
 ## Community
 

@@ -1,6 +1,6 @@
 {
   "name": "rosettify",
-  "version": "2.4.5",
+  "version": "3.1.0-b01",
   "description": "Local utility for Rosetta — manage plans, install agents, and support AI coding workflows via CLI or MCP",
   "license": "Apache-2.0",
   "author": "Rosetta Team <rosetta-support@griddynamics.com>",
@@ -32,6 +32,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
+    "pretest": "npm run build",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

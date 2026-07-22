@@ -23,7 +23,7 @@ Phase 7 is the main question-and-correction checkpoint, where you answer reflect
 ## When To Use This Workflow
 
 - Initialize a repository that does not yet have Rosetta workspace files
-- Upgrade an older Rosetta workspace, including R1 to R2
+- Upgrade an older Rosetta workspace to R3 (from R1 or R2)
 - Generate shells for skills, agents, and workflows in non-plugin setups
 - Build the first `docs/TECHSTACK.md`, `docs/CODEMAP.md`, `docs/DEPENDENCIES.md`, `docs/CONTEXT.md`, and `docs/ARCHITECTURE.md`
 - Extract reusable patterns into `docs/PATTERNS/`
@@ -48,14 +48,41 @@ For shared setup and installation details, use the [Usage Guide](/rosetta/docs/u
 
 ## How To Start
 
+**Greenfield (new repository):**
+
 ```text
-# Greenfield (new repository)
 Initialize this repository using the respective Rosetta workflow, this is a new repository, target tech stack: ..., target architecture: ..., business context: ...
+```
 
-# Brownfield (existing repository)
-Initialize this repository using the respective Rosetta workflow[, this is a composite workspace][, additional information]
+**Brownfield (existing repository):**
 
-Upgrade this repository from Rosetta R1 to R2
+Ask the agent to initialize the repository:
+
+```text
+Initialize this repository using the respective Rosetta workflow
+```
+
+Optionally, add details to that same request. If your workspace contains multiple repositories:
+
+```text
+Initialize this repository using the respective Rosetta workflow, this is a composite workspace
+```
+
+To tell the agent where dead code or existing specs live:
+
+```text
+Initialize this repository using the respective Rosetta workflow, dead code is in <path>, existing specs are in <path>
+```
+
+**Upgrade an existing workspace:**
+
+```text
+Upgrade this repository to Rosetta R3
+```
+
+**Initialize subagents and workflows:**
+
+```text
 Initialize subagents and workflows
 ```
 
@@ -75,7 +102,7 @@ In practice, that changes the user experience in four ways:
 | Phase | What you provide | What agents do | What artifacts appear | Review gate |
 |---|---|---|---|---|
 | 1. Context | Repository access and current session context | Detect install, upgrade, or plugin mode, detect composite status, inventory existing Rosetta files | `agents/init-workspace-flow-state.md` updated with mode, flags, and inventory | No |
-| 2. Shells | Nothing extra unless upgrade context matters | Generate or preserve shells, bootstrap rule, and load-context shell, or skip in plugin mode | Shell configs, bootstrap rule, load-context shell, state update | No |
+| 2. Shells | Nothing extra unless upgrade context matters | Generate or preserve shells, bootstrap rule, and load-project-context shell, or skip in plugin mode | Shell configs, bootstrap rule, load-project-context shell, state update | No |
 | 3. Discovery | Codebase access | Analyze tech stack, structure, dependencies, file count, and composite layout | `docs/TECHSTACK.md`, `docs/CODEMAP.md`, `docs/DEPENDENCIES.md`, state update | No |
 | 4. Rules | Nothing. This phase is disabled in the active workflow. | Record disabled or skipped status and continue | Explicit disabled or skipped status in state | No. Disabled in the active workflow |
 | 5. Patterns | Source code and module structure | Extract recurring coding and architecture patterns, often with module-scoped subagents | `docs/PATTERNS/INDEX.md`, pattern files, `docs/PATTERNS/CHANGES.md`, state update | No |
@@ -158,11 +185,11 @@ sequenceDiagram
 **Agent actions:**
 - Read state
 - Skip the phase if `state.plugin_active == true`
-- Generate shells, bootstrap rule, and load-context shell in install mode
+- Generate shells, bootstrap rule, and load-project-context shell in install mode
 - Create only missing shells in upgrade mode
 - Record created, updated, or skipped status in state
 
-**Produced artifacts:** shell configs, bootstrap rule, load-context shell, updated state
+**Produced artifacts:** shell configs, bootstrap rule, load-project-context shell, updated state
 
 **Review expectation:** if you are upgrading, verify that existing shells were preserved instead of overwritten.
 
@@ -311,7 +338,7 @@ Review the outputs in two passes.
 ## Artifacts You Will Get
 
 - `agents/init-workspace-flow-state.md`
-- Shell configs, bootstrap rule, and load-context shell when not in plugin mode
+- Shell configs, bootstrap rule, and load-project-context shell when not in plugin mode
 - `docs/TECHSTACK.md`
 - `docs/CODEMAP.md`
 - `docs/DEPENDENCIES.md`
@@ -336,12 +363,12 @@ Review the outputs in two passes.
 
 ## Source Files
 
-- [init-workspace-flow.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r2/core/workflows/init-workspace-flow.md)
-- [init-workspace-flow-context.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r2/core/workflows/init-workspace-flow-context.md)
-- [init-workspace-flow-shells.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r2/core/workflows/init-workspace-flow-shells.md)
-- [init-workspace-flow-discovery.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r2/core/workflows/init-workspace-flow-discovery.md)
-- [init-workspace-flow-rules.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r2/core/workflows/init-workspace-flow-rules.md)
-- [init-workspace-flow-patterns.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r2/core/workflows/init-workspace-flow-patterns.md)
-- [init-workspace-flow-documentation.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r2/core/workflows/init-workspace-flow-documentation.md)
-- [init-workspace-flow-questions.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r2/core/workflows/init-workspace-flow-questions.md)
-- [init-workspace-flow-verification.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r2/core/workflows/init-workspace-flow-verification.md)
+- [init-workspace-flow.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r3/core/workflows/init-workspace-flow.md)
+- [init-workspace-flow-context.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r3/core/workflows/init-workspace-flow-context.md)
+- [init-workspace-flow-shells.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r3/core/workflows/init-workspace-flow-shells.md)
+- [init-workspace-flow-discovery.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r3/core/workflows/init-workspace-flow-discovery.md)
+- [init-workspace-flow-rules.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r3/core/workflows/init-workspace-flow-rules.md)
+- [init-workspace-flow-patterns.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r3/core/workflows/init-workspace-flow-patterns.md)
+- [init-workspace-flow-documentation.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r3/core/workflows/init-workspace-flow-documentation.md)
+- [init-workspace-flow-questions.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r3/core/workflows/init-workspace-flow-questions.md)
+- [init-workspace-flow-verification.md](https://github.com/griddynamics/rosetta/blob/main/instructions/r3/core/workflows/init-workspace-flow-verification.md)

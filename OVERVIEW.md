@@ -17,17 +17,17 @@ Rosetta is a **meta-prompting, context engineering, and centralized instructions
 
 Design principles:
 
-**Agent-agnostic.** Works through MCP across Cursor, Claude Code, VS Code, Windsurf, JetBrains (Copilot, Junie), GitHub Copilot, Codex, Antigravity, OpenCode, and any MCP-compatible IDE. Adopts agent-specific features where available; native hooks remain IDE-specific and require per-IDE validation.
+**Agent-agnostic.** Works across Cursor, Claude Code, VS Code, Windsurf, JetBrains (Copilot, Junie), GitHub Copilot, Codex, Antigravity, OpenCode, and any MCP-compatible IDE — via a plugin where supported, via MCP otherwise. Adopts agent-specific features where available; native hooks remain IDE-specific and require per-IDE validation.
 
-**Progressive disclosure.** Instructions load in stages (bootstrap, classification, workflow-specific, sub-instructions) to [prevent context overflow](docs/ARCHITECTURE.md#context-overflow-prevention). The agent gets only what it needs for the current task.
+**Progressive disclosure.** Instructions load in stages (bootstrap, classification, workflow-specific, sub-instructions) to [prevent context overflow](docs/MCP-ARCHITECTURE.md#context-overflow-prevention). The agent gets only what it needs for the current task.
 
 **Classification-first.** Every request is auto-classified into a [workflow type](USAGE_GUIDE.md#workflows) before any work begins. Classification drives which instructions, skills, and rules load. Provided workflows are used as templates.
 
-**Release-based versioning.** Instructions are organized by release (r1, r2, r3). New instructions can be developed without breaking agents on stable versions. Rollback is always possible. See [Architecture — Tradeoffs](docs/ARCHITECTURE.md#tradeoffs) for rationale.
+**Release-based versioning.** Instructions are organized by release (r1, r2, r3). R3 is the final numbered release and evolves through incremental updates, without breaking agents on it. Rollback is always possible. See [Architecture — Tradeoffs](docs/ARCHITECTURE.md#tradeoffs) for rationale.
 
 **Rules-as-code.** AI behavior is authored, versioned, reviewed, and approved through standard engineering workflows. Same rigor as application code. See [Contributing — Prompt Changes](CONTRIBUTING.md#prompt-changes) for the authoring process.
 
-**Security by design.** No source code transfer. Air-gap capable. Runs inside the organization's perimeter. See [Context — Design Philosophy](docs/CONTEXT.md#design-philosophy) for the full set.
+**Security by design.** No source code transfer. Works with limited internet access. Runs inside the organization's perimeter. See [Context — Design Philosophy](docs/CONTEXT.md#design-philosophy) for the full set.
 
 **Inversion of control.** Rosetta is designed to not see or process source code or project data. It exposes guardrails, common best practices, and a menu of available instructions. The coding agent selects only what it needs; Rosetta delivers just those — keeping context lean and IP protected.
 
@@ -47,11 +47,11 @@ These terms are defined here and referenced everywhere else.
 | **Rule**           | Persistent constraint applied globally or by path pattern. Defines best practices, guardrails, guidelines.                                  |
 | **Subagent**       | Delegated specialist with fresh context and its own system prompt. Alias: **Agent**. Examples: orchestrator, planner, executor, and others. |
 | **Template**       | Parameterized prompt with variables and validated placeholders.                                                                             |
-| **Release**        | Versioned instruction set (r1, r2, r3). Enables safe evolution, rollback, and A/B testing.                                                  |
+| **Release**        | Versioned instruction set (r1, r2, r3). R3 is the final numbered release; updates land incrementally within it.                             |
 | **Guardrails**     | Safety measures: scope limits, data protection, transparency rules, approval gates, risk assessment.                                        |
 | **HITL**           | Human-in-the-loop. Approval gates at critical decision points (specs, plans, risky actions).                                                |
-| **Meta-prompting** | Rosetta MCP consults the AI agent on what should be done and how using meta-prompts.                                                        |
-| **Rosetta**        | MCP and CLI of Instruction and Instructions Management System.                                                                                 |
+| **Meta-prompting** | Rosetta consults the AI agent on what should be done and how using meta-prompts.                                                            |
+| **Rosetta**        | Instruction Management System for AI coding agents, delivered primarily as IDE plugins; MCP and CLI are optional delivery modes.             |
 | **Prompt**         | Skill, Rule, Workflow, Command, Subagent, Agent, Template, or any generic prompt. **Rosetta prompt** prompt for Rosetta.                    |
 | **Shells**         | Small prompt proxies with proper fronmatters created during onboarding so that coding agents are aware of skill, agents, commands.          |
 
@@ -87,7 +87,7 @@ Read more about the [bootstrap flow](docs/ARCHITECTURE.md#bootstrap-flow) in the
                 ↓
 5. Execute     Plan, approve (HITL gate), execute with subagents, validate, loop
                 ↓
-6. Evolve      New releases developed safely; rollback if needed
+6. Evolve      Updates ship incrementally to the current release; rollback if needed
 ```
 
 ## Three-Layer Architecture
@@ -98,7 +98,7 @@ Instructions are organized in three layers that merge at runtime:
 - **Organization** — your company's conventions and policies
 - **Project** — local repo docs and configs
 
-Layers at the same resource path get [bundled together](docs/ARCHITECTURE.md#bundler). This is layered customization, not multi-tenancy. See [Architecture](docs/ARCHITECTURE.md) for component details and data flow.
+Layers at the same resource path get merged: in Plugin mode, the generator merges them at build time; in MCP mode, they're [bundled together](docs/MCP-ARCHITECTURE.md#bundler) at request time. This is layered customization, not multi-tenancy. See [Architecture](docs/ARCHITECTURE.md) for component details and data flow.
 
 ## What Rosetta Does Not Do
 

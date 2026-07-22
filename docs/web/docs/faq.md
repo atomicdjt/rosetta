@@ -17,7 +17,7 @@ permalink: /docs/faq/
 
 1. AI coding agent loads CONTEXT.md and ARCHITECTURE.md files - if not it misses the entire context
 2. AI coding agent loads workflow - if not it is taking shortcut delivering subpar results
-3. AI coding agent loads hitl and orchestrator-contract - if not it will not engage user and hallucinate
+3. AI coding agent loads the `hitl` and `orchestration` skills - if not it will not engage user and hallucinate
 
 If none of these are true, Rosetta is not active for this session. See [INSTALLATION.md](/rosetta/docs/installation/).
 
@@ -27,13 +27,13 @@ See the [Quick Start Guide](/rosetta/docs/quickstart/) for the fastest path, or 
 
 **Which Rosetta release should I use?**
 
-**R2** is the current stable release — use it for production work.
+**R3** is the current release — use it for production work. **R2** is the previous release, still supported but receiving backported fixes only. **R1** is out of support.
 
-Rosetta supports the current release and the one before it (N-1) so when a new release ships, the previous one keeps working while you migrate. See [OVERVIEW.md](/rosetta/docs/overview/) for the rationale.
+R3 is the final numbered release — changes ship as incremental updates within it, so there is no future release to migrate to. R2 keeps working with backported fixes while you move to R3. See [OVERVIEW.md](/rosetta/docs/overview/) for the rationale.
 
-**How do I upgrade from R1 to R2?**
+**How do I upgrade to R3?**
 
-Open a new chat in your IDE and type: `Initialize this repository using the respective Rosetta workflow (upgrade R1 to R2)`. Rosetta will detect the existing R1 layout and migrate it.
+Open a new chat in your IDE and type: `Initialize this repository using the respective Rosetta workflow (upgrade to R3)`. Rosetta will detect the existing layout (R1 or R2) and migrate it.
 
 **Plugin install or MCP install — which should I use?**
 
@@ -85,6 +85,14 @@ Pick a **medium** model — **Sonnet 5**, **GPT-5.4-medium**, or **gemini-3.1-pr
 
 See the model guidance in [Quickstart](/rosetta/docs/quickstart/).
 
+**How do I reduce token cost?**
+
+Save cost — add the line below to your workspace AGENTS.md/CLAUDE.md to cut model output tokens:
+
+`MUST ALWAYS think, reason, plan, chat, document in compressed/terse/unicode chars/terms/always/no hieroglyphs; Exclude final artifacts, any tool calls, all code, etc.`
+
+Second, use a flat-rate subscription (e.g. Claude Pro/Max, ChatGPT Plus/Pro) instead of pay-per-token API billing.
+
 ---
 
 ## Behavior & Modes
@@ -127,7 +135,7 @@ If you already have a sophisticated harness for the one workflow you care about,
 **What's the difference between a skill, workflow, agent, and rule?**
 
 - **Rule** — always-on policy the agent must follow (e.g. guardrails, HITL questioning, file naming). Loaded at the start of every session.
-- **Skill** — a focused capability the agent invokes for a specific need (e.g. `load-context`, `questioning`, `tech-specs`). Invoked on demand.
+- **Skill** — a focused capability the agent invokes for a specific need (e.g. `load-project-context`, `questioning`, `tech-specs`). Invoked on demand.
 - **Workflow** — an end-to-end multi-phase process for a class of request (e.g. coding, modernization, research). One per top-level request.
 - **Agent / subagent** — a specialized role spawned by the orchestrator to do delegated work in isolation (e.g. reviewer, researcher, engineer).
 

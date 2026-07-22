@@ -8,7 +8,7 @@ For detailed change history, use git history and PRs instead of expanding this f
 ## Current State
 
 - Rosetta is an OSS instruction platform with:
-  - a Python MCP server in `src/ims-mcp-server/`
+  - a Python MCP server in `src/rosetta-mcp-server/`
   - a Python CLI in `src/rosetta-cli/`
   - public documentation in `docs/` and `docs/web/`
   - deployment examples under `deployment/`
@@ -22,7 +22,7 @@ For detailed change history, use git history and PRs instead of expanding this f
 ### MCP Server
 
 - Refactored into a modular package structure with dedicated `config`, `context`, `services`, `tools`, `auth`, and `analytics` modules.
-- PostHog analytics parity restored in `ims_mcp/analytics/tracker.py`: added `$referring_domain`, `$screen_name`, `$title`, `error_type`/`error_message` on soft errors, `$pageview` and `$web_vitals` events, `error_status_code` on HTTP exceptions, `$browser`/`$browser_version` in exception context, `on_error` logging on Posthog constructor, inner try/except isolating analytics failures from tool results; all exception sites use `logger.warning`. Fixed `feedback.py` `distinct_id` to `call_ctx.username` (was composite `username@repository`). 18 new test cases added covering all acceptance criteria including boundary conditions.
+- PostHog analytics parity restored in `rosetta_mcp/analytics/tracker.py`: added `$referring_domain`, `$screen_name`, `$title`, `error_type`/`error_message` on soft errors, `$pageview` and `$web_vitals` events, `error_status_code` on HTTP exceptions, `$browser`/`$browser_version` in exception context, `on_error` logging on Posthog constructor, inner try/except isolating analytics failures from tool results; all exception sites use `logger.warning`. Fixed `feedback.py` `distinct_id` to `call_ctx.username` (was composite `username@repository`). 18 new test cases added covering all acceptance criteria including boundary conditions.
 - Core MCP tools are implemented, including:
   - `get_context_instructions`
   - `query_instructions`
@@ -41,7 +41,7 @@ For detailed change history, use git history and PRs instead of expanding this f
 - MCP dataset lookup caches dataset objects as well as name/id mappings, avoiding repeated dataset-open calls during instruction/resource/project tool execution.
 - Analytics repository detection caches MCP roots per HTTP session and uses a fixed singleton cache key for STDIO/local transports.
 
-### MCP Server — HTTP Observability + RC1 Hang Fix (ims-mcp-http-observability)
+### MCP Server — HTTP Observability + RC1 Hang Fix (rosetta-mcp-http-observability)
 
 - **RC1 fix (A3/A4):** All sync RAGFlow calls that previously blocked the asyncio event loop are now offloaded via `asyncio.to_thread` + `asyncio.wait_for` using the new `offload()` helper in `tracing.py`. Leaf sites: `list_docs_with_keyword_fallback`, `ragflow.retrieve` in `tools/instructions.py`; `doc_cache.get_all_docs_async` in `clients/doc_cache.py` (used by `list_instructions` and `read_instruction_resource`). Cache reads/writes remain on the event-loop thread (SPECS A-1).
 - **RAGFlow timeout injection (A2/DD-3):** `_traced_http_method` in `tracing.py` now calls `kwargs.setdefault("timeout", _get_ragflow_http_timeout())` before every RAGFlow HTTP call, defaulting to 60s.
@@ -56,7 +56,7 @@ For detailed change history, use git history and PRs instead of expanding this f
 - **SSE chunk tracing (B4/REQ-OBS-5):** `_send` wrapper logs one compact INFO per SSE chunk (seq+bytes); payload only under DEBUG.
 - **Error logging (C1):** Added `logger.error`/`logger.exception` at all `return "Error: ..."` sites in `tools/instructions.py` and `tools/resources.py`.
 - **exc_info in tracing (C3):** `traced_execution` and `_traced_http_method` failures now log with `exc_info=True`.
-- **Transport loggers wired (C4):** `mcp.server.streamable_http` and `mcp.server.streamable_http_manager` loggers attached to the ims-mcp handler at startup.
+- **Transport loggers wired (C4):** `mcp.server.streamable_http` and `mcp.server.streamable_http_manager` loggers attached to the rosetta-mcp handler at startup.
 - **Origin-block log (C5/REQ-OBS-7):** `OriginValidationMiddleware` now WARN-logs rejected origins with origin/path/client.
 - **`/healthz` endpoint (D1-D3):** Registered via `@mcp.custom_route("/healthz", methods=["GET"])`; genuinely unauthenticated (no `RequireAuthMiddleware`); probes RAGFlow off-loop via `asyncio.to_thread` + `asyncio.wait_for(timeout=healthz_ragflow_timeout)`; result cached for `healthz_cache_ttl`; returns 200/503/disabled JSON per spec §4.2.
 - **Dockerfile (E0/E1):** Added `ENV PYTHONFAULTHANDLER=1` and `HEALTHCHECK` using Python stdlib urllib.
@@ -130,6 +130,7 @@ For detailed change history, use git history and PRs instead of expanding this f
 - Envelope is internal: frontends extract payload via `extractOutput` and log failures via `logFailure` before output — consumers never see the raw envelope wrapper.
 - Follow-up help-clarity backlog (P1–P10) captured in `plans/rosettify/plan-help-improvements-proposal.md`.
 - Validated with `npm run typecheck` and `npm run test` (vitest, 90%+ line + branch coverage).
+- **specs command (2026-07-20)** — new `specs` command (`add`, `get`, `query`, `update`, `delete`, `purge`, `implemented`, `approve`, `deprecate`, `restore`, `reopen`, `validate`, `graph`, `render`, `info`, `migrate`) manages a component's requirements as spec units in one JSON document per component: two independent enums (approval `status`: Draft/Approved/Modified/Deprecated/Removed; `implementation`: NotStarted/Implemented/Planned/ToBeModified/ToBeRemoved), guarded fields settable only via lifecycle ops, `depends_on` (acyclic) vs `related` (may cycle), area-scoped caller-supplied ids, batch all-or-nothing writes with one aggregated error string, `purge` gated by `--force` (first `--force` in the codebase), and a query grammar (key:value AND/OR/NOT + free text) shared by `query`/`validate`/`render`. The shared plan write-path was generalized to support it without behavior change: `plan-io.ts` → `shared/doc-io.ts` (parameterized error codes) and `detectCycle` lifted into `shared/graph.ts` (plan re-exports it). Version bumped to `3.1.0-b01`.
 
 ### Instructions and Skills
 
@@ -138,7 +139,7 @@ For detailed change history, use git history and PRs instead of expanding this f
 - Key behaviors: resume-safe `next` command returns `in_progress` steps with `resume: true` before `open` steps; plans stored at `plans/<name>/plan.json`; self-describing `help` command.
 - Converted `adhoc-flow-with-plan-manager` workflow to `USE SKILL plan-manager`; data structure externalized to `pm-schema.md`.
 - All plugins (`core-claude`, `core-cursor`, `core-copilot`, `core-codex`, `core-cursor-standalone`, `core-copilot-standalone`) are auto-synced from core by `npx -y rosettify-plugins@latest` (invoked via `scripts/pre_commit.py`).
-- `npx -y rosettify-plugins@latest` materializes plugin trees from the **release-selected** source `instructions/<release>/core` (`--release`, default **r2**; r3 opt-in). `instructions/r2/core` and `instructions/r3/core` are maintained per release (shared skills/workflows kept aligned where intended).
+- `npx -y rosettify-plugins@latest` materializes plugin trees from the **release-selected** source `instructions/<release>/core` (`--release`, default **r3**; r2 selectable for backports). `instructions/r3/core` (current) and `instructions/r2/core` (previous, backports only) are maintained per release (shared skills/workflows kept aligned where intended).
 - **r3 bootstrap-reduction** (structural decomposition and token-compression pass complete; remaining doc syncs and the publish-gated batch tracked in `docs/stories/reduce-bootstrap.md`) — the runtime footprint is `bootstrap-alwayson.md` plus exactly one mode file (`mcp-files-mode.md`, `plugin-files-mode.md`, or `local-files-mode.md`); heavy rigor is user-invoked through `/rosetta` and on-demand skills. `load-project-context` absorbs `load-context`; `rosetta` absorbs `load-workflow`; `orchestration` replaces `orchestrator-contract`; `subagent-directives` replaces `subagent-contract`; `operation-manager` is split by actor into the two session-execution-controller assets. Built-in todo tasks are the reliability base; LARGE work adds the orchestrator-only EXECUTION_CONTROLLER. Superseded r3 rules/skills were removed only after references were migrated and their content archived verbatim in `docs/stories/bootstrap-removed.md`. Plugin regeneration/publishing remains explicitly user-triggered.
 
 ### Plugin Generator
@@ -155,7 +156,7 @@ For detailed change history, use git history and PRs instead of expanding this f
 - **Workflow index filtering** — only files with `tags: ["workflow"]` appear in workflow/commands/prompts indexes; phase files are excluded.
 - **Standalone plugins** — second-pass generation produces `core-cursor-standalone` and `core-copilot-standalone` from their main plugins. Each standalone is fully wiped and recreated per sync. Copilot standalone moves bootstrap rules to `instructions/*.instructions.md`, renames `commands/` → `prompts/`, rewrites cross-references, strips marketplace-only files. Cursor standalone injects the commands index into `rules/plugin-files-mode.mdc`.
 - **Hook bundle sync into plugins** — bundles from `src/hooks/dist/bundles/<plugin>` are synced into each plugin's hooks directory (`hooks/`, `.cursor/hooks/`, `.codex/hooks/`). Skipped for r2 (non-deterministic hooks); active for r3. Stale `.js` files in r2 hook dirs are removed on sync.
-- **Release selection + conditional templating** — `--release` selects `instructions/<release>/core` (default `r2`); `--output` redirects output (default `<source>/plugins`); `--source` sets repo root (default: current directory). `.tmpl` files are Handlebars templates: bootstrap JSON injected via triple-stache `{{{bootstrap_hooks}}}`; r3-only advisory hook blocks wrapped in `{{#if deterministic_hooks}}`. `pre_commit.py` invokes it with no args (→ r2, output defaults to `<repo-root>/plugins`).
+- **Release selection + conditional templating** — `--release` selects `instructions/<release>/core` (default `r3`); `--output` redirects output (default `<source>/plugins`); `--source` sets repo root (default: current directory); `--deterministic-hooks <bool>` overrides the release descriptor's posture. `.tmpl` files are Handlebars templates: bootstrap JSON injected via triple-stache `{{{bootstrap_hooks}}}`; r3-only advisory hook blocks wrapped in `{{#if deterministic_hooks}}`. `pre_commit.py` pins `--release r3 --deterministic-hooks false` (output defaults to `<repo-root>/plugins`).
 - **Release-aware hook tests** — `hooks-registered.test.ts` and `claude-plugin-root.test.ts` read each plugin's `plugin.json` major version and enforce advisory-hook references only when major ≥ 3 (r3+); r2 (version 2.x) self-skips, not disabled.
 
 ### Workflows and Automation
@@ -167,9 +168,9 @@ For detailed change history, use git history and PRs instead of expanding this f
 - Workflow maintenance included:
   - Bun runtime override for Claude workflows
   - build/publish pipeline repairs
-  - rosetta-mcp publish gating that waits for the matching `ims-mcp` version to appear on PyPI before upload
+  - rosetta-mcp publish gating that waits for the matching `rosetta-mcp` version to appear on PyPI before upload
   - native Git pre-commit hook shim with a shared Python entrypoint under `scripts/`
-  - generated plugin trees sourced from `instructions/r2/core` for all six plugin variants
+  - generated plugin trees sourced from `instructions/r3/core` for all six plugin variants
   - plugin-specific packaging transforms for model metadata, generated indexes, and local marketplace/manifests
   - bootstrap hooks inlined at build time via `hooks.json.tmpl` templates and generic `process_templates` engine; runtime shell scripts eliminated; 4 platform-specific placeholder formats (Claude, Codex, Cursor, Copilot) generated once per build
   - Jira loader recovery after upstream API changes

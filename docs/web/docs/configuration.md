@@ -23,7 +23,7 @@ If you are migrating or modernizing a codebase, do the steps below first, then r
 ## 1. Install and Onboard
 
 1. Connect Rosetta to your IDE — follow the [Quick Start](/rosetta/docs/quickstart/).
-2. Onboard the repository to Rosetta (Quick Start, Step 3). This is required before the steps below.
+2. Onboard the repository to Rosetta (Quick Start, Step 2). This is required before the steps below.
 
 ---
 
@@ -123,6 +123,10 @@ List the patterns the agent should reuse so generated code stays consistent — 
 - Install and configure MCPs and CLIs. Keep at most three MCPs enabled at a time, and prefer CLIs — they are always available and do not consume context.
 - Install and configure plugins and extensions.
 - Install and configure AI coding agent CLIs (Copilot CLI, Claude, Codex, and so on).
+
+Save cost — add the line below to your workspace AGENTS.md/CLAUDE.md to cut model output tokens:
+
+`MUST ALWAYS think, reason, plan, chat, document in compressed/terse/unicode chars/terms/always/no hieroglyphs; Exclude final artifacts, any tool calls, all code, etc.`
 
 #### Recommended CLIs
 
@@ -403,4 +407,4 @@ The old code in `refsrc/` keeps its own `docs/CONTEXT.md` and `docs/ARCHITECTURE
 ### Generate specs and test coverage for the old code
 
 - Use `/requirements-authoring-flow` or `Allium` to generate specs from the existing old code.
-- Use `/coding-flow` for unit tests and `/aqa-flow` for e2e tests to cover the old code before you change it.
+- Use `/coding-flow` for unit tests and `/ui-aqa-flow` for e2e tests to cover the old code before you change it.

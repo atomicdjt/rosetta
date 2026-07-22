@@ -2,6 +2,7 @@
 name: coding-agents-prompting-flow
 description: "Workflow for authoring and adapting AI-agent prompts: skills, agents, workflows, rules, etc."
 tags: ["workflow"]
+user-invocable: true
 baseSchema: docs/schemas/workflow.md
 ---
 
@@ -22,16 +23,17 @@ Execute phases sequentially, do not skip!
 
 <prerequisites>
 
-1. Preparation steps are mandatory prerequisites and must be completed before phase 1.
-2. Workflow execution starts only after prerequisites are satisfied.
-3. Orchestrator and subagents MUST USE SKILL `coding-agents-prompt-authoring`.
-4. MUST just-in-time load each phase's skills
-5. No rush, take your time, MUST FOLLOW WORKFLOW ENTIRELY, no skipping
-6. This workflow MUST be used with Fable, Opus, GPT-5.5+ class models => IF NOT - DEMAND USER TO SWITCH MODEL
+1. All Rosetta prep steps MUST be FULLY completed
+2. USE SKILL `load-project-context`, `orchestration`, `hitl`
+3. MUST ALWAYS use todo tasks ledger, ASAP. Phases are sequential. Independent tasks can run in parallel.
+4. MUST just-in-time load/execute/update each phase's: instructions, definitions, skills, state file.
+5. Orchestrator and subagents MUST USE SKILL `coding-agents-prompt-authoring`.
+6. No rush, take your time, MUST FOLLOW WORKFLOW ENTIRELY, no skipping.
+7. This workflow MUST be used with Fable, Opus, GPT-5.5+ class models => IF NOT - DEMAND USER TO SWITCH MODEL.
 
 </prerequisites>
 
-<discover step="1" subagent="discoverer" role="Context discoverer" subagent_required_model="claude-sonnet-5, gpt-5.4-medium, gemini-3.1-pro">
+<discover step="1" subagent="discoverer" role="Context discoverer" subagent_required_model="claude-sonnet-5, gpt-5.4-medium, gemini-3.1-pro, grok-4.5, gpt-5.6-terra">
 
 1. Discover project-local context, relevant prompt-family artifacts, and required references for this request.
 2. Input: request + optional existing prompt. Output: `Discovery Notes` + `Reference Set`.
@@ -40,7 +42,7 @@ Execute phases sequentially, do not skip!
 
 </discover>
 
-<extract_intake step="2" subagent="prompt-engineer" role="Intent extractor" subagent_required_model="claude-opus-4-8, gpt-5.5-high, gemini-3.1-pro-high">
+<extract_intake step="2" subagent="prompt-engineer" role="Intent extractor" subagent_required_model="claude-opus-4-8, gpt-5.5-high, gemini-3.1-pro-high, gpt-5.6-sol">
 
 1. Extract requirements from source prompt when present and intake clarifications from user.
 2. Input: request + optional existing prompt + `Discovery Notes` + `Reference Set`. Output: `Prompt Brief` + `Open Questions`.
@@ -49,7 +51,7 @@ Execute phases sequentially, do not skip!
 
 </extract_intake>
 
-<blueprint step="3" subagent="prompt-engineer" role="Blueprint Architect" subagent_required_model="claude-opus-4-8, gpt-5.5-high, gemini-3.1-pro-high">
+<blueprint step="3" subagent="prompt-engineer" role="Blueprint Architect" subagent_required_model="claude-opus-4-8, gpt-5.5-high, gemini-3.1-pro-high, gpt-5.6-sol">
 
 1. Design blueprint: structure, actors, contracts, and boundaries for target prompt set.
 2. Input: approved `Prompt Brief`. Output: `Blueprint`.
@@ -58,16 +60,16 @@ Execute phases sequentially, do not skip!
 
 </blueprint>
 
-<for_each_prompt_loop step="4" subagent="prompt-engineer" role="Prompt Author" subagent_required_model="claude-opus-4-8, gpt-5.5-high, gemini-3.1-pro-high">
+<for_each_prompt_loop step="4" subagent="prompt-engineer" role="Prompt Author" subagent_required_model="claude-opus-4-8, gpt-5.5-high, gemini-3.1-pro-high, gpt-5.6-sol">
 
-1. Scope: `draft` target prompts. Subagents must draft one individual prompt file or surgical changes to one file at-a-time: it must think thoroughly about each file first, then it provides the full structure of the file with specific grounded points each section should contain or change, then it validates with schemas requirements/suggestions, and only then it can generate actual file. Repeat for each file. ALSO draft means fully ready for review prompt, just not reviewed and approved!
+1. Scope: `draft` target prompts. Subagents must draft one individual prompt file or surgical changes to one file at-a-time: it must think thoroughly about each file first, then it provides the full structure of the file with specific grounded points each section should contain or change, then it validates with schemas requirements/suggestions, and only then it can generate actual file. Repeat for each file. ALSO draft means fully ready for review prompt, just not reviewed and approved! Aim newly created files to have small extensive coverage, clear concerns, while each rules is very small
 2. Input: approved `Prompt Brief` + `Blueprint`. Output: `Draft Prompt Set` + optional change-log.md in FEATURE PLAN folder.
 3. Update `coding-agents-prompting-flow-state.md`.
 4. HITL when loop stalls, conflicts appear, or intent becomes unclear.
 
 </for_each_prompt_loop>
 
-<for_each_prompt_loop step="5" subagent="prompt-engineer" role="Prompt reviewer and hardening" subagent_required_model="claude-opus-4-8, gpt-5.5-high, gemini-3.1-pro-high">
+<for_each_prompt_loop step="5" subagent="prompt-engineer" role="Prompt reviewer and hardening" subagent_required_model="claude-opus-4-8, gpt-5.5-high, gemini-3.1-pro-high, gpt-5.6-sol">
 
 1. Run loop for each target prompt: `hardening -> edit` until pass criteria or HITL decision.
 2. This is automated review by subagent, this is not HITL review!
@@ -77,7 +79,7 @@ Execute phases sequentially, do not skip!
 
 </for_each_prompt_loop>
 
-<simulate step="6" subagent="prompt-engineer" role="Execution tracer" subagent_required_model="claude-opus-4-8, gpt-5.5-high, gemini-3.1-pro-high">
+<simulate step="6" subagent="prompt-engineer" role="Execution tracer" subagent_required_model="claude-opus-4-8, gpt-5.5-high, gemini-3.1-pro-high, gpt-5.6-sol">
 
 1. Simulate realistic runs and trace context/cognitive load across the prompt chain.
 2. Input: `Prompt Brief` + `Prompt Set`. Output: `Simulation Notes`.
@@ -86,7 +88,7 @@ Execute phases sequentially, do not skip!
 
 </simulate>
 
-<validate step="7" subagent="prompt-engineer" role="Quality validator" subagent_required_model="claude-opus-4-8, gpt-5.5-high, gemini-3.1-pro-high">
+<validate step="7" subagent="prompt-engineer" role="Quality validator" subagent_required_model="claude-opus-4-8, gpt-5.5-high, gemini-3.1-pro-high, gpt-5.6-sol">
 
 1. Validate final artifacts against intent, contracts, failure modes, and traceability.
 2. Input: `Prompt Brief` + `Blueprint` + `Candidate Prompt Set` + `Simulation Notes`. Output: `Final Prompt Set` + `Validation Pack` (`Checklist Results`, `Tests`, `Failure Modes`, `Traceability`; persistent report optional in FEATURE PLAN folder as validation-report.md).
@@ -96,25 +98,6 @@ Execute phases sequentially, do not skip!
 </validate>
 
 </workflow_phases>
-
-<references>
-
-Use `INVOKE SUBAGENT` for agents.
-
-Subagents to use:
-
-1. agent `discoverer`
-2. agent `prompt-engineer`
-
-Contracts:
-
-1. Preparation steps are prerequisites before phase 1.
-2. `Discovery Notes` + `Reference Set` are required before intake starts.
-3. `Prompt Brief` is required input from phase 3 onward.
-4. Load only references needed by current phase.
-5. Workflow defines sequence/contracts; skills define execution internals.
-
-</references>
 
 <validation_checklist>
 

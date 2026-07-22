@@ -6,7 +6,7 @@
 ---
 
 > [!CAUTION]
-> You must receive a prior approval from your manager and company to use it.
+> You must receive prior approval from your manager and company to use it.
 
 > [!WARNING]
 > Use **Sonnet 5 medium**, **GPT-5.4-medium**, **gemini-3.1-pro** or newer models. Please use **medium** reasoning effort or it will take 30 minutes in useless reasoning. Avoid Auto model selection. 
@@ -34,8 +34,23 @@ Initialize this repository using the respective Rosetta workflow, this is a new 
 ```
 
 **Brownfield (existing repository):**
+
+Ask the agent to initialize the repository:
+
 ```
-Initialize this repository using the respective Rosetta workflow[, this is a composite workspace][, additional information]
+Initialize this repository using the respective Rosetta workflow
+```
+
+Optionally, add details to that same request. If your workspace contains multiple repositories:
+
+```
+Initialize this repository using the respective Rosetta workflow, this is a composite workspace
+```
+
+To tell the agent where dead code or existing specs live:
+
+```
+Initialize this repository using the respective Rosetta workflow, dead code is in <path>, existing specs are in <path>
 ```
 
 The agent will analyze your tech stack, generate documentation (TECHSTACK.md, CODEMAP.md, DEPENDENCIES.md, ARCHITECTURE.md, CONTEXT.md), and ask clarifying questions. Read more about [workspace files](INSTALLATION.md#workspace-files-created) and [all workflows](USAGE_GUIDE.md#workflows).
@@ -88,15 +103,15 @@ To properly set up an entire workspace, refer to [CONFIGURATION.md](CONFIGURATIO
 **WHAT**: Helps user go from a test case in Test Management System to a working test in the automation framework. Give it a test case, it gathers what it needs from your code and ticket system (for example, Jira) and AQA implements the automated test, asks questions when it sees contradictions, and helps fix the test until it passes.
 
 ```
-/aqa-flow Automate the test case for the checkout flow, ...
+/ui-aqa-flow Automate the test case for the checkout flow, ...
 ```
 
 ```
-/aqa-flow Implement automation for the test cases in suite ..., ...
+/api-aqa-flow Implement automation for the API test cases in suite ..., ...
 ```
 
 ```
-/aqa-flow Fix the failing automated test for ..., ...
+/ui-aqa-flow Fix the failing automated test for ..., ...
 ```
 
 ### Modernization
@@ -117,19 +132,25 @@ To properly set up an entire workspace, refer to [CONFIGURATION.md](CONFIGURATIO
 /modernization-flow Perform modernization phase 8 for target service to analyze service module ... using subagents. Must use `coding-flow.md` to actually implement and as the main flow. Once done spawn subagent to validate and repeat an entire loop until there are no issues detected.
 ```
 
+### Save Tokens (Optional)
+
+Save cost — add the line below to your workspace AGENTS.md/CLAUDE.md to cut model output tokens:
+
+`MUST ALWAYS think, reason, plan, chat, document in compressed/terse/unicode chars/terms/always/no hieroglyphs; Exclude final artifacts, any tool calls, all code, etc.`
+
 To explore all workflows (coding, requirements authoring, modernization, and more), refer to [USAGE_GUIDE.md — Workflows](USAGE_GUIDE.md#workflows).
 
 ## Links
 
 - [Usage Guide](USAGE_GUIDE.md) — see all Rosetta workflows
 - [Overview](OVERVIEW.md) — mental model and terminology
-- [Deployment Guide](DEPLOYMENT_GUIDE.md) — org-wide deployment
 - [Contributing](CONTRIBUTING.md) — make your first contribution
 - [Architecture](docs/ARCHITECTURE.md) — system internals
+- [Deployment Guide](docs/mcp/DEPLOYMENT_GUIDE.md) — self-hosted MCP (optional, rarely needed)
 
 ## Video Tutorials
 
+- [Install without MCP](https://vimeo.com/1174124213/c50179147c?fl=ml&fe=ec) — limited internet access
 - [Install Using MCP](https://vimeo.com/1174124251/f38e017d8d?fl=ml&fe=ec) — step-by-step setup
-- [Install without MCP](https://vimeo.com/1174124213/c50179147c?fl=ml&fe=ec) — air-gapped environments
 - [Initialize with Antigravity](https://vimeo.com/1174124165/8f5fbd7775?fl=ml&fe=ec) — project initialization
 - [Subagents and Workflows in Claude Code](https://vimeo.com/1174124272/96056d5cc5?fl=ml&fe=ec) — advanced configuration

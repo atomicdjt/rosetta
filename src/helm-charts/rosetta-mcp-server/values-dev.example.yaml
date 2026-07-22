@@ -24,7 +24,7 @@ env:
     - name: ROSETTA_SERVER_URL
       value: "http://ragflow-dev.example.svc.cluster.local:80"
     - name: VERSION
-      value: "r2"
+      value: "r3"
     - name: ROSETTA_TRANSPORT
       value: "http"
     - name: ROSETTA_HTTP_HOST
@@ -59,7 +59,7 @@ env:
       value: ""
     - name: ROSETTA_OAUTH_EXTRA_SCOPES
       value: "openid email profile offline_access"
-    - name: IMS_DEBUG
+    - name: ROSETTA_DEBUG
       value: "1"
     - name: FASTMCP_LOG_LEVEL
       value: "DEBUG"

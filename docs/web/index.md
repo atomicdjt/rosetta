@@ -160,7 +160,7 @@ permalink: /
       <div class="adds-num">9</div>
       <div class="adds-body">
         <strong>Security by design.</strong>
-        Rosetta never sees your code. Instruction delivery is deterministic — the agent requests by tag, not by sending source code. No semantic search over your codebase. Air-gap capable. Runs inside your perimeter.
+        Rosetta never sees your code. Instruction delivery is deterministic — the agent requests by tag, not by sending source code. No semantic search over your codebase. Works with limited internet access. Runs inside your perimeter.
       </div>
     </div>
 
@@ -219,14 +219,14 @@ permalink: /
         </div>
         <div class="qs-step-body">
           <h3 class="qs-step-title">Install Rosetta</h3>
-          <p class="qs-step-desc">Use plugins where they are supported. Use MCP only for agents without a Rosetta plugin path.</p>
+          <p class="qs-step-desc">Use plugins where they are supported. Use MCP only for agents without a Rosetta plugin path — the endpoint below is a public evaluation instance; self-host MCP for production.</p>
           <div class="qs-trust-badge">
             <svg class="qs-trust-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             <span>Rosetta is designed to never use or see your data or IP.</span>
           </div>
           <div class="qs-warning">
             <svg class="qs-warning-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            <span>&nbsp;‼️ You must receive a prior approval from your manager and company to use it. ‼️&nbsp;</span>
+            <span>&nbsp;‼️ You must receive prior approval from your manager and company to use it. ‼️&nbsp;</span>
           </div>
 
           <div class="qs-tabs-scroll">
@@ -245,7 +245,7 @@ permalink: /
 
           <!-- Tab: Claude Code -->
           <div class="qs-content active" data-tab-content="claude">
-            <p class="qs-content-hint">Install the Rosetta plugin from the Claude Code marketplace. Deep links: <a href="{{ '/docs/plugins/#claude-code' | relative_url }}">Plugins</a>, <a href="{{ '/docs/installation/#plugin-based-installation-pre-release' | relative_url }}">Installation</a>.</p>
+            <p class="qs-content-hint">Install the Rosetta plugin from the Claude Code marketplace. Deep links: <a href="{{ '/docs/plugins/#claude-code' | relative_url }}">Plugins</a>, <a href="{{ '/docs/installation/#plugin-based-installation' | relative_url }}">Installation</a>.</p>
             <div class="qs-code-wrap">
               <pre class="qs-code"><span class="qs-prompt">$</span> claude plugin marketplace add griddynamics/rosetta
 <span class="qs-prompt">$</span> claude plugin install rosetta@rosetta</pre>
@@ -256,7 +256,7 @@ claude plugin install rosetta@rosetta">Copy</button>
 
           <!-- Tab: Cursor -->
           <div class="qs-content" data-tab-content="cursor">
-            <p class="qs-content-hint">Use a Cursor team marketplace when available. If not, extract the standalone package into the repository. Deep links: <a href="{{ '/docs/plugins/#cursor' | relative_url }}">Plugins</a>, <a href="{{ '/docs/installation/#plugin-based-installation-pre-release' | relative_url }}">Installation</a>.</p>
+            <p class="qs-content-hint">Use a Cursor team marketplace when available. If not, extract the standalone package into the repository. Deep links: <a href="{{ '/docs/plugins/#cursor' | relative_url }}">Plugins</a>, <a href="{{ '/docs/installation/#plugin-based-installation' | relative_url }}">Installation</a>.</p>
             <div class="qs-code-wrap">
               <pre class="qs-code"><span class="qs-comment"># Team marketplace repository</span>
 https://github.com/griddynamics/rosetta
@@ -269,7 +269,7 @@ Download core-cursor-standalone-*.zip from the <a href="https://github.com/gridd
 
           <!-- Tab: VS Code / GitHub Copilot -->
           <div class="qs-content" data-tab-content="copilot">
-            <p class="qs-content-hint">For VS Code, add Rosetta as a Copilot plugin marketplace and install <code>rosetta</code> from agent customizations. For JetBrains Copilot, use the standalone package. Deep links: <a href="{{ '/docs/plugins/#github-copilot' | relative_url }}">Plugins</a>, <a href="{{ '/docs/installation/#plugin-based-installation-pre-release' | relative_url }}">Installation</a>.</p>
+            <p class="qs-content-hint">For VS Code, add Rosetta as a Copilot plugin marketplace and install <code>rosetta</code> from agent customizations. For JetBrains Copilot, use the standalone package. Deep links: <a href="{{ '/docs/plugins/#github-copilot' | relative_url }}">Plugins</a>, <a href="{{ '/docs/installation/#plugin-based-installation' | relative_url }}">Installation</a>.</p>
             <div class="qs-code-wrap">
               <pre class="qs-code"><span class="qs-comment"># VS Code setting: chat.plugins.marketplaces</span>
 https://github.com/griddynamics/rosetta
@@ -282,7 +282,7 @@ Download core-copilot-standalone-*.zip from the <a href="https://github.com/grid
 
           <!-- Tab: Codex -->
           <div class="qs-content" data-tab-content="codex">
-            <p class="qs-content-hint">Extract the standalone Codex plugin package into the repository, then enable hooks. Deep links: <a href="{{ '/docs/plugins/#codex' | relative_url }}">Plugins</a>, <a href="{{ '/docs/installation/#plugin-based-installation-pre-release' | relative_url }}">Installation</a>.</p>
+            <p class="qs-content-hint">Extract the standalone Codex plugin package into the repository, then enable hooks. Deep links: <a href="{{ '/docs/plugins/#codex' | relative_url }}">Plugins</a>, <a href="{{ '/docs/installation/#plugin-based-installation' | relative_url }}">Installation</a>.</p>
             <div class="qs-code-wrap">
               <pre class="qs-code">Download core-codex-*.zip from the <a href="https://github.com/griddynamics/rosetta/releases/latest">latest release</a> and extract it into the repository.
 
@@ -304,7 +304,7 @@ Download core-copilot-standalone-*.zip from the <a href="https://github.com/grid
 }
 
 Bootstrap rule destination:
-.agent/rules/bootstrap.md</pre>
+.agent/rules/mcp-files-mode.md</pre>
               <button class="qs-copy" data-copy='{"mcpServers":{"Rosetta":{"serverUrl":"https://mcp.rosetta.griddynamics.net/mcp"}}}'>Copy</button>
             </div>
           </div>
@@ -322,7 +322,7 @@ Bootstrap rule destination:
 }
 
 Bootstrap rule destination:
-.windsurf/rules/bootstrap.md</pre>
+.windsurf/rules/mcp-files-mode.md</pre>
               <button class="qs-copy" data-copy='{"mcpServers":{"Rosetta":{"url":"https://mcp.rosetta.griddynamics.net/mcp"}}}'>Copy</button>
             </div>
           </div>
@@ -372,7 +372,7 @@ Bootstrap rule destination:
               <pre class="qs-code">https://mcp.rosetta.griddynamics.net/mcp
 
 Bootstrap rule:
-Download bootstrap.md and place it in your IDE or agent's project instruction file.</pre>
+Download mcp-files-mode.md and place it in your IDE or agent's project instruction file.</pre>
               <button class="qs-copy" data-copy="https://mcp.rosetta.griddynamics.net/mcp">Copy</button>
             </div>
           </div>
@@ -433,8 +433,12 @@ Download bootstrap.md and place it in your IDE or agent's project instruction fi
           <div class="qs-code-wrap">
             <p style="margin:0 0 .25rem;font-size:.85rem;opacity:.7;">Greenfield:</p>
             <pre class="qs-code">Initialize this repository using the respective Rosetta workflow, this is a new repository, target tech stack: ..., target architecture: ..., business context: ...</pre>
-            <p style="margin:.5rem 0 .25rem;font-size:.85rem;opacity:.7;">Brownfield:</p>
-            <pre class="qs-code">Initialize this repository using the respective Rosetta workflow[, this is a composite workspace][, additional information]</pre>
+            <p style="margin:.5rem 0 .25rem;font-size:.85rem;opacity:.7;">Brownfield — existing repository:</p>
+            <pre class="qs-code">Initialize this repository using the respective Rosetta workflow</pre>
+            <p style="margin:.5rem 0 .25rem;font-size:.85rem;opacity:.7;">Brownfield — multiple repositories in one workspace:</p>
+            <pre class="qs-code">Initialize this repository using the respective Rosetta workflow, this is a composite workspace</pre>
+            <p style="margin:.5rem 0 .25rem;font-size:.85rem;opacity:.7;">Brownfield — point to dead code or existing specs:</p>
+            <pre class="qs-code">Initialize this repository using the respective Rosetta workflow, dead code is in &lt;path&gt;, existing specs are in &lt;path&gt;</pre>
           </div>
           <p class="qs-step-desc" style="margin-top:.8rem;">The agent analyzes the tech stack, creates workspace docs such as <code>TECHSTACK.md</code>, <code>CODEMAP.md</code>, <code>DEPENDENCIES.md</code>, <code>ARCHITECTURE.md</code>, and <code>CONTEXT.md</code>, and asks clarifying questions. Deep links: <a href="{{ '/docs/quickstart/' | relative_url }}">Quick Start</a>, <a href="{{ '/docs/init-workspace-flow/' | relative_url }}">Init Workspace Flow</a>.</p>
         </div>

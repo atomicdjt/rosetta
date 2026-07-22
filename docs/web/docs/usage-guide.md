@@ -48,15 +48,42 @@ Sets up a repository so AI coding agents can work with Rosetta context from the 
 
 **Expect:** built-in subagents for mode detection, discovery, pattern extraction, documentation, gap filling, and verification. Your responsibility is to answer domain and architecture questions, review generated docs, and restart the chat after initialization so new shell/context files are loaded.
 
+**Greenfield (new repository):**
+
 ```
-# Greenfield (new repository)
-"Initialize this repository using the respective Rosetta workflow, this is a new repository, target tech stack: ..., target architecture: ..., business context: ..."
+Initialize this repository using the respective Rosetta workflow, this is a new repository, target tech stack: ..., target architecture: ..., business context: ...
+```
 
-# Brownfield (existing repository)
-"Initialize this repository using the respective Rosetta workflow[, this is a composite workspace][, additional information]"
+**Brownfield (existing repository):**
 
-"Upgrade this repository from Rosetta R1 to R2"
-"Initialize subagents and workflows"
+Ask the agent to initialize the repository:
+
+```
+Initialize this repository using the respective Rosetta workflow
+```
+
+Optionally, add details to that same request. If your workspace contains multiple repositories:
+
+```
+Initialize this repository using the respective Rosetta workflow, this is a composite workspace
+```
+
+To tell the agent where dead code or existing specs live:
+
+```
+Initialize this repository using the respective Rosetta workflow, dead code is in <path>, existing specs are in <path>
+```
+
+**Upgrade an existing workspace:**
+
+```
+Upgrade this repository to Rosetta R3
+```
+
+**Initialize subagents and workflows:**
+
+```
+Initialize subagents and workflows
 ```
 
 For composite workspaces, init each repository separately, then init at workspace level. The rules phase exists but is disabled by default.
@@ -234,12 +261,12 @@ Read full workflow: [Research Flow](/rosetta/docs/research-flow/)
 <details markdown="1">
 <summary><b>Automated QA</b></summary>
 
-Creates or updates automated UI tests from a TestRail case, Confluence context, and the project test architecture. The workflow reads requirements first, clarifies assertions, analyzes existing tests and Page Objects, identifies selectors from source or page HTML, implements the test, then waits for execution results before proposing fixes.
+Two test-automation workflows plus a compatibility router. `ui-aqa-flow` creates or updates automated UI tests from a TestRail case, Confluence context, and the project test architecture: it clarifies assertions, analyzes existing tests and Page Objects, identifies selectors from source or page HTML, implements the test, then waits for execution results before proposing fixes. `api-aqa-flow` automates backend API tests: it loads a project config, collects test cases and docs, extracts endpoint contracts from Swagger/OpenAPI or code, writes Given-When-Then specs for approval, implements them, and triages your execution results. `/aqa-flow` routes to the right flow (or to Test Case Generation) and asks when the request is unclear.
 
-**Use when:** automate a TestRail case or QA scenario, reuse existing Page Objects and helpers, avoid guessed selectors, or analyze a failing automated test report.
+**Use when:** automate a TestRail case or QA scenario (UI or API), reuse existing Page Objects and helpers, avoid guessed selectors or invented endpoint schemas, or analyze a failing automated test report.
 
-**Phases:**
-1. Data Collection — collect TestRail, Confluence, project instructions, and create `agents/plans/aqa-<test-name>.md`
+**UI-AQA phases:**
+1. Data Collection — collect TestRail, Confluence, project instructions, and create `plans/ui-aqa-<test-name>/test-plan.md`
 2. Requirements Clarification — ask assertion and behavior questions; wait for answers before code analysis
 3. Code Analysis — inspect frontend code, Page Objects, existing tests, utilities, and project conventions
 4. Selector Identification — map steps to UI elements; request page source only when selectors cannot be found
@@ -248,14 +275,17 @@ Creates or updates automated UI tests from a TestRail case, Confluence context, 
 7. Test Report Analysis — read test report output, categorize failures, and identify root causes
 8. Test Corrections — prepare fixes and require approval before applying changes
 
-**Expect:** sequential state-driven execution with QA/frontend/test implementation focus. HITL gates occur in phases 2, 6, 7, and 8; phase 4 asks for page HTML only if needed. Your responsibility is to provide the TestRail case, Confluence context, answers, page HTML when requested, run the test, and provide the report.
+**API-AQA phases:** 0. Project Config Loading → 1. Data Collection → 2. API Spec Analysis → 3. Gap & Requirements Clarification → 4. Test Case Specification (approval gate) → 5. Test Implementation (you execute) → 6. Execution & Report Analysis → 7. Test Corrections (approval gate); artifacts under `plans/api-aqa-{IDENTIFIER}/`.
+
+**Expect:** sequential state-driven execution (state under `agents/TEMP/<FEATURE>/`). Your responsibility is to provide the QA source and context, answers, page HTML when requested, spec/fix approvals, run the tests, and provide the reports.
 
 ```
+/ui-aqa-flow Create QA automation for the checkout flow
+/api-aqa-flow Write backend API tests for TC-1234. Swagger: https://api.example.com/swagger.json
 /aqa-flow Write tests for the user registration feature
-/aqa-flow Create QA automation for the checkout flow
 ```
 
-Read full workflow: [AQA Flow](/rosetta/docs/aqa-flow/)
+Read full workflows: [UI AQA Flow](/rosetta/docs/ui-aqa-flow/) · [API AQA Flow](/rosetta/docs/api-aqa-flow/) · [AQA router](/rosetta/docs/aqa-flow/)
 
 </details>
 
@@ -267,7 +297,7 @@ Generates structured requirements and TestRail-ready test cases from Jira and Co
 **Use when:** a Jira ticket, epic, or story needs QA scenarios; requirements need traceability to Jira and Confluence; or gaps and contradictions must be resolved before tests are written.
 
 **Phases:**
-0. Project Config Loading — load/create project test generation config and initialize `agents/testgen/{TICKET-KEY}/`
+0. Project Config Loading — load/create project test generation config and initialize `plans/testgen-{TICKET-KEY}/`
 1. Data Collection — retrieve Jira fields, comments, linked docs, Confluence pages, and child pages into `raw-data.md`
 2. Gap and Contradiction Analysis — identify contradictions, gaps, ambiguities, risks, and source conflicts in `analysis.md`
 3. Question Generation and User Input — generate `questions.md`, wait for answers, and save `answers.md`
@@ -372,7 +402,7 @@ Every request benefits from these regardless of workflow.
 
 - **Execution policies** enforce plan-driven work, incremental validation, and memory-based self-learning. The agent consults `agents/MEMORY.md` during planning and records lessons learned. See [Architecture — Workspace Files](/rosetta/docs/architecture/#workspace-files) for the full file list.
 - **HITL and questioning rules** govern how the agent interacts with you. Questions are batched (5-10 per round), prioritized by impact, each targeting a single decision. If something is unclear, Rosetta stops and asks.
-- **[Subagent orchestration](/rosetta/docs/architecture/#rosetta-mcp)** defines how work gets delegated. Subagents start with fresh context, receive explicit scope boundaries, and return concise results. Independent work runs in parallel.
+- **[Subagent orchestration](/rosetta/docs/architecture/#bootstrap-flow)** defines how work gets delegated. Subagents start with fresh context, receive explicit scope boundaries, and return concise results. Independent work runs in parallel.
 
 ## Customization
 
@@ -542,7 +572,7 @@ What happens:
 
 **Brownfield (existing repository):**
 ```
-You: "Initialize this repository using the respective Rosetta workflow[, this is a composite workspace][, additional information]"
+You: "Initialize this repository using the respective Rosetta workflow"
 
 What happens:
 1. Agent scans your tech stack, dependencies, and project structure
@@ -550,6 +580,18 @@ What happens:
 3. Creates CONTEXT.md and ARCHITECTURE.md
 4. Asks clarifying questions about your project
 5. Verifies all generated docs
+```
+
+The command above works on its own. You can add details to the same request. If your workspace contains multiple repositories:
+
+```
+Initialize this repository using the respective Rosetta workflow, this is a composite workspace
+```
+
+To tell the agent where dead code or existing specs live:
+
+```
+Initialize this repository using the respective Rosetta workflow, dead code is in <path>, existing specs are in <path>
 ```
 
 ### Research
@@ -617,6 +659,9 @@ See [Plugins](/rosetta/docs/plugins/) for install commands.
   `Spawn subagent using <Claude Opus 4.8 | GPT-5.5> with high reasoning model to figure out the <problem/issue/task/bug> itself. Do not provide your thinking, only provide context, the problem definition, expected behavior and allowed tradeoffs/alternatives (the ultimate end goal), do not limit its decisions or reasoning.`
 
 - **Run a post-mortem on anything you want improved.** Not just failures — whenever a run disappointed you, fought you, or simply could have gone better, invoke the `post-mortem` skill (`/post-mortem`). It root-causes the behavior across your prompt, workspace files, local config, and Rosetta instructions, and recommends concrete fixes. If a defect is in Rosetta itself, it can also file sanitized feedback as a [Rosetta issue](https://github.com/griddynamics/rosetta/issues) — only with your explicit approval of the exact draft. Nothing is submitted without your sanction; no private code or data leaves your repository.
+- Save cost — add the line below to your workspace AGENTS.md/CLAUDE.md to cut model output tokens:
+
+  `MUST ALWAYS think, reason, plan, chat, document in compressed/terse/unicode chars/terms/always/no hieroglyphs; Exclude final artifacts, any tool calls, all code, etc.`
 
 ## Compaction
 
@@ -642,8 +687,8 @@ Main goal:
 ## Video Tutorials
 
 **Setup:**
-- [Install Using MCP](https://vimeo.com/1174124251/f38e017d8d?fl=ml&fe=ec) (3 min)
 - [Install without MCP](https://vimeo.com/1174124213/c50179147c?fl=ml&fe=ec) (2 min)
+- [Install Using MCP](https://vimeo.com/1174124251/f38e017d8d?fl=ml&fe=ec) (3 min)
 - [Initialize Repo](https://vimeo.com/1174124165/8f5fbd7775?fl=ml&fe=ec) (4 min)
 
 **Configuration:**
@@ -668,8 +713,8 @@ These videos were recorded in different IDEs to show that Rosetta works everywhe
 - [Quick Start](/rosetta/docs/quickstart/) — zero to working setup
 - [Installation](/rosetta/docs/installation/) — all setup modes and environment variables
 - [Architecture](/rosetta/docs/architecture/) — system structure, components, data flow
-- [Deployment](/rosetta/docs/deployment/) — org-wide deployment
 - [Contributing](/rosetta/docs/contributing/) — fastest path to a merged PR
 - [Troubleshooting](/rosetta/docs/troubleshooting/) — symptom-first diagnosis
+- [Deployment](/rosetta/docs/deployment/) — self-hosted MCP (optional, rarely needed)
 
 ---

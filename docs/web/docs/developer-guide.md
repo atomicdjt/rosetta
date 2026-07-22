@@ -41,19 +41,19 @@ fork/clone → branch → edit → validate → push → PR
      - Refactor an old prompt into the new format using local instructions:
 
        ```
-       MUST FULLY EXECUTE `instructions/r2/core/workflows/coding-agents-prompting-flow.md` to refactor old Rosetta prompt `<prompt full path>` as R3 prompt family in Rosetta.
+       MUST FULLY EXECUTE `instructions/r3/core/workflows/coding-agents-prompting-flow.md` to refactor old Rosetta prompt `<prompt full path>` as R3 prompt family in Rosetta.
        ```
 
      - Author a new prompt using local instructions:
 
        ```
-       MUST FULLY EXECUTE `instructions/r2/core/workflows/coding-agents-prompting-flow.md` to author a new R3 Rosetta <skill/agent/workflow/rule/prompt family> `<name>`: <description of what it should be>
+       MUST FULLY EXECUTE `instructions/r3/core/workflows/coding-agents-prompting-flow.md` to author a new R3 Rosetta <skill/agent/workflow/rule/prompt family> `<name>`: <description of what it should be>
        ```
 
      - Author a new prompt via Rosetta MCP:
 
        ```
-       MUST ACQUIRE coding-agents-prompting-flow.md FROM KB AND FULLY EXECUTE IT to author a new R3 Rosetta <skill/agent/workflow/rule/prompt family> `<name>`: <description of what it should be>
+       MUST USE FLOW coding-agents-prompting-flow.md to author a new R3 Rosetta <skill/agent/workflow/rule/prompt family> `<name>`: <description of what it should be>
        ```
 
      Include in every prompt-change PR: a prompt brief (goal, non-goals, constraints), before/after behavior examples, and validation evidence (attach to the PR description).
@@ -94,11 +94,11 @@ fork/clone → branch → edit → validate → push → PR
 ```
 rosetta/
 ├── instructions/         ← Prompts: skills, agents, workflows, rules, templates
-│   └── r2/
+│   └── r3/
 │       ├── core/         ← Rosetta instruction source
 │       └── <org>/        ← Optional organization extensions (e.g., acme/)
-├── src/ims-mcp-server/       ← Rosetta MCP server (PyPI: ims-mcp)
-│   ├── ims_mcp/          ← Server source code
+├── src/rosetta-mcp-server/       ← Rosetta MCP server (PyPI: rosetta-mcp)
+│   ├── rosetta_mcp/          ← Server source code
 │   ├── tests/            ← Unit tests (pytest)
 │   └── validation/       ← verify_mcp.py integration test
 ├── src/rosetta-cli/      ← Rosetta CLI package (PyPI: rosetta-cli)
@@ -107,7 +107,8 @@ rosetta/
 │   └── tests/            ← CLI unit tests
 ├── deployment/           ← Helm charts (RAGFlow)
 ├── plugins/              ← IDE plugin definitions
-├── docs/                 ← Deep documentation (Architecture, RAGFlow, Context)
+├── docs/                 ← Deep documentation (Architecture, Context)
+│   ├── mcp/              ← MCP-only deep reference (Authentication, RAGFlow, self-hosted Deployment Guide)
 │   └── web/              ← Jekyll website (GitHub Pages)
 └── refsrc/               ← Reference sources (read-only, resolves AI stale knowledge)
 ```
@@ -116,7 +117,7 @@ rosetta/
 
 - **Python 3.12+**
 - **uvx** (included with [uv](https://docs.astral.sh/uv/getting-started/installation/))
-- **Podman or Docker** (optional, for Redis, used by full MCP plan_manager tests)
+- **Podman or Docker** (optional, for Redis, used by full MCP execution_controller tests)
 
 ---
 
@@ -144,7 +145,7 @@ Use this when changing MCP server code, tool prompts, or bundler logic.
 
 Run MCP locally in STDIO mode against the dev RAGFlow instance.
 
-### Redis (optional, for plan_manager)
+### Redis (optional, for execution_controller)
 
 Start a Redis-compatible container:
 
@@ -164,9 +165,9 @@ docker run -d --name rosetta-redis -p 6379:6379 valkey/valkey:latest
 claude mcp add --transport stdio Rosetta \
   --env ROSETTA_SERVER_URL=[RAGFlow production server URL] \
   --env ROSETTA_API_KEY=ragflow-xxxxx \
-  --env VERSION=r2 \
+  --env VERSION=r3 \
   --env REDIS_URL=redis://localhost:6379/0 \
-  -- uvx --prerelease=allow ims-mcp@latest
+  -- uvx --prerelease=allow rosetta-mcp@latest
 ```
 
 **Codex:**
@@ -175,9 +176,9 @@ claude mcp add --transport stdio Rosetta \
 codex mcp add Rosetta \
   --env ROSETTA_SERVER_URL=[RAGFlow production server URL] \
   --env ROSETTA_API_KEY=ragflow-xxxxx \
-  --env VERSION=r2 \
+  --env VERSION=r3 \
   --env REDIS_URL=redis://localhost:6379/0 \
-  -- uvx --prerelease=allow ims-mcp@latest
+  -- uvx --prerelease=allow rosetta-mcp@latest
 ```
 
 **Cursor** (`.cursor/mcp.json`):
@@ -187,11 +188,11 @@ codex mcp add Rosetta \
   "mcpServers": {
     "Rosetta": {
       "command": "uvx",
-      "args": ["--prerelease=allow", "ims-mcp@latest"],
+      "args": ["--prerelease=allow", "rosetta-mcp@latest"],
       "env": {
         "ROSETTA_SERVER_URL": "[RAGFlow production server URL]",
         "ROSETTA_API_KEY": "ragflow-xxxxx",
-        "VERSION": "r2",
+        "VERSION": "r3",
         "REDIS_URL": "redis://localhost:6379/0"
       }
     }
@@ -207,11 +208,11 @@ codex mcp add Rosetta \
     "Rosetta": {
       "type": "stdio",
       "command": "uvx",
-      "args": ["--prerelease=allow", "ims-mcp@latest"],
+      "args": ["--prerelease=allow", "rosetta-mcp@latest"],
       "env": {
         "ROSETTA_SERVER_URL": "[RAGFlow production server URL]",
         "ROSETTA_API_KEY": "ragflow-xxxxx",
-        "VERSION": "r2",
+        "VERSION": "r3",
         "REDIS_URL": "redis://localhost:6379/0"
       }
     }
@@ -221,7 +222,7 @@ codex mcp add Rosetta \
 
 **API key:** Get yours from the RAGFlow UI. The dataset you test against must be **owned by user of this API key**.
 
-**VERSION:** Set explicitly here for local development testing. Always test with both `VERSION=r1` and `VERSION=r2`.
+**VERSION:** Set explicitly here for local development testing. Test with `VERSION=r3`; also `VERSION=r2` when backporting.
 
 **Pre-release builds:** Version suffixes like `b00` trigger automatic pre-release publishing. Use `--prerelease=allow` with uvx to pull these builds.
 
@@ -256,20 +257,20 @@ The `--dry-run` flag shows what would be published (new, changed, unchanged file
 
 ```bash
 # From repo root, with the root venv activated
-VERSION=r1 python src/ims-mcp-server/validation/verify_mcp.py
-VERSION=r2 python src/ims-mcp-server/validation/verify_mcp.py
+VERSION=r3 python src/rosetta-mcp-server/validation/verify_mcp.py
+VERSION=r2 python src/rosetta-mcp-server/validation/verify_mcp.py
 
-# With Redis (tests plan_manager with RedisPlanStore)
-REDIS_URL="redis://localhost:6379/0" VERSION=r2 python src/ims-mcp-server/validation/verify_mcp.py
+# With Redis (tests OAuth client/token storage — the dual-backend store path)
+REDIS_URL="redis://localhost:6379/0" VERSION=r3 python src/rosetta-mcp-server/validation/verify_mcp.py
 ```
 
-Run both r1 and r2. If your change touches Redis-dependent features, run with and without `REDIS_URL`.
+Run with R3; also run r2 when backporting. If your change touches Redis-dependent features, run with and without `REDIS_URL`.
 
 ### Unit tests
 
 ```bash
 # MCP server tests
-venv/bin/pytest src/ims-mcp-server/tests
+venv/bin/pytest src/rosetta-mcp-server/tests
 
 # CLI tests
 venv/bin/pytest src/rosetta-cli/tests
@@ -278,7 +279,7 @@ venv/bin/pytest src/rosetta-cli/tests
 ### Type checking
 
 ```bash
-./validate-types.sh
+./src/validate-types.sh
 ```
 
 Run this after any Python code change.
@@ -362,7 +363,7 @@ If you changed CLI commands, run them against dev with `--dry-run` first, then w
 ```bash
 uvx rosetta-cli@latest publish instructions --dry-run
 uvx rosetta-cli@latest publish instructions
-venv/bin/rosetta-cli list-dataset --dataset aia-r2
+venv/bin/rosetta-cli list-dataset --dataset aia-r3
 ```
 
 ---
@@ -371,17 +372,17 @@ venv/bin/rosetta-cli list-dataset --dataset aia-r2
 
 | Change type            | Location                                              | Validation                               |
 | ---------------------- | ----------------------------------------------------- | ---------------------------------------- |
-| New/modified skill     | `instructions/r2/core/skills/<name>/SKILL.md`         | Publish, test via MCP                    |
-| New/modified agent     | `instructions/r2/core/agents/<name>.md`               | Publish, test via MCP                    |
-| New/modified workflow  | `instructions/r2/core/workflows/<name>.md`            | Publish, test via MCP                    |
-| New/modified rule      | `instructions/r2/core/rules/<name>.md`                | Publish, test via MCP                    |
-| Organization extension | `instructions/r2/<org>/` (same type structure)        | Publish, test via MCP                    |
-| MCP tool or prompt     | `src/ims-mcp-server/ims_mcp/server.py`, `tool_prompts.py` | verify_mcp.py, pytest, validate-types.sh |
+| New/modified skill     | `instructions/r3/core/skills/<name>/SKILL.md`         | Publish, test via MCP                    |
+| New/modified agent     | `instructions/r3/core/agents/<name>.md`               | Publish, test via MCP                    |
+| New/modified workflow  | `instructions/r3/core/workflows/<name>.md`            | Publish, test via MCP                    |
+| New/modified rule      | `instructions/r3/core/rules/<name>.md`                | Publish, test via MCP                    |
+| Organization extension | `instructions/r3/<org>/` (same type structure)        | Publish, test via MCP                    |
+| MCP tool or prompt     | `src/rosetta-mcp-server/rosetta_mcp/server.py`, `tool_prompts.py` | verify_mcp.py, pytest, src/validate-types.sh |
 | CLI command            | `src/rosetta-cli/rosetta_cli/commands/`               | pytest, dry-run, publish to dev          |
 | Website                | `docs/web/`                                           | Local Jekyll build                       |
 | Documentation          | `docs/`, repo root `.md` files                        | Use AI to check consistency              |
 
-Always publish the **entire** `/instructions` folder. Never subfolders or single files (breaks tag extraction). See [Architecture — Rosetta CLI](/rosetta/docs/architecture/#rosetta-cli) for details on auto-tagging and change detection.
+Always publish the **entire** `/instructions` folder. Never subfolders or single files (breaks tag extraction). See [MCP Architecture — Rosetta CLI](/rosetta/docs/mcp-architecture/#rosetta-cli) for details on auto-tagging and change detection.
 
 ---
 
@@ -391,13 +392,16 @@ The short version:
 
 - **Introduction** — orientation, what and why
 - **Quick Start** — zero to working setup
+- **Plugins** — install as a plugin (recommended)
+- **MCPs Installation** — install via MCP (optional, secondary)
 - **Overview** — mental model, terminology
 - **Contributing** — PR workflow, checklist
 - **Developer Guide** (this doc) — repo navigation, local dev
-- **Architecture** — system structure, components, data flow
+- **Context** — business context, target state (MCP Context for the self-hosted MCP business case)
+- **Architecture** — system structure, components, data flow (MCP Architecture for MCP server internals)
 - **Review Standards** — what reviewers check
 - **Usage Guide** — how to use Rosetta flows
-- **Deployment** — RAGFlow, MCP, Helm deployment
+- **Deployment** — self-hosted MCP: RAGFlow, MCP, Helm deployment (optional, secondary)
 - **Troubleshooting** — symptom-first diagnosis
 
 ---

@@ -17,8 +17,8 @@ Keyword search is slow and ambiguous for known instruction documents. Tag lookup
 During `rosetta-cli publish`, `DocumentData.from_file()` extracts three tag families from the file path:
 
 ```
-instructions/r2/core/skills/planning/SKILL.md
-  → individual parts: [instructions, r2, core, skills, planning, SKILL.md]
+instructions/r3/core/skills/planning/SKILL.md
+  → individual parts: [instructions, r3, core, skills, planning, SKILL.md]
   → two-part:  skills/planning/SKILL.md, planning/SKILL.md
   → three-part: core/skills/planning/SKILL.md
   → frontmatter tags merged in (deduplicated, case-insensitive)
@@ -50,6 +50,6 @@ ACQUIRE `skills/planning/SKILL.md` FROM KB
 ## Occurrences
 
 - `src/rosetta-cli/rosetta_cli/services/document_data.py` — tag generation
-- `src/ims-mcp-server/ims_mcp/services/query_builder.py` — metadata condition builder
-- `src/ims-mcp-server/ims_mcp/tools/instructions.py` — threshold logic
-- All `ACQUIRE ... FROM KB` calls in instructions (`instructions/r2/core/`)
+- `src/rosetta-mcp-server/rosetta_mcp/services/query_builder.py` — metadata condition builder
+- `src/rosetta-mcp-server/rosetta_mcp/tools/instructions.py` — threshold logic
+- Generated MCP shells (`ACQUIRE ... FROM KB`) and the alias bindings in `instructions/r3/core/rules/mcp-files-mode.md`

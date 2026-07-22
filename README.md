@@ -59,7 +59,7 @@ Rosetta-guided work follows five phases — **Prepare → Research → Plan → 
 | Option                              | Best for                                                                       |
 | ----------------------------------- | ------------------------------------------------------------------------------ |
 | **[Plugins](PLUGINS.md)** — recommended | Everyone with a supported IDE (Claude Code · Cursor · Copilot · Codex). Files install locally — no server, no live connection needed. |
-| **[Hosted MCP](MCPs.md)** — evaluation only | Try Rosetta with zero setup, or use any other MCP-compatible agent (Windsurf · Junie · Antigravity · OpenCode). Public demo endpoint — do not point production or sensitive repos at it. |
+| **[Hosted MCP](MCPs.md)** — evaluation only | Try Rosetta with zero setup, or use any other MCP-compatible agent (Devin/Windsurf · Junie · OpenCode). Public demo endpoint — do not point production or sensitive repos at it. |
 | **[Self-hosted MCP](docs/mcp/DEPLOYMENT_GUIDE.md)** — optional | MCP in production: your own MCP server and RAGFlow inside your perimeter. Only needed if you specifically require centrally-managed, always-fresh instructions with nothing copied into repos — most teams don't. |
 
 MCP is a secondary, optional delivery mode. If your IDE supports plugins, start there.

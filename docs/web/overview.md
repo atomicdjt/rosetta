@@ -9,7 +9,7 @@ permalink: /overview/
 <p>Rosetta is a meta-prompting, context engineering, and centralized instructions management for AI coding agents. It provides structured context - rules, skills, workflows, and sub-agents - guiding AI systems to operate with a deep understanding of system architecture, domain constraints, and engineering standards. Rosetta also accelerates project onboarding by reverse-engineering architecture and domain context, improving the reliability and consistency of AI-generated code.</p>
 <p>When you type a request in your IDE, the agent loads context from Rosetta first — then follows your organization's proven workflows. Rosetta is designed so that source code stays on your machine.</p>
 
-<p class="section-subtitle">Plugins — recommended. Generated once, installed locally. No server, no live connection.</p>
+<p class="section-subtitle"><strong>Plugins</strong> — recommended. Generated once, installed locally. No server, no live connection.</p>
 
 <div class="arch-v2 arch-v2-anim" id="arch-v2-plugin">
 
@@ -32,7 +32,7 @@ permalink: /overview/
     <!-- Connector left -->
     <div class="arch-v2-conn">
       <div class="arch-v2-conn-line"></div>
-      <span class="arch-v2-conn-label">Install once — no live connection</span>
+      <span class="arch-v2-conn-label">Install once <br> no live connection</span>
     </div>
 
     <!-- Center: Rosetta Plugin (hero) -->
@@ -67,7 +67,7 @@ permalink: /overview/
     <!-- Connector right -->
     <div class="arch-v2-conn">
       <div class="arch-v2-conn-line"></div>
-      <span class="arch-v2-conn-label">Generated once, at build time</span>
+      <span class="arch-v2-conn-label">Generated once <br> at build time</span>
     </div>
 
     <!-- Right: Instructions Repo -->
@@ -179,18 +179,6 @@ permalink: /overview/
       </div>
       <div class="arch-v2-sat-label">Rosetta Server</div>
       <div class="arch-v2-sat-sub">RAGFlow · parse<br>chunk · embed · retrieve</div>
-    </div>
-  </div>
-
-  <!-- Annotations -->
-  <div class="arch-v2-annotations">
-    <div class="arch-v2-anno">
-      <h4>Progressive Disclosure</h4>
-      <p>Instructions load on demand. The agent gets only what it needs for your specific request — context stays focused, responses stay precise.</p>
-    </div>
-    <div class="arch-v2-anno">
-      <h4>Three-Layer Instructions</h4>
-      <p><strong>Core</strong> · <strong>Organization</strong> · <strong>Project</strong> — merged at runtime into a single resource path. Published via Rosetta CLI from your Instructions Repo.</p>
     </div>
   </div>
 </div>

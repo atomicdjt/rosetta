@@ -47,18 +47,11 @@ Rosetta is designed to not see your source code or IP. It only serves knowledge 
 
 ## Get Started
 
-Use [Plugins](/rosetta/docs/plugins/) when your IDE supports them. Plugins install Rosetta instructions locally and do not need a live Rosetta server connection during normal agent work.
-
-**Claude Code:**
-
-```sh
-claude plugin marketplace add griddynamics/rosetta
-claude plugin install rosetta@rosetta
-```
-
-**Cursor, GitHub Copilot, and Codex:** follow the plugin or standalone package instructions in [Plugins](/rosetta/docs/plugins/).
-
-Use [MCPs](/rosetta/docs/mcps/) for IDEs without a Rosetta plugin path, including Windsurf, Antigravity, OpenCode, and JetBrains Junie.
+| Option                              | Best for                                                                       |
+| ----------------------------------- | ------------------------------------------------------------------------------ |
+| **[Plugins](/rosetta/docs/plugins/)** — recommended | Everyone with a supported IDE (Claude Code · Cursor · Copilot · Codex). Files install locally — no server, no live connection needed. |
+| **[Hosted MCP](/rosetta/docs/mcps/)** — evaluation only | Try Rosetta with zero setup, or use any other MCP-compatible agent (Devin/Windsurf · Junie · OpenCode). Public demo endpoint — do not point production or sensitive repos at it. |
+| **[Self-hosted MCP](/rosetta/docs/deployment/)** — optional | MCP in production: your own MCP server and RAGFlow inside your perimeter. Only needed if you specifically require centrally-managed, always-fresh instructions with nothing copied into repos — most teams don't. |
 
 After installation, ask:
 

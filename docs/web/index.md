@@ -236,7 +236,7 @@ permalink: /
               <button class="qs-tab" data-tab="copilot" data-mode="plugin" role="tab">Copilot</button>
               <button class="qs-tab" data-tab="codex" data-mode="plugin" role="tab">Codex</button>
               <button class="qs-tab" data-tab="antigravity" data-mode="mcp" role="tab">Antigravity</button>
-              <button class="qs-tab" data-tab="windsurf" data-mode="mcp" role="tab">Windsurf</button>
+              <button class="qs-tab" data-tab="windsurf" data-mode="mcp" role="tab">Windsurf/Devin</button>
               <button class="qs-tab" data-tab="opencode" data-mode="mcp" role="tab">OpenCode</button>
               <button class="qs-tab" data-tab="junie" data-mode="mcp" role="tab">JetBrains Junie</button>
               <button class="qs-tab" data-tab="other-mcp" data-mode="mcp" role="tab">Other MCP Client</button>
@@ -295,28 +295,19 @@ Download core-copilot-standalone-*.zip from the <a href="https://github.com/grid
           <div class="qs-content" data-tab-content="antigravity">
             <p class="qs-content-hint">Add Rosetta MCP to Antigravity, then add the bootstrap rule. Deep links: <a href="{{ '/docs/mcps/#antigravity' | relative_url }}">MCPs Installation</a>, <a href="{{ '/docs/installation/#http-transport' | relative_url }}">Installation</a>.</p>
             <div class="qs-code-wrap">
-              <pre class="qs-code">{
-  "mcpServers": {
-    "Rosetta": {
-      "serverUrl": "https://mcp.rosetta.griddynamics.net/mcp"
-    }
-  }
-}
-
-Bootstrap rule destination:
-.agent/rules/mcp-files-mode.md</pre>
+              <pre class="qs-code">Antigravity does not implement MCP fully and does not support Authentication => Plugins in development and will be released soon.</pre>
               <button class="qs-copy" data-copy='{"mcpServers":{"Rosetta":{"serverUrl":"https://mcp.rosetta.griddynamics.net/mcp"}}}'>Copy</button>
             </div>
           </div>
 
           <!-- Tab: Windsurf -->
           <div class="qs-content" data-tab-content="windsurf">
-            <p class="qs-content-hint">Add Rosetta MCP to Windsurf, then add the bootstrap rule. Deep links: <a href="{{ '/docs/mcps/#windsurf' | relative_url }}">MCPs Installation</a>, <a href="{{ '/docs/installation/#http-transport' | relative_url }}">Installation</a>.</p>
+            <p class="qs-content-hint">Add Rosetta MCP to Devin (Windsurf), then add the bootstrap rule. Deep links: <a href="{{ '/docs/mcps/#windsurf' | relative_url }}">MCPs Installation</a>, <a href="{{ '/docs/installation/#http-transport' | relative_url }}">Installation</a>.</p>
             <div class="qs-code-wrap">
               <pre class="qs-code">{
   "mcpServers": {
     "Rosetta": {
-      "url": "https://mcp.rosetta.griddynamics.net/mcp"
+      "serverUrl": "https://mcp.rosetta.griddynamics.net/mcp"
     }
   }
 }

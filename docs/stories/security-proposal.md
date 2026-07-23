@@ -32,11 +32,14 @@ Orchestration is deliberate about sequence. Passes run in a defined order and ea
 
 ## Operating model
 
-The skill runs where the code already lives — inside the client's own infrastructure, using the client's own tools (their Claude Code, their gateways) under their own authorization. It is delivered together with a trained engineer who onboards the client's team to run it themselves, so the capability stays with the client.
+The skill runs where the code already lives — inside the client's own infrastructure, using the client's own tools (their Claude Code, their gateways) under their own authorization. It is delivered together with a trained engineer who onboards the client's team to run it themselves, so the capability stays with the client. Deterministic tests go first and in parallel. Skill is used for independent project review (all tools are invoked, full report prepared) and as part of development lifecycle (even before PR, AI is involved only after all deterministically detected issues with severity high+ are resolved). AI must seek direct user approval and explicit confirmation on scope of work with clear explanation of what will be done and how. 
 
 ---
 
 ## Core protocol
+0. SECRETS FIRST — pre-scan for secrets and mask them before anything else reads
+   the code; report them; remediation (rotation / replacement) is routed separately
+   through the coding-flow, never fixed in-line here.
 1. AUTHORIZE — confirm the user owns / may test the target. Offensive areas
    (pen-test, DNS/recon, exfil, network) are HARD-GATED behind explicit,
    per-run scope confirmation. Default = defensive/static only.

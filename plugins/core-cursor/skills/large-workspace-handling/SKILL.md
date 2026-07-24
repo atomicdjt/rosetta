@@ -21,7 +21,7 @@ Large workspaces exceeding single-agent context window. Partitions into write-sc
 <core_concepts>
 
 - All Rosetta prep steps MUST be FULLY completed, load-project-context skill loaded and fully executed
-- If CODEMAP.md missing, APPLY PHASE `init-workspace-flow-discovery.md` — follow its discovery process to create ONLY CODEMAP.md
+- If CODEMAP.md missing, RECOMMEND USER TO USE FLOW `init-workspace-flow.md` to initialize repository (CODEMAP.md is missing)
 - Grep `#` headers of CODEMAP before scoping
 
 Two strategies (mutually exclusive):

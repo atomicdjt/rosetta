@@ -40,12 +40,13 @@ Order matters: `run-hook.ts:316` gates on `toolKinds` before calling `def.run(ct
 
 Every new hook must appear in each registering plugin's `hooks.json`. The canonical sources are the `hooks.json.tmpl` templates; direct edits to generated `hooks.json` files are overwritten on the next `npx -y rosettify-plugins@latest` run.
 
-Template paths by plugin:
-- `plugins/core-claude/hooks/hooks.json.tmpl`
-- `plugins/core-codex/.codex-plugin/hooks.json.tmpl`
-- `plugins/core-copilot/hooks/hooks.json.tmpl` (+ `plugins/core-copilot/.github/plugin/hooks.json.tmpl`)
-- `plugins/core-cursor/hooks.json.tmpl` (+ `plugins/core-cursor/hooks/hooks.json.tmpl`)
-- `core-windsurf` and `core-antigravity` are `build-bundles.mjs` `PLUGINS` bundle targets but have no plugin directory / `hooks.json` registration yet.
+Template paths by plugin, all under `src/rosettify-plugins/plugins/` (templates are generator input only — `.tmpl` files are not emitted into the generated `plugins/` tree):
+- `core-claude/hooks/hooks.json.tmpl`
+- `core-codex/.codex-plugin/hooks.json.tmpl`
+- `core-copilot/hooks/hooks.json.tmpl` (+ `core-copilot/.github/plugin/hooks.json.tmpl`)
+- `core-cursor/hooks.json.tmpl` (+ `core-cursor/hooks/hooks.json.tmpl`)
+- `core-antigravity/hooks.json.tmpl`
+- `core-windsurf` is a `build-bundles.mjs` `PLUGINS` bundle target but has no plugin directory / `hooks.json` registration yet.
 
 ### Platform-scoped events
 

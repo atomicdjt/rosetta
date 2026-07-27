@@ -1,6 +1,6 @@
 {
   "name": "rosetta",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Rosetta for Codex - Software Engineering Accelerator instruction set, workflows, and guardrails.",
   "author": {
     "name": "Grid Dynamics",
@@ -25,7 +25,7 @@
   "interface": {
     "displayName": "Rosetta",
     "shortDescription": "Rosetta core skills and bundled local references for Codex.",
-    "longDescription": "Rosetta 2.0 for Codex. Includes reusable skills and bundled local rules and workflow references generated from the Rosetta instruction set.",
+    "longDescription": "Rosetta 3.0 for Codex. Includes reusable skills and bundled local rules and workflow references generated from the Rosetta instruction set.",
     "developerName": "Grid Dynamics",
     "category": "Productivity",
     "capabilities": [

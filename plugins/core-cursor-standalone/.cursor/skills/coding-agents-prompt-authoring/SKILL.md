@@ -48,6 +48,12 @@ Also for porting prompts between agents/IDEs, or migrating rules between formats
 - Every skill folder contains `README.md` (maintainer doc; spec: READ SKILL FILE `references/pa-schemas.md`) — create/update it whenever authoring or changing a skill
 - Prompt adaptation and porting MUST APPLY SKILL FILE `references/pa-adapt.md`
 
+Runtime mental model:
+
+- Author instructions for a future coding agent; never confuse authoring-time work with target-runtime work.
+- Skill = reusable method; workflow = phase sequence + subagent assignments; executing coding agent follows and orchestrates both.
+- Assign by canonical subagent prompt/model fit: executor for bounded mechanical/noisy tasks; full agents for deep work; validator runs real validation.
+
 Prompt classification:
 
 - **Skill** — reusable knowledge/instructions/action/activity dynamically loaded into agents on demand; skill is a folder with SKILL.md file plus references and assets loaded from SKILL.md

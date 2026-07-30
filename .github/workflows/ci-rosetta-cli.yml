@@ -1,0 +1,47 @@
+name: CI Rosetta CLI
+
+# Pre-merge gate: build + tests for the rosetta-cli package on every PR that
+# touches it. Complements publish-rosetta-cli.yml, which only runs on push to
+# main (publish time) and is not a pre-merge gate. Mirrors that workflow's
+# test/build steps so a green CI here means the publish job will pass.
+on:
+  pull_request:
+    paths:
+      - 'src/rosetta-cli/**'
+      - 'requirements.txt'
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run CLI tests
+      run: |
+        pytest src/rosetta-cli/tests -v
+
+    - name: Build package
+      working-directory: ./src/rosetta-cli
+      run: |
+        python -m build
+
+    - name: Check package
+      working-directory: ./src/rosetta-cli
+      run: |
+        twine check dist/*

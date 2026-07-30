@@ -2,15 +2,11 @@ name: Rosetta GitHub Triage
 
 # Event-driven workflow triggered by PR and issue activity.
 # Reviews PRs and issues, adds labels, posts triage comments,
-# creates Jira proxy stories under CTORNDGAIN-1174, and handles
-# /rosetta slash commands in comments.
+# and handles /rosetta slash commands in comments.
 #
 # Required GitHub Secrets:
 #   - BIFROST_HOST_NAME: Bifrost gateway hostname (no protocol/port/path), routes Anthropic API calls through Bifrost
 #   - BIFROST_API_KEY: Bifrost-issued API key
-#   - JIRA_API_KEY
-#   - CONFLUENCE_API_KEY
-#   - JIRA_CONFLUENCE_API_EMAIL
 
 on:
   pull_request_target:
@@ -90,9 +86,8 @@ jobs:
             MUST APPLY AND FULLY EXECUTE FULLY AUTONOMOUSLY WITHOUT ANY USER INTERACTION OR QUESTIONS, No HITL: .github/prompts/repo-triage.md
           show_full_output: false
           claude_args: |
-            --allowedTools Read,Glob,Grep,Bash(*),mcp__atlassian__jira_search,mcp__atlassian__jira_create_issue,mcp__atlassian__jira_get_issue,mcp__atlassian__jira_add_comment,mcp__atlassian__jira_add_remote_link,mcp__atlassian__jira_create_issue_link,mcp__atlassian__jira_get_link_types
-            --mcp-config '{"mcpServers":{"atlassian":{"type":"stdio","command":"uvx","args":["mcp-atlassian"],"env":{"JIRA_URL":"${{ secrets.JIRA_URL }}","JIRA_USERNAME":"${{ secrets.JIRA_CONFLUENCE_API_EMAIL }}","JIRA_API_TOKEN":"${{ secrets.JIRA_API_KEY }}","CONFLUENCE_URL":"${{ secrets.CONFLUENCE_URL }}","CONFLUENCE_USERNAME":"${{ secrets.JIRA_CONFLUENCE_API_EMAIL }}","CONFLUENCE_API_TOKEN":"${{ secrets.CONFLUENCE_API_KEY }}"}}}}'
-            --model claude-sonnet-4-6
+            --allowedTools Read,Glob,Grep,Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git branch:*),Bash(git ls-files:*),Bash(git rev-parse:*)
+            --model sonnet
 
       - name: Upload Claude execution trace
         if: always()

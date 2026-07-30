@@ -127,7 +127,7 @@ jobs:
           echo "Prompt: $PROMPT"
 
           claude --model $MODEL \
-            --allowedTools "Write(.tmp/**), Edit(.tmp/**), Read(.tmp/**), Read(instructions/**), Read(docs/**), Read(agents/**), Read(pr/**), Bash, Task" \
+            --allowedTools "Write(.tmp/**), Edit(.tmp/**), Read(.tmp/**), Read(instructions/**), Read(docs/**), Read(agents/**), Read(pr/**), Bash(git status:*), Bash(git diff:*), Bash(git log:*), Bash(git show:*), Bash(git branch:*), Bash(git ls-files:*), Bash(git rev-parse:*), Task" \
             --system-prompt-file ./.github/prompts/prompt-comparison.md \
             -p "$PROMPT"
 

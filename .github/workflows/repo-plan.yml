@@ -1,10 +1,16 @@
 name: Rosetta Story Planner
 
-# Polls Jira epic CTORNDGAIN-1174 every 2 hours (or on manual trigger).
-# Stories in "Planned" status without AI-PLANNING/AI-PLANNED labels
-# → parallel planning subagents that write implementation plan + specs back to Jira.
+# DISABLED: this Jira-epic-driven pipeline (analysis -> plan -> implement) is
+# retired now that story tracking moved fully to GitHub issues. Triggers are
+# commented out below; workflow_dispatch is kept only for manual re-enable
+# testing. Do not re-enable the schedule without re-adding Jira/Confluence
+# wiring first.
 #
-# Required GitHub Secrets:
+# Previously: polled Jira epic CTORNDGAIN-1174 every 2 hours (or on manual
+# trigger). Stories in "Planned" status without AI-PLANNING/AI-PLANNED labels
+# → parallel planning subagents that wrote implementation plan + specs back to Jira.
+#
+# Required GitHub Secrets (when re-enabled):
 #   - BIFROST_HOST_NAME: Bifrost gateway hostname (no protocol/port/path), routes Anthropic API calls through Bifrost
 #   - BIFROST_API_KEY: Bifrost-issued API key
 #   - JIRA_API_KEY
@@ -12,9 +18,9 @@ name: Rosetta Story Planner
 #   - JIRA_CONFLUENCE_API_EMAIL
 
 on:
-  schedule:
-#    - cron: '0 */2 * * *'
-    - cron: '0 1 * * *'
+  # schedule:
+  #   - cron: '0 */2 * * *'
+  #   - cron: '0 1 * * *'
   workflow_dispatch:
 
 permissions:
@@ -90,7 +96,7 @@ jobs:
           claude_args: |
             --allowedTools Read,Glob,Grep,mcp__atlassian__jira_get_issue,mcp__atlassian__jira_update_issue,mcp__atlassian__jira_add_comment,mcp__atlassian__jira_edit_comment,mcp__atlassian__jira_add_remote_link,mcp__atlassian__jira_get_issue_development_info,mcp__atlassian__jira_create_issue_link,mcp__atlassian__jira_get_link_types,mcp__atlassian__jira_get_transitions,mcp__atlassian__jira_transition_issue,mcp__Rosetta__get_context_instructions,mcp__Rosetta__list_instructions,mcp__Rosetta__query_instructions
             --mcp-config '{"mcpServers":{"atlassian":{"type":"stdio","command":"uvx","args":["mcp-atlassian"],"env":{"JIRA_URL":"${{ secrets.JIRA_URL }}","JIRA_USERNAME":"${{ secrets.JIRA_CONFLUENCE_API_EMAIL }}","JIRA_API_TOKEN":"${{ secrets.JIRA_API_KEY }}","CONFLUENCE_URL":"${{ secrets.CONFLUENCE_URL }}","CONFLUENCE_USERNAME":"${{ secrets.JIRA_CONFLUENCE_API_EMAIL }}","CONFLUENCE_API_TOKEN":"${{ secrets.CONFLUENCE_API_KEY }}"}},"Rosetta":{"type":"stdio","command":"uvx","args":["--prerelease=allow","rosetta-mcp@latest"],"env":{"ROSETTA_SERVER_URL":"${{ secrets.RAGFLOW_BASE_URL }}","ROSETTA_API_KEY":"${{ secrets.RAGFLOW_API_KEY }}","ROSETTA_USER_EMAIL":"${{ secrets.JIRA_CONFLUENCE_API_EMAIL }}","VERSION":"r2"}}}}'
-            --model claude-sonnet-4-6
+            --model sonnet
 
       - name: Upload Claude execution trace
         if: always()

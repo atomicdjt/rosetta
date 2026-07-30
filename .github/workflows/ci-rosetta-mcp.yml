@@ -1,0 +1,66 @@
+name: CI Rosetta MCP
+
+# Pre-merge gate: build + tests for the rosetta-mcp-server package on every PR
+# that touches it. Complements publish-rosetta-mcp.yml, which only runs on push
+# to main (publish time) and is not a pre-merge gate. Mirrors that workflow's
+# build/test steps so a green CI here means the publish job will pass.
+on:
+  pull_request:
+    paths:
+      - 'src/rosetta-mcp-server/**'
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+
+    - name: Create venv and install dependencies
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install build twine
+        echo "$GITHUB_WORKSPACE/venv/bin" >> $GITHUB_PATH
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v5
+      with:
+        node-version: '24'
+
+    - name: Install rosettify dependencies
+      working-directory: ./src/rosettify
+      run: npm ci
+
+    - name: Run type validation
+      run: |
+        chmod +x src/validate-types.sh
+        ./src/validate-types.sh
+
+    - name: Build package
+      working-directory: ./src/rosetta-mcp-server
+      run: |
+        chmod +x build.sh
+        ./build.sh
+
+    - name: Check package
+      working-directory: ./src/rosetta-mcp-server
+      run: |
+        twine check dist/*
+
+    - name: Run tests
+      working-directory: ./src/rosetta-mcp-server
+      run: |
+        pytest tests/ -v

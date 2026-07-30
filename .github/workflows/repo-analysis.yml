@@ -1,21 +1,28 @@
 name: Rosetta Repo Analysis
 
-# DISABLED: this Jira-epic-driven pipeline (analysis -> plan -> implement) is
-# retired now that story tracking moved fully to GitHub issues. Triggers are
-# commented out below; workflow_dispatch is kept only for manual re-enable
-# testing. Do not re-enable the schedule without re-adding Jira/Confluence
-# wiring first.
+# DISABLED: triggers are workflow_dispatch-only until a manual test run is
+# reviewed and the schedule is deliberately re-enabled.
 #
-# Previously: ran nightly at 01:00 UTC. Loaded Jira stories under epic
-# CTORNDGAIN-1174, reviewed the codebase for improvements, and created/updated
-# stories automatically using Claude + Atlassian MCP.
+# Reviews the codebase for improvements and files them as GitHub issues on the
+# "Rosetta Automation Board" (GitHub Projects v2, org griddynamics, project
+# number 57 — https://github.com/orgs/griddynamics/projects/57), added at
+# Status "Backlog". Board membership is the scoping mechanism (replaces the
+# old Jira epic parent).
 #
-# Required GitHub Secrets (when re-enabled):
+# Background KB and the automation run log live on the repo's GitHub Wiki
+# (a separate git repo: https://github.com/griddynamics/rosetta.wiki.git).
+# The Claude agent never pushes to the wiki directly — it only reads the
+# checked-out KB page and writes the updated log page to the local wiki/
+# checkout; a dedicated workflow step (below, using the PAT directly, not the
+# agent's Bash tool) commits and pushes that checkout afterward.
+#
+# Required GitHub Secrets:
 #   - BIFROST_HOST_NAME: Bifrost gateway hostname (no protocol/port/path), routes Anthropic API calls through Bifrost
 #   - BIFROST_API_KEY: Bifrost-issued API key
-#   - JIRA_API_KEY: Atlassian API token
-#   - CONFLUENCE_API_KEY: Atlassian API token (Confluence)
-#   - JIRA_CONFLUENCE_API_EMAIL: Atlassian account email for API auth
+#   - SELF_AUTOMATION_PROJECTS_TOKEN: PAT with org Projects (read/write) plus repo
+#     Issues/Pull requests/Contents (read/write) scope, and access to the wiki.
+#     The default GITHUB_TOKEN cannot read or write GitHub Projects v2 items,
+#     so this PAT is used for all gh/git operations in this workflow.
 
 on:
   # schedule:
@@ -38,10 +45,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-        with:
-          enable-cache: false
+      - name: Checkout wiki
+        run: |
+          git clone "https://x-access-token:${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}@github.com/${{ github.repository }}.wiki.git" wiki || {
+            echo "Wiki repo has no content yet — initializing a fresh checkout."
+            mkdir -p wiki
+            cd wiki
+            git init -q
+            git remote add origin "https://x-access-token:${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}@github.com/${{ github.repository }}.wiki.git"
+          }
+          mkdir -p wiki
+          touch wiki/Automation-KB.md wiki/Automation-Log.md
 
       - name: Install Bun
         id: bun
@@ -54,16 +68,31 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.BIFROST_API_KEY }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}
           path_to_bun_executable: ${{ steps.bun.outputs.bun-path }}
+          plugin_marketplaces: |
+            https://github.com/griddynamics/rosetta.git
+          plugins: |
+            rosetta@rosetta
           prompt: "MUST APPLY AND FULLY EXECUTE FULLY AUTONOMOUSLY WITHOUT ANY USER INTERACTION OR QUESTIONS, No HITL: .github/prompts/repo-analysis.md"
           show_full_output: false
           claude_args: >-
             --allowedTools
-            "Read,Glob,Grep,mcp__atlassian__jira_search,mcp__atlassian__jira_get_issue,mcp__atlassian__jira_create_issue,mcp__atlassian__jira_batch_create_issues,mcp__atlassian__jira_update_issue,mcp__atlassian__jira_add_remote_link,mcp__atlassian__jira_create_issue_link,mcp__atlassian__jira_get_link_types,mcp__atlassian__confluence_get_page,mcp__atlassian__confluence_update_page,mcp__atlassian__confluence_search,mcp__Rosetta__get_context_instructions,mcp__Rosetta__list_instructions,mcp__Rosetta__query_instructions"
-            --mcp-config
-            '{"mcpServers":{"atlassian":{"type":"stdio","command":"uvx","args":["mcp-atlassian"],"env":{"JIRA_URL":"${{ secrets.JIRA_URL }}","JIRA_USERNAME":"${{ secrets.JIRA_CONFLUENCE_API_EMAIL }}","JIRA_API_TOKEN":"${{ secrets.JIRA_API_KEY }}","CONFLUENCE_URL":"${{ secrets.CONFLUENCE_URL }}","CONFLUENCE_USERNAME":"${{ secrets.JIRA_CONFLUENCE_API_EMAIL }}","CONFLUENCE_API_TOKEN":"${{ secrets.CONFLUENCE_API_KEY }}"}},"Rosetta":{"type":"stdio","command":"uvx","args":["--prerelease=allow","rosetta-mcp@latest"],"env":{"ROSETTA_SERVER_URL":"${{ secrets.RAGFLOW_BASE_URL }}","ROSETTA_API_KEY":"${{ secrets.RAGFLOW_API_KEY }}","ROSETTA_USER_EMAIL":"${{ secrets.JIRA_CONFLUENCE_API_EMAIL }}","VERSION":"r2"}}}}'
+            "Read,Glob,Grep,Write(wiki/Automation-Log.md),Edit(wiki/Automation-Log.md),Bash(gh issue list:*),Bash(gh issue view:*),Bash(gh issue create:*),Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh pr list:*),Bash(gh project view:*),Bash(gh project field-list:*),Bash(gh project item-list:*),Bash(gh project item-add:*),Bash(gh project item-edit:*)"
             --model sonnet
+
+      - name: Publish wiki changes
+        working-directory: wiki
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add Automation-Log.md
+          if git diff --cached --quiet; then
+            echo "No wiki changes to publish."
+          else
+            git commit -m "Automation log update $(date -u +%F)"
+            git push origin HEAD:master
+          fi
 
       - name: Upload Claude execution trace
         if: always()

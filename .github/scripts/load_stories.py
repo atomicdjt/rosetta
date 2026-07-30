@@ -1,143 +1,147 @@
 #!/usr/bin/env python3
 """
-Load Jira stories from epic CTORNDGAIN-1174 that require AI work.
+Load GitHub Projects v2 board items that require AI work.
 
-Filtering logic:
-  - Status "Planned"               AND no label AI-PLANNING or AI-PLANNED   → plan_matrix
-  - Status "Selected for Development" AND no label AI-IMPLEMENTING or AI-IMPLEMENTED → impl_matrix
+Board: "Rosetta Automation Board" — org griddynamics, project number 57
+https://github.com/orgs/griddynamics/projects/57
+
+Filtering logic (Status field on the board):
+  - Status "Backlog" → plan_matrix   (plan-agent claims by moving to "In progress")
+  - Status "Ready"   → impl_matrix   (implement-agent claims by moving to "In progress")
+
+Board membership itself is the scoping mechanism (replaces the old Jira epic
+parent): only issues added to project 57 are eligible for AI work.
 
 Writes to GITHUB_OUTPUT:
-  plan_matrix, impl_matrix, has_plan, has_impl, plan_count, impl_count
+  plan_matrix, impl_matrix, has_plan, has_impl, plan_count, impl_count,
+  project_id, status_field_id, status_option_ids (JSON: {status_name: option_id})
+
+Requires GH_TOKEN env set to a PAT with org Projects read/write scope
+(secrets.SELF_AUTOMATION_PROJECTS_TOKEN) — the default GITHUB_TOKEN cannot
+read or write GitHub Projects v2 items.
 """
 
-import base64
 import json
 import os
-import urllib.parse
-import urllib.request
+import subprocess
+import sys
 
-FIELDS = ["summary", "status", "labels"]
-
-
-JQL = (
-    'parent = CTORNDGAIN-1174 '
-    'AND status in ("Planned", "Selected for Development") '
-    'ORDER BY priority DESC'
-)
+PROJECT_OWNER = "griddynamics"
+PROJECT_NUMBER = "57"
+TARGET_REPO = os.environ.get("GITHUB_REPOSITORY", "griddynamics/rosetta")
 
 
-def build_auth_header(username: str, api_token: str) -> str:
-    creds = f"{username}:{api_token}"
-    return base64.b64encode(creds.encode()).decode()
-
-
-def jira_request(
-    jira_base: str,
-    auth_header: str,
-    path: str,
-    *,
-    method: str = "GET",
-    payload: dict | None = None,
-) -> dict:
-    data = json.dumps(payload).encode() if payload is not None else None
-    req = urllib.request.Request(
-        f"{jira_base}{path}",
-        data=data,
-        method=method,
-        headers={
-            "Authorization": f"Basic {auth_header}",
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        },
+def gh_json(*args: str) -> dict:
+    result = subprocess.run(
+        ["gh", *args, "--format", "json"],
+        capture_output=True,
+        text=True,
+        check=True,
     )
-    with urllib.request.urlopen(req) as resp:
-        return json.loads(resp.read())
+    return json.loads(result.stdout)
 
 
-def fetch_story_issues(
-    jira_base: str,
-    auth_header: str,
-    request_fn=jira_request,
-) -> dict:
-    page_size = 50
-    start_at = 0
-    all_issues: list = []
-    total = None
-
-    while True:
-        params = urllib.parse.urlencode({"maxResults": page_size, "startAt": start_at})
-        data = request_fn(
-            jira_base,
-            auth_header,
-            f"/rest/api/3/search/jql?{params}",
-            method="POST",
-            payload={"jql": JQL, "fields": FIELDS},
-        )
-        page = data.get("issues", [])
-        all_issues.extend(page)
-        if total is None:
-            total = data.get("total", 0)
-        start_at += len(page)
-        if not page or start_at >= total:
-            break
-
-    return {"issues": all_issues}
+def load_project_view() -> dict:
+    return gh_json("project", "view", PROJECT_NUMBER, "--owner", PROJECT_OWNER)
 
 
-def collect_story_matrices(data: dict) -> tuple[list[dict], list[dict]]:
-    plan_stories: list[dict] = []
-    impl_stories: list[dict] = []
-
-    for issue in data.get("issues", []):
-        key: str = issue["key"]
-        status: str = issue["fields"]["status"]["name"]
-        labels: list[str] = issue["fields"].get("labels", [])
-        summary: str = issue["fields"]["summary"][:80].replace('"', "'").replace("\n", " ")
-
-        if status == "Planned":
-            if "AI-PLANNING" not in labels and "AI-PLANNED" not in labels:
-                plan_stories.append({"story_key": key, "story_summary": summary})
-        elif status == "Selected for Development":
-            if "AI-IMPLEMENTING" not in labels and "AI-IMPLEMENTED" not in labels:
-                impl_stories.append({"story_key": key, "story_summary": summary})
-
-    return plan_stories, impl_stories
+def load_project_fields() -> dict:
+    return gh_json("project", "field-list", PROJECT_NUMBER, "--owner", PROJECT_OWNER)
 
 
-def build_matrix(stories: list[dict]) -> str:
-    if stories:
-        return json.dumps({"include": stories})
-    return json.dumps({"include": [{"story_key": "__skip__", "story_summary": ""}]})
+def load_project_items() -> dict:
+    return gh_json(
+        "project", "item-list", PROJECT_NUMBER, "--owner", PROJECT_OWNER, "--limit", "200"
+    )
 
 
-def write_outputs(plan_stories: list[dict], impl_stories: list[dict]) -> None:
-    output_file = os.environ.get("GITHUB_OUTPUT", "/dev/stdout")
-    with open(output_file, "a") as f:
-        f.write(f"plan_matrix={build_matrix(plan_stories)}\n")
-        f.write(f"impl_matrix={build_matrix(impl_stories)}\n")
-        f.write(f"plan_count={len(plan_stories)}\n")
-        f.write(f"impl_count={len(impl_stories)}\n")
-        f.write(f"has_plan={'true' if plan_stories else 'false'}\n")
-        f.write(f"has_impl={'true' if impl_stories else 'false'}\n")
+def extract_status_field(fields_data: dict) -> tuple[str, dict]:
+    for field in fields_data.get("fields", []):
+        if field.get("name") == "Status":
+            options = {opt["name"]: opt["id"] for opt in field.get("options", [])}
+            return field["id"], options
+    print(
+        "::error::'Status' field not found on project 57 — check `gh project field-list 57 "
+        "--owner griddynamics --format json` output",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
+
+def get_status(item: dict) -> str | None:
+    for key, value in item.items():
+        if key.lower() == "status" and isinstance(value, str):
+            return value
+    return None
+
+
+def collect_matrices(items_data: dict) -> tuple[list[dict], list[dict]]:
+    plan_items: list[dict] = []
+    impl_items: list[dict] = []
+
+    for item in items_data.get("items", []):
+        content = item.get("content", {})
+        if content.get("type") != "Issue":
+            continue
+        repo = content.get("repository", "")
+        if repo and repo != TARGET_REPO:
+            continue
+
+        number = content.get("number")
+        if number is None:
+            continue
+
+        status = get_status(item)
+        title = (content.get("title") or "")[:80].replace('"', "'").replace("\n", " ")
+        entry = {"issue_number": number, "issue_title": title, "item_id": item.get("id")}
+
+        if status == "Backlog":
+            plan_items.append(entry)
+        elif status == "Ready":
+            impl_items.append(entry)
+
+    return plan_items, impl_items
+
+
+def build_matrix(items: list[dict]) -> str:
+    if items:
+        return json.dumps({"include": items})
+    return json.dumps(
+        {"include": [{"issue_number": 0, "issue_title": "__skip__", "item_id": ""}]}
+    )
+
+
+def write_output(name: str, value: str) -> None:
+    with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+        f.write(f"{name}={value}\n")
 
 
 def main() -> None:
-    jira_base = os.environ["JIRA_URL"].rstrip("/")
-    auth_header = build_auth_header(
-        os.environ["JIRA_USERNAME"],
-        os.environ["JIRA_API_TOKEN"],
-    )
-    data = fetch_story_issues(jira_base, auth_header)
-    plan_stories, impl_stories = collect_story_matrices(data)
+    project = load_project_view()
+    fields_data = load_project_fields()
+    items_data = load_project_items()
 
-    write_outputs(plan_stories, impl_stories)
+    status_field_id, status_options = extract_status_field(fields_data)
+    plan_items, impl_items = collect_matrices(items_data)
 
-    print(f"Stories to plan:      {len(plan_stories)}")
-    print(f"Stories to implement: {len(impl_stories)}")
-    for story in plan_stories:
-        print(f"  [PLAN] {story['story_key']}: {story['story_summary']}")
-    for story in impl_stories:
-        print(f"  [IMPL] {story['story_key']}: {story['story_summary']}")
+    write_output("project_id", project["id"])
+    write_output("status_field_id", status_field_id)
+    write_output("status_option_ids", json.dumps(status_options))
+
+    write_output("plan_matrix", build_matrix(plan_items))
+    write_output("has_plan", "true" if plan_items else "false")
+    write_output("plan_count", str(len(plan_items)))
+
+    write_output("impl_matrix", build_matrix(impl_items))
+    write_output("has_impl", "true" if impl_items else "false")
+    write_output("impl_count", str(len(impl_items)))
+
+    print(f"Board items to plan:      {len(plan_items)}")
+    print(f"Board items to implement: {len(impl_items)}")
+    for entry in plan_items:
+        print(f"  [PLAN] #{entry['issue_number']}: {entry['issue_title']}")
+    for entry in impl_items:
+        print(f"  [IMPL] #{entry['issue_number']}: {entry['issue_title']}")
 
 
 if __name__ == "__main__":

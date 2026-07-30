@@ -94,7 +94,7 @@ Steps:
    - **Modified file** (exists on disk AND in base ref): Read the NEW version from disk (Read tool). If `PR content path` is present, read `<PR content path>/<file_path>` but keep `file` in output as `<file_path>`. Get the BASE version via `git show <base_ref>:<file_path>` or `git -C <PR content path> show <base_ref>:<file_path>` when `PR content path` is present. Compare both.
    - **Deleted file** (not on disk, exists in base ref): Get the BASE version via `git show <base_ref>:<file_path>` or `git -C <PR content path> show <base_ref>:<file_path>` when `PR content path` is present. Evaluate what was lost — deleted prompts may remove critical agent capabilities, safety guardrails, or workflow steps. This is essential regression signal.
    - **New file** (exists on disk, not in base ref): Read the NEW version from disk. If `PR content path` is present, read `<PR content path>/<file_path>` but keep `file` in output as `<file_path>`. If a similar file existed in a previous release, compare against that predecessor. Otherwise evaluate the new prompt against all quality gates from scratch — new prompts must meet the same standards as existing ones — and for comparison scoring use the baseline of the file not existing: compare each gate against what a reasonable prompt architect would assume if the file did not exist (e.g., if a new safety skill is added, the comparison baseline is "no safety skill existed"). Avoid bias from having already read the file — score the delta between "not having it" and "having it."
-5. Use workspace-relative paths in all output (e.g., `instructions/r2/core/rules/example.md`).
+5. Use workspace-relative paths in all output (e.g., `instructions/r3/core/rules/example.md`).
 
 ## Success Criteria
 
@@ -203,7 +203,7 @@ Comparison is NOT two independent evaluations. It is a **change-focused** analys
 
 The output is a JSON **array** written to the output file path provided in the prompt. Each element represents one evaluated file and contains:
 
-1. **`file`** — workspace-relative path of the evaluated file (e.g., `instructions/r2/core/skills/example.md`)
+1. **`file`** — workspace-relative path of the evaluated file (e.g., `instructions/r3/core/skills/example.md`)
 
 2. **`status`** — one of: `modified`, `deleted`, `new`
 
@@ -235,7 +235,7 @@ For files that cannot be processed, use `{"file": "<path>", "error": "<message>"
 
 [
   {
-    "file": "instructions/r2/core/skills/example.md",
+    "file": "instructions/r3/core/skills/example.md",
     "status": "modified",
     "gates": {
       "Goal Specification": {
@@ -262,7 +262,7 @@ For files that cannot be processed, use `{"file": "<path>", "error": "<message>"
     ]
   },
   {
-    "file": "instructions/r2/core/rules/deleted-rule.md",
+    "file": "instructions/r3/core/rules/deleted-rule.md",
     "status": "deleted",
     "gates": {
       "Goal Specification": {

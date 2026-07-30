@@ -18,7 +18,7 @@ on:
 #  pull_request:
 #    types: [opened, synchronize, reopened, ready_for_review]
 #    paths:
-#      - 'instructions/r2/**'
+#      - 'instructions/r3/**'
 #      - '.github/workflows/validate-test-cases.yml'
   workflow_dispatch:
 

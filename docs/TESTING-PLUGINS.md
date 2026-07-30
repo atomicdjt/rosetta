@@ -50,7 +50,7 @@ Create `.agents/plugins/rosetta` folder in the repository. Copy contents of `cor
 # Prompts reliability
 
 ```
-I am a plugin developer. Take no actions or execute anything. ultrathink. How to improve which prompt for you to [PROBLEM TO FIX]? I can only modify hook prompts as of now. Instructions from the session start hook: /Users/isolomatov/Sources/GAIN/rosetta/instructions/r2/core/rules/bootstrap-*.md
+I am a plugin developer. Take no actions or execute anything. ultrathink. How to improve which prompt for you to [PROBLEM TO FIX]? I can only modify hook prompts as of now. Instructions from the session start hook: /Users/isolomatov/Sources/GAIN/rosetta/instructions/r3/core/rules/bootstrap-*.md
 ```
 
 ```

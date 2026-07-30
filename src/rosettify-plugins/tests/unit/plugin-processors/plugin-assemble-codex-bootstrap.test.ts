@@ -152,6 +152,49 @@ describe('pluginAssembleCodexBootstrap — plugin-root entry (workspace-root tra
     const payload = result.templateContext['bootstrap_hooks'] as string;
     expect(payload).toContain('}, {');
   });
+
+  it('exactly one entry carries the workspace_root plugin-root marker, and it is the final entry (FR-HOOK-0007)', () => {
+    // CODEX_PLUGIN_ROOT_COMMAND repeats "workspace_root" several times WITHIN its own single
+    // entry — so the discriminant is how many split ENTRIES contain the marker, not raw
+    // substring-occurrence count.
+    const frames = [
+      makeDocFrame('plugin-files-mode', '\n# Lead\n'),
+      makeDocFrame('bootstrap-core-policy', '\n# Policy\n'),
+      makeDocFrame('bootstrap-guardrails', '\n# Guardrails\n'),
+    ];
+    const p = makePluginFrame(frames);
+    const result = pluginAssembleCodexBootstrap(p);
+    const payload = result.templateContext['bootstrap_hooks'] as string;
+    const entries = payload.split('}, {');
+    const entriesWithRootMarker = entries.filter((e) => e.includes('workspace_root'));
+    expect(entriesWithRootMarker.length).toBe(1);
+    expect(entries[entries.length - 1]).toContain('workspace_root');
+  });
+});
+
+// ─── Lead document carries NO prefix (FR-HOOK-0003 Deprecated) ───────────────
+
+describe('pluginAssembleCodexBootstrap — lead document has no bootstrap prefix', () => {
+  it('payload does not contain the removed bootstrap prefix text', () => {
+    const frames = [makeDocFrame('plugin-files-mode', '\n# Bootstrap Content\n')];
+    const p = makePluginFrame(frames);
+    const result = pluginAssembleCodexBootstrap(p);
+    const payload = result.templateContext['bootstrap_hooks'] as string;
+    expect(payload).not.toContain('ALWAYS MUST FULLY');
+    expect(payload).not.toContain('get_context_instructions');
+  });
+
+  it("emits the lead document's body as-is, without a leading blank line", () => {
+    const frames = [makeDocFrame('plugin-files-mode', '\n# Bootstrap Content\n')];
+    const p = makePluginFrame(frames);
+    const result = pluginAssembleCodexBootstrap(p);
+    const payload = result.templateContext['bootstrap_hooks'] as string;
+    expect(payload).toContain('# Bootstrap Content');
+    // The leading-newline strip is retained after prefix removal (now driven by loop position,
+    // not the removed isLead field): the body must not begin with an escaped newline immediately
+    // after the additionalContext quote.
+    expect(payload).not.toContain('\\"additionalContext\\":\\"\\\\n');
+  });
 });
 
 // ─── NFR-0004: size > 10000 → soft error ─────────────────────────────────────

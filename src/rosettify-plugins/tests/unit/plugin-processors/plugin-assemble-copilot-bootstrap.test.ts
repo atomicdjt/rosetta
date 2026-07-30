@@ -206,6 +206,47 @@ describe('pluginAssembleCopilotBootstrap — plugin-root entry', () => {
     const payload = result.templateContext['bootstrap_hooks'] as string;
     expect(payload).toContain('}, {');
   });
+
+  it('exactly one entry carries the agentPlugins plugin-root marker, and it is the final entry (FR-HOOK-0007)', () => {
+    // agentPlugins appears TWICE within the single root entry (once in the bash field, once in
+    // the powershell field) — the discriminant is how many split ENTRIES contain the marker.
+    const frames = [
+      makeDocFrame('plugin-files-mode', '\n# Lead\n'),
+      makeDocFrame('bootstrap-core-policy', '\n# Policy\n'),
+      makeDocFrame('bootstrap-guardrails', '\n# Guardrails\n'),
+    ];
+    const p = makePluginFrame(frames);
+    const result = pluginAssembleCopilotBootstrap(p);
+    const payload = result.templateContext['bootstrap_hooks'] as string;
+    const entries = payload.split('}, {');
+    const entriesWithRootMarker = entries.filter((e) => e.includes('agentPlugins'));
+    expect(entriesWithRootMarker.length).toBe(1);
+    expect(entries[entries.length - 1]).toContain('agentPlugins');
+  });
+});
+
+// ─── Lead document carries NO prefix (FR-HOOK-0003 Deprecated) ───────────────
+
+describe('pluginAssembleCopilotBootstrap — lead document has no bootstrap prefix', () => {
+  it('payload does not contain the removed bootstrap prefix text', () => {
+    const frames = [makeDocFrame('plugin-files-mode', '\n# Bootstrap Content\n')];
+    const p = makePluginFrame(frames);
+    const result = pluginAssembleCopilotBootstrap(p);
+    const payload = result.templateContext['bootstrap_hooks'] as string;
+    expect(payload).not.toContain('ALWAYS MUST FULLY');
+    expect(payload).not.toContain('get_context_instructions');
+  });
+
+  it("emits the lead document's body as-is, without a leading blank line, in BOTH the top-level and nested additionalContext copies", () => {
+    const frames = [makeDocFrame('plugin-files-mode', '\n# Bootstrap Content\n')];
+    const p = makePluginFrame(frames);
+    const result = pluginAssembleCopilotBootstrap(p);
+    const payload = result.templateContext['bootstrap_hooks'] as string;
+    expect(payload).toContain('# Bootstrap Content');
+    // Copilot duplicates additionalContext at top-level AND nested in hookSpecificOutput
+    // (docs/hooks/copilot.md, Bug 2) — the leading-newline strip must hold for both copies.
+    expect(payload).not.toContain('\\"additionalContext\\":\\"\\n');
+  });
 });
 
 // ─── NFR-0004: size > 10000 → soft error ─────────────────────────────────────

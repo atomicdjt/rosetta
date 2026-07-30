@@ -165,6 +165,46 @@ describe('pluginAssembleCursorBootstrap — plugin-root entry', () => {
     const payload = result.templateContext['bootstrap_hooks'] as string;
     expect(payload).toContain('}, {');
   });
+
+  it('exactly one entry carries the CURSOR_PROJECT_DIR plugin-root marker, and it is the final entry (FR-HOOK-0007)', () => {
+    const frames = [
+      makeDocFrame('plugin-files-mode', '\n# Lead\n'),
+      makeDocFrame('bootstrap-core-policy', '\n# Policy\n'),
+      makeDocFrame('bootstrap-guardrails', '\n# Guardrails\n'),
+    ];
+    const p = makePluginFrame(frames);
+    const result = pluginAssembleCursorBootstrap(p);
+    const payload = result.templateContext['bootstrap_hooks'] as string;
+    const entries = payload.split('}, {');
+    const entriesWithRootMarker = entries.filter((e) => e.includes('CURSOR_PROJECT_DIR'));
+    expect(entriesWithRootMarker.length).toBe(1);
+    expect(entries[entries.length - 1]).toContain('CURSOR_PROJECT_DIR');
+  });
+});
+
+// ─── Lead document carries NO prefix (FR-HOOK-0003 Deprecated) ───────────────
+
+describe('pluginAssembleCursorBootstrap — lead document has no bootstrap prefix', () => {
+  it('payload does not contain the removed bootstrap prefix text', () => {
+    const frames = [makeDocFrame('plugin-files-mode', '\n# Bootstrap Content\n')];
+    const p = makePluginFrame(frames);
+    const result = pluginAssembleCursorBootstrap(p);
+    const payload = result.templateContext['bootstrap_hooks'] as string;
+    expect(payload).not.toContain('ALWAYS MUST FULLY');
+    expect(payload).not.toContain('get_context_instructions');
+  });
+
+  it("emits the lead document's body as-is, without a leading blank line", () => {
+    const frames = [makeDocFrame('plugin-files-mode', '\n# Bootstrap Content\n')];
+    const p = makePluginFrame(frames);
+    const result = pluginAssembleCursorBootstrap(p);
+    const payload = result.templateContext['bootstrap_hooks'] as string;
+    expect(payload).toContain('# Bootstrap Content');
+    // Cursor uses additional_context (buildCursorHookPayloadJson) — same leading-newline-strip
+    // contract as the other targets, now driven by loop position rather than the removed isLead
+    // field.
+    expect(payload).not.toContain('\\"additional_context\\":\\"\\\\n');
+  });
 });
 
 // ─── NFR-0004: size > 10000 → soft error ─────────────────────────────────────

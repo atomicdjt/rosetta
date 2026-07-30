@@ -1,5 +1,94 @@
 # plugin-generator — Requirements Change Log
 
+## 2026-07-28 — `FR-HOOK-0003` Deprecated: bootstrap prefix removed
+
+**Files:** `FR-HOOK.md`, `GLOSSARY.md`, `ASSUMPTIONS.md`, `NFR.md`
+
+**Source:** User-approved fix found by inspecting real generated output. Hooks are now small and `get_context_instructions` is no longer used in this flow, making the fixed lead-in string obsolete.
+
+- `FR-HOOK-0003` marked `Deprecated` (`implementation: Removed`) with a note explaining hooks are now small and the prefix string is removed; the record is kept, not deleted, since `FR-HOOK-0009`'s manifest-order/lead-position semantics survive.
+- Removed the `BOOTSTRAP_PREFIX` constant from `src/spec/bootstrap-manifest.ts` and its application in `src/bootstrap/payload.ts`; every document's body is now emitted as-is. The leading-newline strip is retained but applies UNIFORMLY to all entries rather than only the former lead — all bodies come from `stripFrontmatter` and all carried a leading newline, so stripping just the first was arbitrary.
+- `FR-HOOK-0009` updated: its statement and rationale had promised an explicit, non-positional lead designation, which existed only to place the prefix. With the prefix gone the `isLead` flag was removed rather than left as a field no behavior reads; the requirement now states that no entry carries a lead designation and that manifest order governs payload sequence and determinism only. Its acceptance criterion about the lead carrying the prefix was replaced, and the record moved to `Implemented` with file/test evidence.
+- Removed the now-orphaned `isLead` field from `BootstrapEntryRef` (`types.ts`) and from all 9 `BOOTSTRAP_MANIFEST_ORDER` entries.
+- `GLOSSARY.md`'s "Bootstrap prefix" term and the manifest-order line referencing it updated to reflect removal; `ASSUMPTIONS.md` QF-1 updated to note the prefix is now gone (not just resolved); `NFR.md` NFR-0004's criterion and implementation notes updated — "after the bootstrap prefix" no longer applies to the size-check pipeline.
+- Scope: only the prefix string. `get_context_instructions` remains a live MCP tool (`src/rosetta-mcp-server/`) and is untouched, as are all `instructions/` references to it.
+- Session-hook entry counts are unaffected (9/5 Claude, 9/5 Copilot, 8/4 Codex) — only the lead entry's content shrinks.
+
+---
+
+## 2026-07-28 — `FR-ARCH-0058`: standalone `pluginReplaceLiterals()` processor replaces reverted `PluginSpec.literalRewritePairs`
+
+**Files:** `FR-ARCH.md`
+
+**Source:** User-approved architecture correction, superseding the same day's earlier `FR-ARCH-0049` addendum below. `plugin-files-mode.md`'s glob-doc bullet for workflows still read `workflows/*.md` in Codex/Antigravity output even though those targets restructure `workflows/**` into `skills/<name>/SKILL.md` (`fileWorkflowToSkill`), because `FR-ARCH-0049` deliberately emits no folder-level pair for a restructuring mapping. The initial fix folded a spec-declared literal-pair lookup into `pluginRewriteReferences()` via a new optional `PluginSpec.literalRewritePairs` field; on review this was the wrong abstraction and was reverted in favor of a separate composed processor.
+
+- New `FR-ARCH-0058` — `pluginReplaceLiterals(pairs)`: a generic `PluginProcessor` factory taking `(from, to)` literal pairs as data and returning a named `pluginReplaceLiteralsProcessor` that performs exact, unconditional substring substitution over non-binary, non-null-content, non-`verbatim` frame contents. Deliberately NO boundary/regex/path-token semantics — it targets prose and glob-documentation strings, not path references, so `pluginRewriteReferences()`'s word-boundary and dot-directory guards (FR-ARCH-0037) would be actively wrong here.
+- `FR-ARCH-0049`'s addendum reverted: the spec-declared-literal-pairs sentence removed from its `<statement>`, the corresponding acceptance criterion removed, and the 2026-07-28 `literalRewritePairs` paragraph removed from its `implementationNotes` (replaced with a short pointer to `FR-ARCH-0058` and a note on why the field was reverted). All of `FR-ARCH-0049`'s pure-relocation-vs-restructuring discriminant work is unaffected.
+- `types.ts`: removed `PluginSpec.literalRewritePairs?: ReadonlyArray<readonly [string, string]>`. `plugin-rewrite-references.ts`: removed step 3 of `buildRenamePairs` (the literal-pair append/re-sort).
+- `spec/targets.ts`: `WORKFLOW_GLOB_TO_SKILLS_FLOW_LITERAL_PAIR` (`['WORKFLOW/COMMAND \`workflows/*.md\`', 'WORKFLOW/COMMAND \`skills/*-flow/SKILL.md\`']`, unchanged) is now supplied to `pluginReplaceLiterals()` and composed into the pipeline via `buildPipeline`'s existing `extraAfterIndexes` parameter — Codex: `[pluginReplaceLiterals([WORKFLOW_GLOB_TO_SKILLS_FLOW_LITERAL_PAIR])]`; Antigravity: the same call appended after `pluginAntigravityReduceFrontmatter, pluginAntigravitySubagentModel`. Runs after `pluginGenerateIndexes()` and before the bootstrap assembler, so hook payloads inherit the substitution. Still keyed on the long literal (including the `WORKFLOW/COMMAND ` prefix), not the bare `workflows/*.md` token, because that bare token also appears unrelated in `skills/rosetta/README.md`, which must stay unchanged.
+- Why reverted: (1) `PluginSpec` surface — a data field used by only 2 of 7 specs is a worse fit than a processor composed only where needed (FR-ARCH-0004/0005's "supply specificity as data at composition time" is better served by pipeline composition than by a spec-level field consumed inside a shared processor); (2) wrong semantics — folding the pair into `pluginRewriteReferences()`'s lookup meant it inherited (or had to specially bypass) that processor's complete-boundary-token/dot-directory matching rules, which are correct for path references but not for prose; (3) a global per-target lookup inside one processor is a worse fit than per-spec pipeline composition, which makes "which targets get this correction" visible directly in `spec/targets.ts` rather than as an implicit consequence of which specs happen to populate a field.
+- Companion fix (non-requirements, unchanged from the original entry): `instructions/r2/core/rules/plugin-files-mode.md`'s AGENT/WORKFLOW bullets normalized (`, ` → `/`, drop "in") to match r3's existing phrasing, so both releases carry the identical literal that the pair targets.
+- Generated output is byte-equivalent to the reverted field-based approach; only the internal composition mechanism changed.
+
+---
+
+## 2026-07-28 — `FR-VAR-0041`: preserved Codex config must not name the omitted workflows index
+
+**Files:** `FR-VAR.md`
+
+**Source:** Defect found while auditing target manifests. Requirement criterion added and the stale pointer corrected.
+
+- `.codex-plugin/plugin.json`'s `interface.defaultPrompt` instructed the agent to "consult rules/INDEX.md and workflows/INDEX.md", but `FR-VAR-0041` removes the Codex workflows index. Preserved config folders are byte-copied by `pluginCopyFiles` and never pass through `pluginRewriteReferences`, so the dangling pointer would ship silently.
+- Criterion added requiring the preserved `core-codex` config to name no workflows folder or workflows index.
+- Pointer corrected in `src/rosettify-plugins/plugins/core-codex/.codex-plugin/plugin.json` to reference the bundled skills instead.
+
+Audit note: `core-claude`'s `.claude-plugin/plugin.json` `"commands": "./workflows/"` is the only other manifest naming that folder and is correct — Claude exposes workflows as slash commands by manifest pointer without renaming the folder.
+
+---
+
+## 2026-07-28 — `FR-ARCH-0049`: folder-level rewrite restricted to pure folder relocations
+
+**Files:** `FR-ARCH.md`
+
+**Source:** User-directed correction. The requirement was under-specified and mandated behavior that is wrong for restructuring mappings.
+
+- `FR-ARCH-0049` previously required, without qualification, that a bare `workflows/` token be rewritten to the target folder. That is correct only for a pure folder relocation such as `workflows`→`commands`, where the document keeps its basename. It is wrong for a restructuring mapping such as `workflows/<name>.md`→`skills/<name>/SKILL.md`, where a bare folder token carries no document identity: rewriting it yields a path that does not exist and corrupts prose and glob mentions that merely contain the token.
+- The statement now emits a folder-level pair only when every in-scope frame from the source folder lands directly in the target folder as a single path segment (extension-only renames such as `.md`→`.mdc` still qualify). Restructuring mappings rewrite exact per-document references only.
+- Two acceptance criteria added covering the restructuring case and the prose/glob non-rewrite case; the existing bare-token criterion is now scoped to pure relocations.
+- Status moved to `ToBeModified` — `buildRenamePairs` requires the corresponding change.
+
+Observed corruption motivating this: `rules/plugin-files-mode.md` (the bootstrap lead document) rendered `` WORKFLOW/COMMAND `skills/*.md` ``, contradicting its own `` SKILL `skills/*/SKILL.md` `` entry, and `skills/post-mortem/SKILL.md` rendered `(skills/agents/skills/rules)`. Both already present in committed `core-antigravity` output.
+
+---
+
+## 2026-07-28 — Correct `FR-HOOK-0007` r3 session-start entry counts
+
+**Files:** `FR-HOOK.md`
+
+**Source:** User-approved correction of a pre-existing defect surfaced during Phase 8 code review. Requirements only.
+
+- `FR-HOOK-0007` — the r3 acceptance counts were derived on the assumption that r3 loses only the workflows index relative to r2. r3 in fact consolidates the five split `bootstrap-*` rules into a single `bootstrap-alwayson.md`, and `BOOTSTRAP_MANIFEST_ORDER` skips the four absent basenames, so every r3 count was overstated by three. Corrected Claude/Copilot r3 from 8 to 5 and `core-codex` r3 from 7 to 4. The r2 counts (9 and 8) were already correct and are unchanged.
+
+Counts verified empirically by generating both releases for all seven targets from `instructions/`.
+
+---
+
+## 2026-07-27 — Generate `core-codex` workflows as skills
+
+**Files:** `FR-COPY.md`, `FR-VAR.md`, `FR-HOOK.md`, `STRUCTURES.md`, `GLOSSARY.md`, `ASSUMPTIONS.md`, `INDEX.md`
+
+**Source:** User-approved requirements change. Requirements only; implementation and generated plugins are unchanged.
+
+- `FR-COPY-0080` — requires the generator to reuse the existing workflow-to-skill transform for the `core-codex` and `core-antigravity` targets; the configured roots are `.agents/skills/` and `skills/`; emitted phase files have no YAML frontmatter.
+- `FR-VAR-0041` — requires the generator to generate the rules index only for the `core-codex` target and omit the workflows index from its output and session-start hooks.
+- `FR-VAR-0042` — requires the generator to package `core-codex` workflows as skills, emit no `.agents/workflows/` folder, retain Codex normalization, and isolate `core-antigravity`-only transforms.
+- `FR-HOOK-0007` — reduces the generated `core-codex` session-start entry counts by one because the generator emits no workflows index for that target.
+- `FR-STRUCT-0010/0030` — updates the generated `core-codex` target tree to the skills-based layout and requires body-only phase files in the `core-codex` and `core-antigravity` outputs.
+
+All six affected requirement units were approved by the user on 2026-07-27.
+
+---
+
 ## 2026-07-23 — Add Antigravity target; deprecate Gemini CLI (ticket #138)
 
 **Files:** `MODEL.md`, `FR-VAR.md`, `FR-COPY.md`, `FR-CLI.md`, `SCOPE.md`, `REFERENCES.md`, `GLOSSARY.md`, `STRUCTURES.md`, `ASSUMPTIONS.md`, `INDEX.md`

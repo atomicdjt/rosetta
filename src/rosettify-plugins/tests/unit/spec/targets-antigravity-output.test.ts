@@ -35,7 +35,13 @@ function buildInstructionsTree(): string {
   writeFile(
     base,
     'rules/sample-rule.md',
-    '---\nname: sample-rule\ndescription: A sample rule\ntrigger: always_on\n---\n\n# Sample Rule\n\nBody text.\n',
+    '---\nname: sample-rule\ndescription: A sample rule\ntrigger: always_on\n---\n\n# Sample Rule\n\nBody text.\n' +
+      // FR-ARCH-0058: exercises the pluginReplaceLiterals correction on the
+      // WORKFLOW/COMMAND glob-doc string (workflows->skills restructures document paths, so no
+      // folder-level pair exists to rewrite it) alongside a bare `workflows/*.md` mention
+      // elsewhere in the SAME content, which must be left untouched.
+      'WORKFLOW/COMMAND `workflows/*.md`\n\n' +
+      'See also the unrelated glob `workflows/*.md` used elsewhere.\n',
   );
 
   writeFile(
@@ -143,6 +149,14 @@ describe('core-antigravity — generated output shape (FR-VAR-0080, FR-STRUCT-00
     expect(skillContent).not.toContain('APPLY PHASE');
   });
 
+  it('strips phase frontmatter but retains a distinct body (FR-STRUCT-0030: workflow phases contain no YAML frontmatter)', () => {
+    const phaseDoc = path.join(targetRoot, 'skills', 'demo-flow', 'phases', 'demo-flow-step.md');
+    const phaseContent = fs.readFileSync(phaseDoc, 'utf-8');
+    expect(phaseContent).not.toContain('---');
+    expect(phaseContent).not.toContain('name: demo-flow-step');
+    expect(phaseContent).toContain('Do the step.');
+  });
+
   it('preserves a real (non-workflow) skill under skills/ with its folder structure intact', () => {
     expect(fs.existsSync(path.join(targetRoot, 'skills', 'mytool', 'SKILL.md'))).toBe(true);
   });
@@ -195,5 +209,25 @@ describe('core-antigravity — generated output shape (FR-VAR-0080, FR-STRUCT-00
     }
     const tmplFiles = listFilesRecursive(targetRoot).filter((f) => f.endsWith('.tmpl'));
     expect(tmplFiles, `no .tmpl file may appear in core-antigravity output; found: ${tmplFiles.join(', ')}`).toHaveLength(0);
+  });
+
+  // FR-ARCH-0058 — pluginReplaceLiterals correction on the WORKFLOW/COMMAND
+  // glob-doc string, keyed on the long form so a bare `workflows/*.md` token elsewhere is
+  // untouched.
+  it('rewrites the WORKFLOW/COMMAND glob-doc string to the skills-flow form, leaving a bare workflows/*.md token elsewhere unchanged', () => {
+    const ruleDoc = path.join(targetRoot, 'rules', 'sample-rule.md');
+    const content = fs.readFileSync(ruleDoc, 'utf-8');
+    expect(content).toContain('WORKFLOW/COMMAND `skills/*-flow/SKILL.md`');
+    expect(content).not.toContain('WORKFLOW/COMMAND `workflows/*.md`');
+    expect(content).toContain('unrelated glob `workflows/*.md`');
+  });
+
+  // FR-HOOK-0003 (Deprecated) — the generated bootstrap payload no longer carries the removed
+  // BOOTSTRAP_PREFIX text.
+  it('generated hooks.json bootstrap payload contains no removed BOOTSTRAP_PREFIX text', () => {
+    const hooksPath = path.join(targetRoot, 'hooks.json');
+    const hooks = fs.readFileSync(hooksPath, 'utf-8');
+    expect(hooks).not.toContain('ALWAYS MUST FULLY');
+    expect(hooks).not.toContain('get_context_instructions');
   });
 });

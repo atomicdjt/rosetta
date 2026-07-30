@@ -2,7 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import { pluginAssembleClaudeBootstrap } from '../../../src/plugin-processors/plugin-assemble-claude-bootstrap.js';
 import type { FileProcessingFrame, PluginProcessingFrame, PluginSpec } from '../../../src/types.js';
-import { BOOTSTRAP_MANIFEST_ORDER, BOOTSTRAP_PREFIX } from '../../../src/spec/bootstrap-manifest.js';
+import { BOOTSTRAP_MANIFEST_ORDER } from '../../../src/spec/bootstrap-manifest.js';
 
 function makeDocFrame(basename: string, body: string): FileProcessingFrame {
   return {
@@ -124,6 +124,25 @@ describe('pluginAssembleClaudeBootstrap — plugin-root entry', () => {
     expect(entries[entries.length - 1]).toContain('CLAUDE_PLUGIN_ROOT');
   });
 
+  it('CLAUDE_PLUGIN_ROOT marker occurs exactly once — exactly one final plugin-root entry (FR-HOOK-0007)', () => {
+    const frames = [
+      makeDocFrame('plugin-files-mode', '\n# Lead\n'),
+      makeDocFrame('bootstrap-core-policy', '\n# Policy\n'),
+      makeDocFrame('bootstrap-guardrails', '\n# Guardrails\n'),
+    ];
+    const p = makePluginFrame(frames);
+    const result = pluginAssembleClaudeBootstrap(p);
+    const payload = result.templateContext['bootstrap_hooks'] as string;
+    const occurrences = (payload.match(/CLAUDE_PLUGIN_ROOT/g) || []).length;
+    expect(occurrences).toBe(1);
+    const entries = payload.split('}, {');
+    expect(entries[entries.length - 1]).toContain('CLAUDE_PLUGIN_ROOT');
+    // ...and it does NOT appear in any earlier entry (genuinely last, not merely present).
+    for (const entry of entries.slice(0, -1)) {
+      expect(entry).not.toContain('CLAUDE_PLUGIN_ROOT');
+    }
+  });
+
   it('entries are joined by ", " separator', () => {
     const frames = [
       makeDocFrame('plugin-files-mode', '\n# Lead\n'),
@@ -146,15 +165,27 @@ describe('pluginAssembleClaudeBootstrap — plugin-root entry', () => {
   });
 });
 
-// ─── Lead document gets prefix (FR-HOOK-0003) ────────────────────────────────
+// ─── Lead document carries NO prefix (FR-HOOK-0003 Deprecated) ───────────────
 
-describe('pluginAssembleClaudeBootstrap — lead document prefix', () => {
-  it('payload contains bootstrap prefix text', () => {
+describe('pluginAssembleClaudeBootstrap — lead document has no bootstrap prefix', () => {
+  it('payload does not contain the removed bootstrap prefix text', () => {
     const frames = [makeDocFrame('plugin-files-mode', '\n# Bootstrap Content\n')];
     const p = makePluginFrame(frames);
     const result = pluginAssembleClaudeBootstrap(p);
     const payload = result.templateContext['bootstrap_hooks'] as string;
-    expect(payload).toContain('ALWAYS MUST FULLY');
+    expect(payload).not.toContain('ALWAYS MUST FULLY');
+    expect(payload).not.toContain('get_context_instructions');
+  });
+
+  it("emits the lead document's body as-is, without a leading blank line", () => {
+    const frames = [makeDocFrame('plugin-files-mode', '\n# Bootstrap Content\n')];
+    const p = makePluginFrame(frames);
+    const result = pluginAssembleClaudeBootstrap(p);
+    const payload = result.templateContext['bootstrap_hooks'] as string;
+    expect(payload).toContain('# Bootstrap Content');
+    // The leading newline strip is retained after prefix removal: the body must not
+    // begin with an escaped newline immediately after the additionalContext quote.
+    expect(payload).not.toContain('\\"additionalContext\\":\\"\\\\n');
   });
 });
 

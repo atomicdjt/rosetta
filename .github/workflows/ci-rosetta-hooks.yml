@@ -1,0 +1,42 @@
+name: CI Rosetta Hooks
+
+# Pre-merge gate: type-check + build + tests for the rosetta-hooks package on
+# every PR that touches it. Mirrors the ci-curiocity.yml pattern for Node/TS
+# packages so a green CI here means the package builds and tests cleanly.
+on:
+  pull_request:
+    paths:
+      - 'src/hooks/**'
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v5
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v5
+      with:
+        node-version: '24'
+
+    - name: Install dependencies
+      working-directory: ./src/hooks
+      run: npm ci
+
+    - name: Run type validation
+      working-directory: ./src/hooks
+      run: npm run check
+
+    - name: Build package
+      working-directory: ./src/hooks
+      run: npm run build
+
+    - name: Run tests
+      working-directory: ./src/hooks
+      run: npm run test

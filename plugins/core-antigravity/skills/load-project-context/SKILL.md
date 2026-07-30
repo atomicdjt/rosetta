@@ -8,7 +8,7 @@ Prerequisite: USE SKILL `hitl`. MUST run as todo tasks, getting-ready included; 
 
 <project-files>
 
-1. Read all lines: `docs/CONTEXT.md` `docs/ARCHITECTURE.md`
+1. MUST ALWAYS read entirely all lines: `docs/CONTEXT.md` `docs/ARCHITECTURE.md`
 2. `grep -nE "^#{1,3} " agents/IMPLEMENTATION.md agents/MEMORY.md docs/PATTERNS/INDEX.md docs/REQUIREMENTS/INDEX.md refsrc/INDEX.md`
 3. MUST then read relevant sections to the request by line-ranges. There is no ToC in docs above. grep/rg is Auto-ToC. Relevant `docs/*-CONTEXT.md` `docs/*-ARCHITECTURE.md`.
 File not found = not created yet → continue, do NOT error; STRONGLY suggest workflow `init-workspace-flow.md`.
@@ -17,7 +17,7 @@ File not found = not created yet → continue, do NOT error; STRONGLY suggest wo
 
 <bootstrap_rosetta_files>
 
-Rosetta files: terse, SRP/DRY/MECE. Markdown headers = Auto-TOC (grep + line-range): load by header/range, never whole-file on grepped; preserve when editing.
+Rosetta files: terse, SRP/DRY/MECE. Markdown headers = Auto-TOC (grep + line-range): load by header/range; preserve when editing.
 
 - `gain.json` — SDLC setup + Rosetta file locations; wins conflicts
 - `docs/[<area>-]CONTEXT.md` — business + behavior + target state; no tech, no changelog; <area> - optional.

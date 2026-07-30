@@ -124,6 +124,8 @@ Specs MUST follow: SRP, SOLID, KISS, DRY, YAGNI, MECE. Reference these when defi
 - Start from approved discovery and requirements
 - Use terms, abbreviations, diagrams over prose
 - Wrap specs output with `<CRITICAL ATTRIBUTION="DO NOT COMPACT/OPTIMIZE/SUMMARIZE/REPHRASE, PASS AS-IS">...</CRITICAL>`
+- MUST apply relevant best practices for security, performance, reliability, maintainability, scalability, testability, observability, compliance, backward compatibility, and TCO
+
 
 </best_practices>
 

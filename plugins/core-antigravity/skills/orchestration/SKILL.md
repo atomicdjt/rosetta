@@ -22,7 +22,9 @@ Prerequisites: USE SKILL `hitl`, `load-project-context`
 
 - ~1-2 files, one area → SMALL → hold it yourself on todo-task ledger; subagents for fresh-eye review.
 - ~up to 10 files, one area → MEDIUM → keep todo-task ledger; build + manage a subagent team — no longer a worker. MUST APPLY SKILL FILE `assets/o-team-manager.md`.
-- 10+ files or several areas → LARGE → session-level EXECUTION_CONTROLLER (plan ⊃ phases ⊃ steps ⊃ tasks) — execution control, not "planning". MUST APPLY SKILL FILE `assets/o-session-execution-controller.md`.
+- 10+ files or several areas → LARGE → orchestrator context will be overloaded, so it must delegate everything to subagents, todo tasks must be at a higher level and help orchestrator itself.
+
+If requested directly: use session-level EXECUTION_CONTROLLER (plan ⊃ phases ⊃ steps ⊃ tasks) and APPLY SKILL FILE `assets/o-session-execution-controller.md`.
 
 Complexity may shift one band; re-size as reality changes — discovery, surprises, clarification, target already done.
 

@@ -25,7 +25,7 @@ Run task-adaptive security review through mandatory canonical subagents. End wit
 6. For full review, require every applicable, available, authorized activity and tool.
 7. Maintain a task ledger and run phases JIT.
 8. Every question and approval follows the loaded `hitl` skill.
-9. Flow state MUST be saved to AGENTS TEMP FEATURE folder as `security-flow-state.md`; every phase updates it before the next starts.
+9. Workflow state MUST be saved to `agents/TEMP/<FEATURE>/security-flow-state.md` file; every phase updates it before the next starts.
 
 </prerequisites>
 

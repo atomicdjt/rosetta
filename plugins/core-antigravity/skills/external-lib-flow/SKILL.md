@@ -17,6 +17,7 @@ description: "Workflow for onboarding an external private library so AI can use 
 - MUST use compressed XML (Tree-sitter) for small output
 - Onboarding document MUST specify KB title and search instructions
 - Update ARCHITECTURE.md based on template `MUST use RefSrc/{project-name}.xml and RefSrc/{project-name}-onboarding.md. MUST use grep or search with those, because those are big files.`. Combine this rule for multiple external dependencies.
+- Workflow state MUST be saved to `agents/TEMP/<FEATURE>/external-lib-flow-state.md` file.
 
 ## Onboarding Flow
 

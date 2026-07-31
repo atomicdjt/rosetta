@@ -167,29 +167,23 @@ echo ""
 echo -e "${CYAN}=== Rosetta Version Bumper ===${RESET}"
 echo ""
 echo "Current versions:"
+for f in "${PLUGIN_MARKETPLACE_FILES[@]}"; do
+    if [[ "$f" == *marketplace.json ]]; then
+        printf "  %-55s %s\n" "[marketplace] ${f#$ROOT/}" "$(get_json_version "$f")"
+    else
+        printf "  %-55s %s\n" "[plugin.json] ${f#$ROOT/}" "$(get_json_version "$f")"
+    fi
+done
 for f in \
     "$ROOT/src/rosetta-cli/pyproject.toml" \
-    "$ROOT/src/ims-mcp-server/pyproject.toml" \
-    "$ROOT/src/rosetta-mcp-server/pyproject.toml"; do
+    "$ROOT/src/rosetta-mcp-server/pyproject.toml" \
+    "$ROOT/src/ims-mcp-server/pyproject.toml"; do
     printf "  %-55s %s\n" "[toml]        ${f#$ROOT/}" "$(get_toml_version "$f")"
 done
 printf "  %-55s %s\n" "[package.json] src/rosettify/package.json" "$(get_json_version "$ROOT/src/rosettify/package.json")"
 printf "  %-55s %s\n" "[package.json] src/rosettify-plugins/package.json" "$(get_json_version "$ROOT/src/rosettify-plugins/package.json")"
 printf "  %-55s %s\n" "[package.json] src/rosettify-prompts/package.json" "$(get_json_version "$ROOT/src/rosettify-prompts/package.json")"
 printf "  %-55s %s\n" "[package.json] src/curiocity/package.json" "$(get_json_version "$ROOT/src/curiocity/package.json")"
-for f in \
-    "$ROOT/src/rosettify-plugins/plugins/core-claude/.claude-plugin/plugin.json" \
-    "$ROOT/src/rosettify-plugins/plugins/core-cursor/.cursor-plugin/plugin.json" \
-    "$ROOT/src/rosettify-plugins/plugins/core-copilot/.github/plugin/plugin.json" \
-    "$ROOT/src/rosettify-plugins/plugins/core-codex/.codex-plugin/plugin.json"; do
-    printf "  %-55s %s\n" "[plugin.json] ${f#$ROOT/}" "$(get_json_version "$f")"
-done
-for f in \
-    "$ROOT/.claude-plugin/marketplace.json" \
-    "$ROOT/.cursor-plugin/marketplace.json" \
-    "$ROOT/.github/plugin/marketplace.json"; do
-    printf "  %-55s %s\n" "[marketplace] ${f#$ROOT/}" "$(get_json_version "$f")"
-done
 
 echo ""
 echo "Bump type:"
@@ -224,7 +218,7 @@ bump_plugin_marketplace_group
 echo ""
 echo "--- pyproject.toml files ---"
 bump_file_toml "$ROOT/src/rosetta-cli/pyproject.toml"        "n"
-bump_file_toml "$ROOT/src/rosetta-mcp-server/pyproject.toml" "y"
+bump_file_toml "$ROOT/src/rosetta-mcp-server/pyproject.toml" "n"
 
 # ims-mcp-server: bump version + sync rosetta-mcp dependency to match rosetta-mcp-server
 ROSETTA_VERSION="$(get_toml_version "$ROOT/src/rosetta-mcp-server/pyproject.toml")"
@@ -232,7 +226,7 @@ f="$ROOT/src/ims-mcp-server/pyproject.toml"
 current="$(get_toml_version "$f")"
 rel="${f#$ROOT/}"
 new_version="$(compute_new_version "$current")"
-if ask_yn "Bump $rel  ($current → $new_version, rosetta-mcp → $ROSETTA_VERSION)?" "y"; then
+if ask_yn "Bump $rel  ($current → $new_version, rosetta-mcp → $ROSETTA_VERSION)?" "n"; then
     sedi "s/^version = \"${current}\"/version = \"${new_version}\"/" "$f"
     old_rosetta="$(grep 'rosetta-mcp==' "$f" | sed 's/.*rosetta-mcp==\([^"]*\)".*/\1/')"
     sedi "s/\"rosetta-mcp==${old_rosetta}\"/\"rosetta-mcp==${ROSETTA_VERSION}\"/" "$f"
@@ -243,19 +237,19 @@ fi
 
 echo ""
 echo "--- src/rosettify/package.json ---"
-bump_file_json "$ROOT/src/rosettify/package.json" "y"
+bump_file_json "$ROOT/src/rosettify/package.json" "n"
 
 echo ""
 echo "--- src/rosettify-plugins/package.json ---"
-bump_file_json "$ROOT/src/rosettify-plugins/package.json" "y"
+bump_file_json "$ROOT/src/rosettify-plugins/package.json" "n"
 
 echo ""
 echo "--- src/rosettify-prompts/package.json ---"
-bump_file_json "$ROOT/src/rosettify-prompts/package.json" "y"
+bump_file_json "$ROOT/src/rosettify-prompts/package.json" "n"
 
 echo ""
 echo "--- src/curiocity/package.json ---"
-bump_file_json "$ROOT/src/curiocity/package.json" "y"
+bump_file_json "$ROOT/src/curiocity/package.json" "n"
 
 echo ""
 echo -e "${GREEN}Done!${RESET}"

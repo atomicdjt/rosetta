@@ -20,7 +20,7 @@ Validation: Each phase produces verifiable outputs; reviewer catches issues befo
 <prerequisites phase="0" applies="ALL">
 
 1. All Rosetta prep steps MUST be FULLY completed
-2. MUST USE SKILL `load-project-context` (required: all), `orchestration` (medium+), `hitl` (all)
+2. MUST USE SKILL `load-project-context` (required: all), `orchestration` (medium+), `hitl` (all, unless `No HITL` or `Fully Autonomous`)
 3. MUST ALWAYS use todo tasks ledger, ASAP. Phases are sequential. Independent tasks can run in parallel.
 4. No rush, take your time, MUST FOLLOW WORKFLOW ENTIRELY, no skipping, if in doubt - select the safest / longest path, no deviation from the workflow is allowed
 5. When debugging is needed, INVOKE SUBAGENT `engineer` with `debugging` skill to save LLM context

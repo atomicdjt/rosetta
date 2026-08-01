@@ -61,6 +61,7 @@ Produce:
 5. Output fidelity as a test requirement. Because one suite serves both, the rendered output (DOM/response shape) must stay close to the original — structure, selectors, ordering, text. Connect this to the identity rule: this is why selectors are preserved. Add the corollary about not restructuring markup to suit the new design system's preferred composition.
 6. Authoring location & SCM. If tests are authored inside read-only reference material, state the carve-out explicitly: test files writable, application code untouched. Check the ignore rules — an acceptance gate that lands untracked is not a gate. Flag needed changes.
 7. Sequencing. Gate-building as a distinct phase preceding all porting, then the per-session loop.
+8. Screenshots. Must use screenshots for final validation - once everything else works and passes.
 
 Rules: terse. Ground every claim about the legacy suite in what you read. Do not restate the archetype mapping.
 

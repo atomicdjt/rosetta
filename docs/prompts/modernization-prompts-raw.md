@@ -17,6 +17,7 @@ Produce, terse, at the top of the document:
 5. Preserved asymmetries. Legacy inconsistencies that must NOT be unified. These are the highest-risk items: they look like bugs and invite cleanup.
 6. Out of scope. Subsystems that exist in the legacy code but have no consumer or were abandoned, with the evidence.
 7. Current state. One line. Never let planned work read as landed.
+8. Subagents. One small subset (few files), migrated, ONLY then another small subset (few files). Context control. Hallucination control. MUST NEVER read ALL original files at once.
 
 Rules: cite evidence as repo-relative paths. Do not duplicate file inventory, versions, or port steps — cross-reference them. Assume a competent reader who knows both technologies. If you find a contradiction with an existing doc, report it rather than authoring a second version of the same fact — one authority per fact.
 

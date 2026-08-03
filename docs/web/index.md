@@ -269,12 +269,12 @@ Download core-cursor-standalone-*.zip from the <a href="https://github.com/gridd
 
           <!-- Tab: VS Code / GitHub Copilot -->
           <div class="qs-content" data-tab-content="copilot">
-            <p class="qs-content-hint">For VS Code, add Rosetta as a Copilot plugin marketplace and install <code>rosetta</code> from agent customizations. For JetBrains Copilot, use the standalone package. Deep links: <a href="{{ '/docs/plugins/#github-copilot' | relative_url }}">Plugins</a>, <a href="{{ '/docs/installation/#plugin-based-installation' | relative_url }}">Installation</a>.</p>
+            <p class="qs-content-hint">Add Rosetta as a Copilot plugin marketplace (VS Code or JetBrains) and install <code>rosetta</code> from agent customizations. If your Marketplace/plugin catalog isn't available, extract the standalone package as a fallback. Deep links: <a href="{{ '/docs/plugins/#github-copilot' | relative_url }}">Plugins</a>, <a href="{{ '/docs/installation/#plugin-based-installation' | relative_url }}">Installation</a>.</p>
             <div class="qs-code-wrap">
-              <pre class="qs-code"><span class="qs-comment"># VS Code setting: chat.plugins.marketplaces</span>
+              <pre class="qs-code"><span class="qs-comment"># VS Code / JetBrains Copilot marketplace setting</span>
 https://github.com/griddynamics/rosetta
 
-<span class="qs-comment"># JetBrains Copilot</span>
+<span class="qs-comment"># Standalone fallback</span>
 Download core-copilot-standalone-*.zip from the <a href="https://github.com/griddynamics/rosetta/releases/latest">latest release</a> and extract it into the repository.</pre>
               <button class="qs-copy" data-copy="https://github.com/griddynamics/rosetta">Copy</button>
             </div>

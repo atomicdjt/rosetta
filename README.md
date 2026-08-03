@@ -137,10 +137,13 @@ flowchart LR
 
 Higher layers propagate to every project automatically; teams customize without forking. Everything is authored in markdown and versioned in Git.
 
-## Tech Demo
+## Tech Demo: Init and Coding
 
 https://github.com/user-attachments/assets/fc0ef06a-2f9c-49fa-bc05-68001dadd286
 
+## Tech Demo: Modernization
+
+https://github.com/user-attachments/assets/8a48ce2e-a8f6-4d80-a208-4e808ab502df
 
 ## Why not just use IDE rules?
 

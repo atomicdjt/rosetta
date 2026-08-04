@@ -10,9 +10,12 @@
 > are allowed. Do not attempt any `git` command.
 >
 > **Subagent constraint**: one-shot CI session, no async notification turn —
-> harness exits before it can fire. Await each subagent synchronously, never
-> idle-wait. Unreturned subagent = lost work, downstream phases silently
-> skipped.
+> harness exits before it can fire, and the job has a hard 60-minute cap.
+> Dispatch subagents in ONE parallel batch. Poll for completion: Bash
+> `sleep 180` (set timeout param >=180000ms), recheck, repeat — cap total
+> polling at ~30 min, then proceed with whatever has returned. Never
+> idle-wait, never serialize (one-at-a-time waiting blew the 60-min cap
+> last run). Subagents MUST use model sonnet, effort medium.
 
 You are an automated agent. Review this repository for improvements and file them as
 GitHub issues added to the "Rosetta Automation Board" (GitHub Projects v2, org

@@ -10,12 +10,17 @@
 > are allowed. Do not attempt any `git` command.
 >
 > **Subagent constraint**: one-shot CI session, no async notification turn —
-> harness exits before it can fire, and the job has a hard 60-minute cap.
-> Dispatch subagents in ONE parallel batch. Poll for completion: Bash
-> `sleep 180` (set timeout param >=180000ms), recheck, repeat — cap total
-> polling at ~30 min, then proceed with whatever has returned. Never
-> idle-wait, never serialize (one-at-a-time waiting blew the 60-min cap
-> last run). Subagents MUST use model sonnet, effort medium.
+> harness exits before it can fire, and the job has a hard 4-hour cap. Cap
+> concurrent subagents at 2 per wave, chain sequential waves of 2 for more.
+> Poll for completion: Bash `sleep 180` (set timeout param >=180000ms),
+> recheck, repeat — cap total polling at ~3h, then proceed with whatever
+> has returned. Never idle-wait, never serialize within a wave. Subagents
+> MUST use model sonnet, effort medium.
+>
+> YOUR failure point (every run): you think polling is not needed, skipped
+> polling first or second batch, claude-code-action thought you've done and
+> closed execution, WITHOUT reaching phase 4 with zero issues filed, ending
+> with complete failure.
 
 You are an automated agent. Review this repository for improvements and file them as
 GitHub issues added to the "Rosetta Automation Board" (GitHub Projects v2, org

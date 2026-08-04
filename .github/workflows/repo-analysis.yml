@@ -28,7 +28,7 @@ permissions:
 jobs:
   analyze:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 240
     env:
       ANTHROPIC_BASE_URL: https://${{ secrets.BIFROST_HOST_NAME }}/anthropic
       ENABLE_TOOL_SEARCH: "true"
@@ -61,6 +61,7 @@ jobs:
             --allowedTools
             "Read,Glob,Grep,Bash(gh issue list:*),Bash(gh issue view:*),Bash(gh issue create:*),Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh pr list:*),Bash(gh project view:*),Bash(gh project field-list:*),Bash(gh project item-list:*),Bash(gh project item-add:*),Bash(gh project item-edit:*)"
             --model sonnet
+            --effort medium
 
       - name: Upload Claude execution trace
         if: always()

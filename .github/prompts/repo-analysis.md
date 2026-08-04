@@ -7,8 +7,7 @@
 > clear and actionable for the human reviewer.
 >
 > **Bash constraint**: only `gh issue *`, `gh pr list`, and `gh project *` commands
-> are allowed. Do not attempt any `git` command — the wiki checkout is published by
-> a separate workflow step, not by you.
+> are allowed. Do not attempt any `git` command.
 
 You are an automated agent. Review this repository for improvements and file them as
 GitHub issues added to the "Rosetta Automation Board" (GitHub Projects v2, org
@@ -34,9 +33,6 @@ You always must "simulate" how the entire AI coding agent flow works if instruct
 ## Constraints
 
 - ONLY add new issues to project 57 ("Rosetta Automation Board"). Touch no other project.
-- The wiki checkout at `wiki/` is read/write via the `Write`/`Edit` tools on `wiki/Automation-Log.md`
-  only — you do not have `git` access; a workflow step commits and pushes it after you finish.
-- `wiki/Automation-KB.md` is **read-only** — read it via the `Read` tool, never write to it.
 - Do NOT commit code, create PRs, or modify any repository files.
 - No nitpicking, if nothing is found - then it is great - nothing to add!
 - Always think - is it ACTUALLY needed to be resolved? How does it affect current repository and user experience?
@@ -48,8 +44,6 @@ List issues already on the board:
 gh project item-list 57 --owner griddynamics --format json --limit 200
 ```
 Note their titles to avoid duplicates.
-
-Also read `wiki/Automation-KB.md` (via the `Read` tool) for background context, if it has content.
 
 Also load recently closed PRs created by this automation:
 ```bash
@@ -159,23 +153,6 @@ For each approved improvement:
    ```
 3. **Update** if an existing issue is stale or missing the `AI` label — use `gh issue edit <N> --add-label AI`.
 
-## Phase 4 — Update the Automation Log
-
-Using the `Write`/`Edit` tool on `wiki/Automation-Log.md`, append a new run section (do NOT remove existing content):
-
-```markdown
-## Run <UTC date/time>
-
-- Issues found on board: <N>
-- Improvements identified: <N>
-- Created: <issue number list>
-- Updated: <issue number list>
-- Skipped (duplicate): <N>
-- Rejected by validator: <N>
-```
-
-Do not run any `git` command yourself — the workflow publishes this file after you finish.
-
 ## Output
 
 Print a summary:
@@ -188,5 +165,4 @@ Created: <issue number list>
 Updated: <issue number list>
 Skipped (duplicate): <N>
 Rejected by validator: <N>
-Log updated: yes/no
 ```

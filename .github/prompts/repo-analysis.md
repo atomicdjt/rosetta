@@ -9,21 +9,21 @@
 > **Bash constraint**: only `gh issue *`, `gh pr list`, and `gh project *` commands
 > are allowed. Do not attempt any `git` command.
 >
-> **Subagent constraint**: one-shot CI session, no async notification turn —
-> harness exits before it can fire, and the job has a hard 4-hour cap.
-> Dispatch subagents in ONE parallel batch. After dispatching, ALWAYS arm
-> ScheduleWakeup (with a prompt) to resume yourself. NEVER call
-> ScheduleWakeup with stop:true while any subagent is still outstanding.
-> Never idle-wait, never serialize. Subagents MUST use model sonnet, effort
-> medium.
+> **Subagent constraint**: one-shot headless session. Ending a turn without a tool
+> call kills the job in ~2s — no later turn, no notification, no wakeup; the 4-hour
+> budget is irrelevant.
 >
-> YOUR CRITICAL FAILURES FROM ALL PREVIOUS RUNS, YOU MUST FOLLOW: you think
-> polling is not needed or skipped polling after first or second batch,
-> claude-code-action thought you've done and closed execution, WITHOUT
-> reaching phase 4 with zero issues filed, ending with complete failure.
-> The harness will not re-invoke you via task-notification — this pipeline
-> uses a stop notification and will consider it reached the end, and the
-> entire process will be terminated even BEFORE subagents complete.
+> Pass `run_in_background: false` on every `Agent` call (omit only if the schema
+> lacks it), all calls in one assistant message. They run concurrently (verified)
+> and the turn stays open until every report returns — the only wait that works here.
+> ScheduleWakeup, Monitor, sleep and polling were each tested and fail silently.
+> Missing report → review that area yourself with Read/Grep rather than wait.
+>
+> Subagents: model sonnet, effort medium, no nested subagents; per finding return
+> title, file path, 2-sentence rationale.
+>
+> All 6 prior runs dispatched subagents, ended the turn to wait, and died: zero
+> issues filed, CI green. One reasoned the warning didn't apply and failed the same.
 
 You are an automated agent. Review this repository for improvements and file them as
 GitHub issues added to the "Rosetta Automation Board" (GitHub Projects v2, org
@@ -92,7 +92,7 @@ If a candidate from Phase 2 touches `instructions/r*/**`, or concerns Rosetta in
 skills, workflows, agents, prompts, bootstrap behavior, or prompt quality generally:
 
 1. MUST treat it as instruction-quality review, not an ordinary documentation/code improvement.
-2. MUST USE SKILL `orchestrator-contract` before any subagent dispatch.
+2. MUST USE SKILL `orchestration` before any subagent dispatch.
 3. MUST spawn at least one subagent with:
    - role: Rosetta prompt quality reviewer
    - MUST USE SKILL `coding-agents-prompt-authoring`
@@ -159,7 +159,7 @@ For each approved improvement:
 2. **Create** if new:
    ```bash
    gh issue create --title "[ROSETTA] <concise title, max 80 chars>" \
-     --body "<2-3 sentences: what, why, where>" --label AI
+     --body "<2-3 sentences: what, why, where>"
    ```
    Then add it to the board and set Status to "Backlog":
    ```bash
@@ -167,7 +167,7 @@ For each approved improvement:
    gh project item-edit --id <item-id> --project-id <project-id> \
      --field-id <status-field-id> --single-select-option-id <backlog-option-id>
    ```
-3. **Update** if an existing issue is stale or missing the `AI` label — use `gh issue edit <N> --add-label AI`.
+3. **Update** if an existing issue is stale — use `gh issue edit <N>` to correct the title or body.
 
 ## Output
 

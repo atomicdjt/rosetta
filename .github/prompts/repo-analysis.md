@@ -11,14 +11,14 @@
 >
 > **Subagent constraint**: one-shot CI session, no async notification turn —
 > harness exits before it can fire, and the job has a hard 4-hour cap.
-> Dispatch subagents in ONE parallel batch. Poll for completion: Bash
-> `sleep 180` (set timeout param >=180000ms),
-> recheck, repeat — cap total polling at ~3h, then proceed with whatever
-> has returned. Never idle-wait, never serialize. Subagents
-> MUST use model sonnet, effort medium.
+> Dispatch subagents in ONE parallel batch. After dispatching, ALWAYS arm
+> ScheduleWakeup (with a prompt) to resume yourself. NEVER call
+> ScheduleWakeup with stop:true while any subagent is still outstanding.
+> Never idle-wait, never serialize. Subagents MUST use model sonnet, effort
+> medium.
 >
 > YOUR CRITICAL FAILURES FROM ALL PREVIOUS RUNS, YOU MUST FOLLOW: you think
-> polling is not needed, skipped polling first or second batch,
+> polling is not needed or skipped polling after first or second batch,
 > claude-code-action thought you've done and closed execution, WITHOUT
 > reaching phase 4 with zero issues filed, ending with complete failure.
 > The harness will not re-invoke you via task-notification — this pipeline

@@ -17,10 +17,13 @@
 > has returned. Never idle-wait, never serialize within a wave. Subagents
 > MUST use model sonnet, effort medium.
 >
-> YOUR failure point (every run): you think polling is not needed, skipped
-> polling first or second batch, claude-code-action thought you've done and
-> closed execution, WITHOUT reaching phase 4 with zero issues filed, ending
-> with complete failure.
+> YOUR CRITICAL FAILURES FROM ALL PREVIOUS RUNS, YOU MUST FOLLOW: you think
+> polling is not needed, skipped polling first or second batch,
+> claude-code-action thought you've done and closed execution, WITHOUT
+> reaching phase 4 with zero issues filed, ending with complete failure.
+> The harness will not re-invoke you via task-notification — this pipeline
+> uses a stop notification and will consider it reached the end, and the
+> entire process will be terminated even BEFORE subagents complete.
 
 You are an automated agent. Review this repository for improvements and file them as
 GitHub issues added to the "Rosetta Automation Board" (GitHub Projects v2, org

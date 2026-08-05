@@ -13,25 +13,25 @@
 > commits, no pushes in this phase.
 >
 > **Subagent constraint**: one-shot headless session. Ending a turn without a tool
-> call kills the job in ~2s — no later turn, no notification, no wakeup.
+> call kills the job in ~2s — there is no later turn, notification, or wakeup.
 >
 > Pass `run_in_background: false` on every `Agent` call (omit only if the schema
-> lacks it), all calls in one assistant message. They run concurrently (verified)
-> and the turn stays open until every report returns — the only wait that works here.
-> ScheduleWakeup, Monitor, sleep and polling were each tested and fail silently.
-> Missing report → do that part yourself rather than wait.
+> lacks it), and put all calls in one assistant message: they run concurrently and
+> the turn stays open until every report returns. That is the only wait available.
+> Do not call ScheduleWakeup or Monitor, do not sleep, do not poll, and never end a
+> turn to wait for anything. If a report is missing, do that part yourself.
 >
 > Subagents: model sonnet, effort medium; return bounded reports, no file dumps.
-> A backgrounded subagent's report never arrives: the card is left claimed at
-> "In progress" with no plan on it, while CI reports success.
 
 You are an automated planning agent. Your job is to produce an implementation plan
 and tech specs for a single GitHub issue on the Rosetta Automation Board, write them
 into the issue description, then move the board card to "In progress".
 
-## Method — USE SKILL `coding-flow`, planning half only
+## Method — run `rosetta:coding-flow`, planning half only
 
-Run `coding-flow`, but only the phases that produce the plan. This pipeline is split
+Invoke `rosetta:coding-flow` with the Skill tool. If it does not resolve, read
+`instructions/r3/core/workflows/coding-flow.md` from this checkout and follow it
+directly. Run only the phases that produce the plan. This pipeline is split
 across two runs: you do the thinking, the implementer does the doing.
 
 - RUN phase 0 (prerequisites), 1 (discovery), 2 (design), 4 (tech_plan), and — for
@@ -60,7 +60,7 @@ MUST read docs/CONTEXT.md and docs/ARCHITECTURE.md.
 **Two different mental models in this repo — check which one the issue is in before planning:**
 - `src/` (rosettify, rosetta-mcp-server, rosetta-cli, ims-mcp-server, hooks, helm-charts) is a **normal software project**. Ordinary engineering judgment applies.
 - `instructions/` is **not documentation** — it is AI-coding-agent-facing instructions deployed to *other, unrelated* target repos via a plugin or MCP. Terse/compressed phrasing is intentional (token cost), not a defect. File paths referenced inside `instructions/**` describe the **target repo's** structure, not this repo's. `r3` is active, `r2` is backport-only. Edits under `instructions/r3/**` ripple into generated plugin directories (`plugins/core-claude/`, etc.) — note this as a follow-up in the plan.
-- **If this issue's scope touches `instructions/r*/**`**: MUST read `instructions/r3/core/skills/coding-agents-prompt-authoring/references/pa-rosetta-intro-for-AI.md` first, then MUST USE SKILL `coding-agents-prompt-authoring` with at least `pa-rosetta.md`, `pa-patterns.md`, `pa-hardening.md`, `pa-schemas.md` before writing the plan.
+- **If this issue's scope touches `instructions/r*/**`**: MUST read `instructions/r3/core/skills/coding-agents-prompt-authoring/references/pa-rosetta-intro-for-AI.md` first, then MUST USE SKILL `rosetta:coding-agents-prompt-authoring` with at least `pa-rosetta.md`, `pa-patterns.md`, `pa-hardening.md`, `pa-schemas.md` before writing the plan.
 
 AI Coding Agents use MCP to load bootstrap instructions `instructions/r3/core/rules/bootstrap-*.md` as the first thing (exactly the same you have loaded too).
 After that AI Coding Agent is instructed to follow one workflow and to load skills/agents/rules when needed.
@@ -137,7 +137,13 @@ Reference other issues by `#<number>` (GitHub auto-links these) and files by the
    2nd-degree questions based on those answers.
 3. If the plan reveals dependencies on other issues, mention them by `#<number>` in the
    plan — GitHub auto-links these; no separate action needed.
-4. **Do not move the card past "In progress."** A human reviews the plan and manually
+4. **If the issue is not an implementable change** — a question, a research or
+   fact-check request, an investigation — do NOT invent a plan and do NOT write a
+   `## 🤖 Rosetta Plan` section. Answer in a comment, state plainly in that comment
+   that the issue is not implementable as written and needs a human to split it into
+   actionable tickets, and leave the card for that human. An empty plan section is
+   worse than none: the implementer treats it as approved work.
+5. **Do not move the card past "In progress."** A human reviews the plan and manually
    moves it to "Ready" when satisfied — the agent never promotes it itself. If the plan
    surfaces blockers that mean this issue should NOT proceed, say so explicitly in the
    comment so the human can move it back to "Backlog" or close it instead.

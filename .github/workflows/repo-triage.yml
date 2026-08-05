@@ -89,7 +89,8 @@ jobs:
             MUST APPLY AND FULLY EXECUTE FULLY AUTONOMOUSLY WITHOUT ANY USER INTERACTION OR QUESTIONS, No HITL: .github/prompts/repo-triage.md
           show_full_output: false
           claude_args: |
-            --allowedTools Read,Glob,Grep,Agent,Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git branch:*),Bash(git ls-files:*),Bash(git rev-parse:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr edit:*),Bash(gh pr comment:*),Bash(gh issue view:*),Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh issue create:*),Bash(gh api:*)
+            --allowedTools
+            "Read,Glob,Grep,Agent,Skill,Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*),Bash(git branch:*),Bash(git ls-files:*),Bash(git rev-parse:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr edit:*),Bash(gh pr comment:*),Bash(gh issue view:*),Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh issue create:*),Bash(gh api:*)"
             --disallowedTools ScheduleWakeup
             --model sonnet
 
@@ -102,6 +103,12 @@ jobs:
             ${{ secrets.GITHUB_TOKEN }}
             ${{ secrets.BIFROST_API_KEY }}
         run: python3 .github/scripts/scrub_trace.py /home/runner/work/_temp/claude-execution-output.json
+
+      # Triage is event-driven, so a run that finds nothing to say is legitimate:
+      # --allow-no-op keeps the abandoned-subagent check and drops the did-it-mutate one.
+      - name: Verify the run did real work
+        if: always()
+        run: python3 .github/scripts/check_trace.py /home/runner/work/_temp/claude-execution-output.json --allow-no-op
 
       - name: Upload Claude execution trace
         if: always()

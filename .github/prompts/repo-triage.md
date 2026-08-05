@@ -7,17 +7,15 @@
 > **Bash constraint**: Only git read-only commands are allowed in bash (`git status`, `git diff`, `git log`, `git show`, `git branch`, `git ls-files`, `git rev-parse`). Do not attempt any other bash command, and do not attempt git write/mutating operations (commit, push, reset, clean, checkout -f, etc.) — they are blocked.
 >
 > **Subagent constraint**: one-shot headless session. Ending a turn without a tool
-> call kills the job in ~2s — no later turn, no notification, no wakeup.
+> call kills the job in ~2s — there is no later turn, notification, or wakeup.
 >
 > Pass `run_in_background: false` on every `Agent` call (omit only if the schema
-> lacks it), all calls in one assistant message. They run concurrently (verified)
-> and the turn stays open until every report returns — the only wait that works here.
-> ScheduleWakeup, Monitor, sleep and polling were each tested and fail silently.
-> Missing report → review that area yourself with Read/Grep rather than wait.
+> lacks it), and put all calls in one assistant message: they run concurrently and
+> the turn stays open until every report returns. That is the only wait available.
+> Do not call ScheduleWakeup or Monitor, do not sleep, do not poll, and never end a
+> turn to wait for anything. If a report is missing, do that part yourself.
 >
-> Subagents: model sonnet, effort medium; per finding return title, file path,
-> 2-sentence rationale. A backgrounded subagent's report never
-> arrives and the run ends having done nothing, while CI reports success.
+> Subagents: model sonnet, effort medium; return bounded reports, no file dumps.
 
 You are an automated triage agent. Your first action is always to load
 Rosetta bootstrap/context instructions from the installed Claude Code plugin
@@ -67,10 +65,10 @@ This guardrail applies to ALL activities and ALL `/rosetta` commands. No excepti
 If a PR changes `instructions/r*/**`, or an issue/comment is about Rosetta instructions, rules, skills, workflows, agents, prompts, bootstrap behavior, or prompt quality:
 
 1. MUST treat it as instruction-quality review, not ordinary documentation/code review.
-2. MUST USE SKILL `orchestration` before any subagent dispatch.
+2. MUST USE SKILL `rosetta:orchestration` before any subagent dispatch.
 3. MUST spawn at least one subagent with:
    - role: Rosetta prompt quality reviewer
-   - MUST USE SKILL `coding-agents-prompt-authoring`
+   - MUST USE SKILL `rosetta:coding-agents-prompt-authoring`
    - MUST load/use at minimum:
      - `pa-rosetta-intro-for-AI.md`
      - `pa-rosetta.md`

@@ -18,8 +18,8 @@ name: Rosetta Repo Analysis
 #     so this PAT is used for all gh operations in this workflow.
 
 on:
-  # schedule:
-  #   - cron: '0 0 * * *'
+  schedule:
+    - cron: '0 23 * * *'
   workflow_dispatch:
 
 permissions:

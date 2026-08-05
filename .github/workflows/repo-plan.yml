@@ -22,9 +22,9 @@ name: Rosetta Story Planner
 #     gh/git operations in this workflow.
 
 on:
-  # schedule:
-  #   - cron: '0 */2 * * *'
-  #   - cron: '0 1 * * *'
+  schedule:
+    - cron: '0 */2 * * *'
+    - cron: '0 1 * * *'
   workflow_dispatch:
 
 permissions:

@@ -22,9 +22,9 @@ name: Rosetta Story Implementer
 #     gh/git operations in this workflow.
 
 on:
-  # schedule:
-  #   - cron: '0 */4 * * *'
-  #   - cron: '0 2 * * *'
+  schedule:
+    - cron: '30 */3 * * *'
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 jobs:

@@ -33,6 +33,7 @@ jobs:
       ANTHROPIC_BASE_URL: https://${{ secrets.BIFROST_HOST_NAME }}/anthropic
       ENABLE_TOOL_SEARCH: "true"
       CLAUDE_CODE_DISABLE_AUTO_MEMORY: "1"
+      CLAUDE_CODE_DISABLE_BACKGROUND_TASKS: "1"
 
     steps:
       - name: Checkout repository
@@ -55,6 +56,8 @@ jobs:
 
       - name: Run Claude
         uses: anthropics/claude-code-action@v1
+        env:
+          CLAUDE_CODE_DISABLE_BACKGROUND_TASKS: "1"
         with:
           anthropic_api_key: ${{ secrets.BIFROST_API_KEY }}
           github_token: ${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}

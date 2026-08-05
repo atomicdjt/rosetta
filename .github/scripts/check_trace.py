@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Post-run guard for the repo-analysis pipeline.
+"""Post-run guard for the board-driven Claude pipelines.
 
 Fails the job on the two silent-failure modes the traces exposed:
   1. the main agent backgrounded a subagent (report can never arrive in -p)
@@ -74,7 +74,7 @@ def main(path):
         )
     if not mutating:
         failures.append(
-            "Phase 3 never ran: no gh issue create/edit/comment/close or "
+            "The run changed nothing: no gh issue create/edit/comment/close and no "
             "gh project item-add/item-edit command was executed."
         )
 

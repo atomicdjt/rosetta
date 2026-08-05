@@ -73,6 +73,18 @@ jobs:
             "Read,Glob,Grep,Agent,Bash(gh issue list:*),Bash(gh issue view:*),Bash(gh issue create:*),Bash(gh issue edit:*),Bash(gh issue close:*),Bash(gh issue comment:*),Bash(gh pr list:*),Bash(gh pr view:*),Bash(gh project view:*),Bash(gh project list:*),Bash(gh project field-list:*),Bash(gh project item-list:*),Bash(gh project item-add:*),Bash(gh project item-edit:*)"
             --model sonnet
             --effort medium
+            --disallowedTools
+            "ScheduleWakeup"
+
+      # The trace is a full tool transcript published as a downloadable artifact,
+      # outside Actions log masking. Redact credentials before it leaves the runner.
+      - name: Scrub credentials from execution trace
+        if: always()
+        env:
+          SCRUB_VALUES: |
+            ${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}
+            ${{ secrets.BIFROST_API_KEY }}
+        run: python3 .github/scripts/scrub_trace.py /home/runner/work/_temp/claude-execution-output.json
 
       - name: Upload Claude execution trace
         if: always()

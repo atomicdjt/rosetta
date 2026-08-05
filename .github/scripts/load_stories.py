@@ -28,6 +28,11 @@ import sys
 
 PROJECT_OWNER = "griddynamics"
 PROJECT_NUMBER = "57"
+
+# Priority gate — planner only. An issue is planned only when its Priority is set
+# AND is not one of these values (compared case-insensitively). Adjust this set if
+# the board's Priority options are renamed.
+LOW_PRIORITY_VALUES = {"low", "p3", "p4"}
 TARGET_REPO = os.environ.get("GITHUB_REPOSITORY", "griddynamics/rosetta")
 
 
@@ -46,7 +51,9 @@ def load_project_view() -> dict:
 
 
 def load_project_fields() -> dict:
-    return gh_json("project", "field-list", PROJECT_NUMBER, "--owner", PROJECT_OWNER)
+    return gh_json(
+        "project", "field-list", PROJECT_NUMBER, "--owner", PROJECT_OWNER, "--limit", "100"
+    )
 
 
 def load_project_items() -> dict:
@@ -75,12 +82,44 @@ def get_status(item: dict) -> str | None:
     return None
 
 
+def require_priority_field(fields_data: dict) -> None:
+    """The planner gate depends on Priority existing. If the field is missing every
+    item would read as unset and nothing would ever be planned -- fail loudly rather
+    than report a green run with an empty matrix."""
+    for field in fields_data.get("fields", []):
+        if field.get("name") == "Priority":
+            return
+    print(
+        "::error::'Priority' field not found on project 57 -- the planner gate needs "
+        "it. Check `gh project field-list 57 --owner griddynamics --format json`",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
+
+def get_priority(item: dict) -> str | None:
+    for key, value in item.items():
+        if key.lower() == "priority" and isinstance(value, str):
+            return value
+    return None
+
+
+def is_plannable(priority: str | None) -> bool:
+    """Unset or low priority is never planned."""
+    if priority is None or not priority.strip():
+        return False
+    return priority.strip().lower() not in LOW_PRIORITY_VALUES
+
+
 def collect_matrices(items_data: dict) -> tuple[list[dict], list[dict]]:
     plan_items: list[dict] = []
     impl_items: list[dict] = []
+    skipped: list[tuple[int, str]] = []
 
     for item in items_data.get("items", []):
-        content = item.get("content", {})
+        # gh emits an explicit null for content it cannot resolve, so a plain
+        # .get(..., {}) default is not enough.
+        content = item.get("content") or {}
         if content.get("type") != "Issue":
             continue
         repo = content.get("repository", "")
@@ -96,9 +135,19 @@ def collect_matrices(items_data: dict) -> tuple[list[dict], list[dict]]:
         entry = {"issue_number": number, "issue_title": title, "item_id": item.get("id")}
 
         if status == "Backlog":
-            plan_items.append(entry)
+            priority = get_priority(item)
+            if is_plannable(priority):
+                plan_items.append(entry)
+            else:
+                skipped.append((number, priority or "unset"))
         elif status == "Ready":
+            # No priority gate on the implementation side: a human moving a card to
+            # "Ready" is the decision to build it.
             impl_items.append(entry)
+
+    if skipped:
+        detail = ", ".join(f"#{n} ({p})" for n, p in skipped)
+        print(f"::notice::Skipped {len(skipped)} Backlog issue(s) on priority: {detail}")
 
     return plan_items, impl_items
 
@@ -122,6 +171,7 @@ def main() -> None:
     items_data = load_project_items()
 
     status_field_id, status_options = extract_status_field(fields_data)
+    require_priority_field(fields_data)
     plan_items, impl_items = collect_matrices(items_data)
 
     write_output("project_id", project["id"])

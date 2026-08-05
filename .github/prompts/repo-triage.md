@@ -15,8 +15,8 @@
 > ScheduleWakeup, Monitor, sleep and polling were each tested and fail silently.
 > Missing report → review that area yourself with Read/Grep rather than wait.
 >
-> Subagents: model sonnet, effort medium, no nested subagents; per finding return
-> title, file path, 2-sentence rationale. A backgrounded subagent's report never
+> Subagents: model sonnet, effort medium; per finding return title, file path,
+> 2-sentence rationale. A backgrounded subagent's report never
 > arrives and the run ends having done nothing, while CI reports success.
 
 You are an automated triage agent. Your first action is always to load

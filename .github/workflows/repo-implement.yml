@@ -68,6 +68,7 @@ jobs:
       ANTHROPIC_BASE_URL: https://${{ secrets.BIFROST_HOST_NAME }}/anthropic
       ENABLE_TOOL_SEARCH: "true"
       CLAUDE_CODE_DISABLE_AUTO_MEMORY: "1"
+      CLAUDE_CODE_DISABLE_BACKGROUND_TASKS: "1"
 
     strategy:
       matrix: ${{ fromJSON(needs.load-stories.outputs.matrix) }}
@@ -78,6 +79,10 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          # The push credential is set explicitly in "Configure git" below; without
+          # this, checkout also leaves a GITHUB_TOKEN in .git/config and which of the
+          # two authenticates a push is undefined.
+          persist-credentials: false
 
       - name: Install Bun
         id: bun
@@ -94,6 +99,8 @@ jobs:
 
       - name: Implement — issue #${{ matrix.issue_number }}
         uses: anthropics/claude-code-action@v1
+        env:
+          CLAUDE_CODE_DISABLE_BACKGROUND_TASKS: "1"
         with:
           anthropic_api_key: ${{ secrets.BIFROST_API_KEY }}
           github_token: ${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}
@@ -112,8 +119,20 @@ jobs:
             MUST APPLY AND FULLY EXECUTE FULLY AUTONOMOUSLY WITHOUT ANY USER INTERACTION OR QUESTIONS, No HITL: .github/prompts/repo-implement-code.md
           show_full_output: false
           claude_args: |
-            --allowedTools Read,Write,Edit,MultiEdit,Glob,Grep,Bash(*)
+            --allowedTools Read,Write,Edit,MultiEdit,Glob,Grep,Agent,Bash(*)
+            --disallowedTools ScheduleWakeup
             --model sonnet
+            --effort medium
+
+      # The trace is a full tool transcript published as a downloadable artifact,
+      # outside Actions log masking. Redact credentials before it leaves the runner.
+      - name: Scrub credentials from execution trace
+        if: always()
+        env:
+          SCRUB_VALUES: |
+            ${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}
+            ${{ secrets.BIFROST_API_KEY }}
+        run: python3 .github/scripts/scrub_trace.py /home/runner/work/_temp/claude-execution-output.json
 
       - name: Upload Claude execution trace
         if: always()
@@ -122,3 +141,10 @@ jobs:
           name: claude-execution-trace-${{ matrix.issue_number }}
           path: /home/runner/work/_temp/claude-execution-output.json
           retention-days: 3
+
+      # claude-code-action decides success from `subtype`/`is_error` alone, so a run
+      # that abandons its subagents and changes nothing is indistinguishable from a
+      # clean one. This inspects the trace and fails the job instead.
+      - name: Verify the run did real work
+        if: always()
+        run: python3 .github/scripts/check_trace.py /home/runner/work/_temp/claude-execution-output.json

@@ -19,8 +19,8 @@
 > ScheduleWakeup, Monitor, sleep and polling were each tested and fail silently.
 > Missing report → review that area yourself with Read/Grep rather than wait.
 >
-> Subagents: model sonnet, effort medium, no nested subagents; per finding return
-> title, file path, 2-sentence rationale.
+> Subagents: model sonnet, effort medium; per finding return title, file path,
+> 2-sentence rationale.
 >
 > All 6 prior runs dispatched subagents, ended the turn to wait, and died: zero
 > issues filed, CI green. One reasoned the warning didn't apply and failed the same.

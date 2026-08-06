@@ -181,7 +181,7 @@ jobs:
           show_full_output: false
           claude_args: |
             --allowedTools
-            "Read,Glob,Grep,Agent,Skill,Bash(gh issue view:*),Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh pr list:*),Bash(gh project item-list:*),Bash(gh project item-edit:*)"
+            "Read,Glob,Grep,Agent,Skill,Bash(which:*),Bash(gh auth status:*),Bash(gh issue view:*),Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh pr list:*),Bash(gh project item-list:*),Bash(gh project item-edit:*)"
             --disallowedTools ScheduleWakeup
             --model sonnet
             --effort high

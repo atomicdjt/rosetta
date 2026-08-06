@@ -94,7 +94,7 @@ to implement the changes described in the plan.
 
 Rules:
 - Follow existing code style and conventions exactly
-- Write or update tests for every changed behaviour
+- Write or update tests for every changed behavior
 - Keep changes minimal and focused on the issue scope
 - Do NOT refactor unrelated code
 

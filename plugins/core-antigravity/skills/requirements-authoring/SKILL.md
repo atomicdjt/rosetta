@@ -247,7 +247,7 @@ Attributes are ordered by volatility — status, approved_by, changed always cha
 Grep contracts this shape enables:
 
 - `status="Draft"` — everything still unapproved
-- `ears="unwanted"` — every criterion covering error behaviour
+- `ears="unwanted"` — every criterion covering error behavior
 - `source="Inferred"` — everything AI generated rather than user-stated
 - `implementation="ToBeModified"` — drift between spec and code
 

@@ -53,6 +53,22 @@ You always must "simulate" how the entire AI coding agent flow works if instruct
 - No nitpicking, if nothing is found - then it is great - nothing to add!
 - Always think - is it ACTUALLY needed to be resolved? How does it affect current repository and user experience?
 
+### Non-public security findings — NEVER disclose in an issue you create
+
+You can read CodeQL / code-scanning, Dependabot, and CI check data. This repository is **public**, but those alerts are **not**: viewing them requires write access. Every issue you create and every issue body you edit is world-readable, so anything you quote from an alert is published to everyone, including whoever would exploit it. An unfixed vulnerability disclosed this way is a real incident, not a documentation slip.
+
+MUST NOT appear in any issue title, body, or comment unless that issue is labelled `security`:
+
+- alert titles, descriptions, messages, rule help text, or CWE narratives
+- file paths, line numbers, code snippets, or data-flow / taint traces taken from an alert
+- alert numbers, alert URLs, or any identifier that resolves to one
+- package + vulnerable-version pairs, CVE / GHSA identifiers, or advisory text from Dependabot
+- counts sliced finely enough to pinpoint a single finding
+
+MAY appear publicly: that automated security checks were consulted, and an aggregate count with severity distribution, e.g. `3 open code-scanning alerts: 1 high, 2 low`.
+
+To raise a real finding, create a `security`-labelled issue that references the alert **by URL only** and carries no detail beyond severity. Repository configuration weaknesses you identified yourself by reading committed files (missing `permissions:` blocks, unpinned actions, and the like) are NOT covered by this rule — that content is already public in the repository, and filing it as an ordinary issue is correct.
+
 ## Phase 1 — Load Existing Work
 
 List issues already on the board:

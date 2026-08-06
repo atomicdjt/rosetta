@@ -76,6 +76,22 @@ You always must "simulate" how the entire AI coding agent flow works if instruct
 - The card is at Status "Planning" and you move it to "Ready" when the plan is
   written. Never move it to "Scheduled" — that move is the user's approval.
 
+### Non-public security findings — NEVER disclose in the plan you write back
+
+You can read CodeQL / code-scanning, Dependabot, and CI check data. This repository is **public**, but those alerts are **not**: viewing them requires write access. The plan you write into the issue body is world-readable, so anything you quote from an alert is published to everyone, including whoever would exploit it. An unfixed vulnerability disclosed this way is a real incident, not a documentation slip.
+
+MUST NOT appear in the issue body, plan text, or any comment:
+
+- alert titles, descriptions, messages, rule help text, or CWE narratives
+- file paths, line numbers, code snippets, or data-flow / taint traces taken from an alert
+- alert numbers, alert URLs, or any identifier that resolves to one
+- package + vulnerable-version pairs, CVE / GHSA identifiers, or advisory text from Dependabot
+- counts sliced finely enough to pinpoint a single finding
+
+MAY appear publicly: that automated security checks were consulted, and an aggregate count with severity distribution, e.g. `3 open code-scanning alerts: 1 high, 2 low`.
+
+If an alert is genuinely load-bearing for the plan, describe the remediation in terms of the code as it already exists in the repository — which is public — and never in terms of the alert's exploitability, reachability, or trigger conditions.
+
 ## Phase 1 — Read the Issue
 
 1. ALWAYS read the issue in full before anything else — body AND every comment:

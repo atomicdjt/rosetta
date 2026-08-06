@@ -100,6 +100,7 @@ jobs:
             --disallowedTools
             "ScheduleWakeup,Bash(* --show-token),Bash(* --show-token*),Bash(gh api * -X*),Bash(gh api * --method*),Bash(gh api * -f*),Bash(gh api * -F*),Bash(gh api * --field*),Bash(gh api * --raw-field*),Bash(gh api * --input*)"
             --model sonnet
+            --effort high
 
       # The trace is a full tool transcript published as a downloadable artifact,
       # outside Actions log masking. Redact credentials before it leaves the runner.

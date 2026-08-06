@@ -30,13 +30,29 @@ MUTATING = re.compile(
 
 
 def blocks(msg):
-    content = (msg.get("message") or {}).get("content")
-    return content if isinstance(content, list) else []
+    """Content blocks of an SDK message, or [] for anything without them.
+
+    Not every entry in the trace is an assistant/user turn. `system` entries
+    (permission_denied, hook_started, init, ...) carry `message` as a plain
+    string or omit it entirely, so every level here has to be type-checked
+    rather than assumed.
+    """
+    if not isinstance(msg, dict):
+        return []
+    message = msg.get("message")
+    if not isinstance(message, dict):
+        return []
+    content = message.get("content")
+    if not isinstance(content, list):
+        return []
+    return [b for b in content if isinstance(b, dict)]
 
 
 def main(path, require_mutation=True):
     with open(path) as fh:
         msgs = json.load(fh)
+    if not isinstance(msgs, list):
+        msgs = [msgs]
 
     # Main agent only: parent_tool_use_id is null. A nested subagent that
     # backgrounds its own child is a prompt-compliance issue, not the fatal
@@ -44,13 +60,16 @@ def main(path, require_mutation=True):
     main_agent_dispatches = {}
     mutating = []
     for msg in msgs:
-        is_main = msg.get("parent_tool_use_id") is None
+        is_main = isinstance(msg, dict) and msg.get("parent_tool_use_id") is None
         for b in blocks(msg):
             if b.get("type") == "tool_use":
+                inp = b.get("input") if isinstance(b.get("input"), dict) else {}
                 if is_main and b.get("name") in ("Agent", "Task"):
-                    main_agent_dispatches[b["id"]] = b["input"].get("description", "")
+                    main_agent_dispatches[b.get("id")] = inp.get("description", "")
                 elif b.get("name") == "Bash":
-                    cmd = b.get("input", {}).get("command", "")
+                    cmd = inp.get("command", "")
+                    if not isinstance(cmd, str):
+                        continue
                     if MUTATING.match(cmd):
                         mutating.append(cmd.strip()[:120])
 

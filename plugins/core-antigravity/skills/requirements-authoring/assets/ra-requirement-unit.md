@@ -36,10 +36,10 @@ Attributes are ordered by volatility — `status`, `approved_by`, `changed` alwa
   <evidence>[reverse-engineering only: path:line-range per source location]</evidence>
   <acceptance>
     <criteria id="[req-id].AC1" ears="ubiquitous" system="[actor or component that responds]" shall="[outcome]"/>
-    <criteria id="[req-id].AC2" ears="event" when="[trigger]" system="[actor or component that responds]" shall="[outcome]"/>
-    <criteria id="[req-id].AC3" ears="state" while="[state]" system="[actor or component that responds]" shall="[outcome]"/>
-    <criteria id="[req-id].AC4" ears="optional" where="[feature is present]" system="[actor or component that responds]" shall="[outcome]"/>
-    <criteria id="[req-id].AC5" ears="unwanted" if="[fault]" system="[actor or component that responds]" shall="[mitigation]"/>
+    <criteria id="[req-id].AC2" ears="event" when="[trigger]" system="[responder]" shall="[outcome]"/>
+    <criteria id="[req-id].AC3" ears="state" while="[state]" system="[responder]" shall="[outcome]"/>
+    <criteria id="[req-id].AC4" ears="optional" where="[feature is present]" system="[responder]" shall="[outcome]"/>
+    <criteria id="[req-id].AC5" ears="unwanted" if="[fault]" system="[responder]" shall="[mitigation]"/>
   </acceptance>
   <implementationNotes>[CONCISE: Implemented: aggregated files affected, NotStarted/Planned/ToBeRemoved: nothing, ToBeModified: what was originally documented but now dropped]</implementationNotes>
   <notes>[anything else; the rejection reason when status is Removed]</notes>

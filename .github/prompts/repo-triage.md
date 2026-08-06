@@ -128,7 +128,7 @@ For `pull_request_target`, the workflow checks out trusted repository content fr
 
 **Step 3 — Add Labels, Priority, Type** via `gh pr edit <PR_NUMBER>`.
 - Type: `bug` / `feature` / `task`
-- Labels (multi-select): `draft`, `bug`, `enhancement`, `duplicate`, `good first issue`, `help wanted`, `invalid`, `needs more work`, `question`, `security`, `documentation`, `wontfix`
+- Labels (multi-select): `draft`, `bug`, `enhancement`, `duplicate`, `good first issue`, `help wanted`, `invalid`, `needs more work`, `question`, `security`, `documentation`, `instructions`, `wontfix`
 - Priority: Urgent / High / Medium / Low
 
 Only edit those which clearly apply. Skip if none apply or unclear or unsure.
@@ -185,7 +185,7 @@ If you can answer yourself those questions from the code - please do it first an
 
 **Step 3 — Add Labels, Priority, Type** via `gh pr edit <PR_NUMBER>`.
 - Type: `bug` / `feature` / `task`
-- Labels (multi-select): `draft`, `bug`, `enhancement`, `duplicate`, `good first issue`, `help wanted`, `invalid`, `needs more work`, `question`, `security`, `documentation`, `wontfix`
+- Labels (multi-select): `draft`, `bug`, `enhancement`, `duplicate`, `good first issue`, `help wanted`, `invalid`, `needs more work`, `question`, `security`, `documentation`, `instructions`, `wontfix`
 - Priority: Urgent / High / Medium / Low
 
 Only edit those which clearly apply. Skip if none apply or unclear or unsure.

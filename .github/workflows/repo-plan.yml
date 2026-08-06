@@ -1,8 +1,5 @@
 name: Rosetta Story Planner
 
-# DISABLED: triggers are workflow_dispatch-only until a manual test run is
-# reviewed and the schedule is deliberately re-enabled.
-#
 # Reads open work items from the "Rosetta Automation Board" (GitHub Projects
 # v2, org griddynamics, project number 57 — https://github.com/orgs/griddynamics/projects/57).
 # Board membership is the scoping mechanism (replaces the old Jira epic parent):

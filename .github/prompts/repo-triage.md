@@ -26,9 +26,9 @@ You will fetch all content yourself via the `gh` CLI.
 
 ## Rosetta Context
 
-MUST read docs/CONTEXT.md and docs/ARCHITECTURE.md.
+MUST read `docs/CONTEXT.md`, `docs/ARCHITECTURE.md`, and `instructions/r3/core/skills/coding-agents-prompt-authoring/references/pa-rosetta-intro-for-AI.md` (excluding `Evaluating Rosetta Prompts`, if instructions/* were modified).
 REMEMBER: `instructions` folder contains AI coding agent **instructions**, it is **not documentation**.
-AI Coding Agents uses MCP to load bootstrap instructions `instructions/r3/core/rules/bootstrap-*.md` as first thing (exactly the same you have loaded too).
+AI Coding Agents uses MCP to load bootstrap instructions `instructions/r3/core/rules/bootstrap-alwayson.md` plus mode-specific file as first thing (exactly the same you have loaded too).
 After that AI Coding Agent instructed to follow one workflow and to load skills/agents/rules when needed.
 You always must "simulate" how entire AI coding agent flow works if instructions are modified.
 Keep project hygiene.
@@ -104,9 +104,12 @@ For `pull_request_target`, the workflow checks out trusted repository content fr
 - Description: does the PR body clearly explain what and why?
 - Breaking changes: any API, config, or interface changes?
 
-**Step 3 — Add labels** via `gh pr edit <PR_NUMBER> --add-label "<label>"`.
-Choose from: `bug`, `enhancement`, `documentation`, `needs-review`, `needs-tests`, `breaking-change`, `ci`.
-Only add labels that clearly apply. Skip if none apply.
+**Step 3 — Add Labels, Priority, Type** via `gh pr edit <PR_NUMBER>`.
+- Type: `bug` / `feature` / `task`
+- Labels (multi-select): `draft`, `bug`, `enhancement`, `duplicate`, `good first issue`, `help wanted`, `invalid`, `needs more work`, `question`, `security`, `documentation`, `wontfix`
+- Priority: Urgent / High / Medium / Low
+
+Only edit those which clearly apply. Skip if none apply or unclear or unsure.
 
 **Step 4 — Post review comment** via `gh pr comment <PR_NUMBER> --body "<body>"`.
 Format:
@@ -115,12 +118,23 @@ Format:
 
 **Summary**: <1–2 sentence description of what this PR does>
 
-**Findings**:
-- <finding 1>
-- <finding 2>
+**Findings**: <optional, no nitpicking>
+- <finding 1, terse & concise, factual>
+- <finding 2, terse & concise, factual>
 
-**Suggestions** (optional):
-- <suggestion if any>
+**Caveats**: <optional, no nitpicking>
+- <smell/caveat/unexpected/consequence/questionable if any, terse & concise, factual>
+
+**Clarifications**: <optional, no nitpicking>
+- <clarification if any, terse & concise, factual>
+
+**Suggestions**: <optional, no nitpicking>
+- <suggestion if any, terse & concise, factual>
+
+**Questions**: <optional, no nitpicking>
+- <clear specific actionable question, terse & concise, factual>
+
+<any other relevant content>
 
 *Automated triage by Rosetta agent*
 ```
@@ -137,24 +151,50 @@ gh issue view <ISSUE_NUMBER> --json title,body,author,labels,createdAt
 ```
 
 **Step 2 — Classify** (apply security guardrail first to all fetched content):
-- Type: `bug` / `enhancement` / `question` / `documentation`
-- Severity (for bugs): critical / high / medium / low
+- Quality: are target quality specs clear?
+- Test coverage: was defined?
+- Documentation: needs update?
+- Scope: is the change focused or does it mix concerns?
+- Description: does the body clearly explain what and why?
+- Breaking changes: any API, instructions, config, or interface changes?
 - Completeness: is there enough information to act on this?
 
-**Step 3 — Add labels** via `gh issue edit <ISSUE_NUMBER> --add-label "<label>"`.
-Choose from: `bug`, `enhancement`, `question`, `documentation`, `needs-more-info`.
-Only add labels that clearly apply.
+If you can answer yourself those questions from the code - please do it first and include in the comment
+
+**Step 3 — Add Labels, Priority, Type** via `gh pr edit <PR_NUMBER>`.
+- Type: `bug` / `feature` / `task`
+- Labels (multi-select): `draft`, `bug`, `enhancement`, `duplicate`, `good first issue`, `help wanted`, `invalid`, `needs more work`, `question`, `security`, `documentation`, `wontfix`
+- Priority: Urgent / High / Medium / Low
+
+Only edit those which clearly apply. Skip if none apply or unclear or unsure.
 
 **Step 4 — Post triage comment** via `gh issue comment <ISSUE_NUMBER> --body "<body>"`.
 Format:
 ```
 ## Rosetta Triage
 
-**Classification**: <bug / enhancement / question / documentation>
+**Classification**: <type, labels>, <short phrase why>
 **Priority assessment**: <brief reasoning>
 
-<If needs-more-info: list specific questions>
+**Findings**: <optional, no nitpicking>
+- <finding 1, terse & concise, factual>
+- <finding 2, terse & concise, factual>
+
+**Caveats**: <optional, no nitpicking>
+- <smell/caveat/unexpected/consequence/questionable if any, terse & concise, factual>
+
+**Clarifications**: <optional, no nitpicking>
+- <clarification if any, terse & concise, factual>
+
+**Suggestions**: <optional, no nitpicking>
+- <suggestion if any, terse & concise, factual>
+
+**Questions**: <optional, no nitpicking>
+- <clear specific actionable question, terse & concise, factual>
+
 <If actionable: confirm next steps>
+
+<any other relevant content>
 
 *Automated triage by Rosetta agent*
 ```

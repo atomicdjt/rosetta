@@ -4,7 +4,23 @@
 > All decisions are made autonomously. Post findings as GitHub comments or issues only.
 > Run fully end-to-end without any human interaction or confirmation.
 >
-> **Bash constraint**: Only git read-only commands are allowed in bash (`git status`, `git diff`, `git log`, `git show`, `git branch`, `git ls-files`, `git rev-parse`). Do not attempt any other bash command, and do not attempt git write/mutating operations (commit, push, reset, clean, checkout -f, etc.) — they are blocked.
+> **Bash constraint**: allowed are read-only `git` (`status`, `diff`, `log`, `show`,
+> `branch`, `ls-files`, `rev-parse`, each also in `git -C <dir> …` form for the `pr/`
+> checkout); read-only `gh` (`pr view|diff|checks`, `issue view`, any `gh … list`,
+> `gh … status`, and `gh api` GET on this repo's comments, labels, contents, trees,
+> tags, code-scanning, dependabot and check-runs endpoints); and the writes triage
+> exists to perform — `gh pr comment|edit`, `gh issue comment|edit|create`.
+> Everything else is blocked, including git mutations (commit, push, reset, clean,
+> checkout -f) and any `gh api` carrying `-X`, `--method`, `-f`, `-F`, `--field`,
+> `--raw-field` or `--input`. Mutate only via the `gh` subcommands above.
+>
+> **One command per Bash call.** A command containing `;`, `&&`, `||` or a pipe is
+> split and every part must be separately allowed, so bundling turns one allowed
+> command into a denied batch. Commands containing `$VAR`, `$(…)`, `<(…)`, `for`
+> loops or a `>` redirect outside the working directory are rejected before any
+> allowlist check and cannot be approved at all. Write literal, single, unbundled
+> commands — repeat a command with different arguments instead of looping. The one
+> permitted exception is `--body "$(cat <<'EOF' … EOF)"` for comment bodies.
 >
 > **Subagent constraint**: one-shot headless session. Ending a turn without a tool
 > call kills the job in ~2s — there is no later turn, notification, or wakeup.

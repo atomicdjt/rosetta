@@ -1,9 +1,80 @@
-Modernization Prompts
+# Modernization or Migration using AI
 
----
-Prompt 1: Establish the modernization mandate & principles
----
+## Key Principles
 
+1. Workspace structure is critical. Composite with submodules is highly recommended, fallback to refsrc. See [configuration guide](../CONFIGURATION.md).
+2. Modernization/migration principles and decisions documented in context in a CONCISE manner.
+2. Modernization/migration scope, pattern mapping, technical archetype mapping, component mapping is the most important.
+3. Leaf-based code-to-code migration is fast and reliable, allows to refactor then in-place with working solution.
+2. Integration, E2E, side-by-side, screenshots are the spine for automated migration.
+3. Requirements matter, but as a part of a final checklist.
+5. Must use Fable/Sol-XHigh/Opus-XHigh for initial documentation and planning.
+
+## Red Flags
+
+1. Mocking. Must only be used for unit testing and nothing else. All services must work and run locally.
+2. Migrating big features. Must migrate leafs first.
+3. Requirements-first. AI will deviate. Migrate code first, then improve migrated code. Requirements are validation gates.
+4. Planning for humans. Must use AI to build a graph of a plan for AI agentic sessions (sequential, parallel, etc), including specialized WHAT and CHECKLIST in each session.
+
+## Start Prompt Templates
+
+### Prompt 0: Setting up the stage (a rule or common prompt)
+
+```md
+Scope & intent
+- Rewrite ≠ redesign. Port behavior; change only the implementation.
+- "No new features" means no behavior change — not fewer files. Migrating more files, routes, or dead stubs is faithfulness, not scope creep.
+- Port defects as-is; log them separately. A known bug reproduced MUST BE CALLED OUT; a bug silently fixed is an unapproved behavior change. Bug not called out is a failure.
+- Name every deliberate deviation explicitly. Anything not named is an accident.
+- One stack substitution at a time, each explicitly approved. Framework defaults (fonts, icons, boilerplate) are silent substitutions — strip them.
+- Always use checklists with fresh-eye subagent validator; Use in each session and for the bigger blocks. Wide, not deep. Checkpoints, not tasks. Limited by severity (all medium+) not by count.
+
+Identity & reviewability
+- Keep names 1:1: components, similar files, functions, params, fields, routes, CSS classes, ids. Adapt only the naming convention.
+- Same inputs, outputs, param order, shapes. No renaming, merging, splitting, or "while I'm here" improvements.
+- Target: easier migration and mapping old vs new
+
+Tests as the gate
+- Tests judge the code. Red test → fix the code, not the test. Only harness/selector/import/URL edits are legitimate.
+- Audit the legacy suite before trusting it — generator stubs pin nothing and give false confidence.
+- Author the golden master against the running original, before porting starts. Green-against-legacy defines truth.
+- Run the same spec set against both apps. Divergent suites destroy the gate.
+- Output fidelity (DOM/API shape) is a testability requirement, not just aesthetics — it's what lets one suite serve both.
+
+Side-by-side is the final gate
+- Running side-by-side and evaluating behavior old-vs-new is critical final gate
+- Taking and comparing screenshots for frontend and mobile to detect discrepancies 
+
+Sequencing
+- Leaf-first, dependency-resolved: port a unit only when all its dependencies already exist. No stubbing, no forward references.
+- Shared code (types, data access, shell) first.
+- Small sessions — one or a few units. Never big-bang.
+- App-wide/global behaviors land last and alone; early they break everything else's tests.
+- Preserve legacy asymmetries deliberately. Inconsistency you "clean up" is behavior you changed.
+
+Documentation discipline
+- Separate the contract to preserve from the plan to build it from the current state. Never let planned work read as landed.
+- Prescriptive "patterns" for code that doesn't exist yet are speculation — they drift, contradict, and mislead. Delete them.
+- One authority per fact. Two documents describing the same decision will disagree.
+- Archetype-level mapping (framework concept → framework concept) beats file-level inventory; the audience already knows both frameworks.
+- Terse each item and exhaustive overall. No fluff. Every extra line is a line that can go stale.
+
+Working with AI agents
+- Framework-idiom pull is strong: agents drift toward "better" over "same" even with explicit instruction. One correction pass is rarely enough.
+- Delegation amplifies over-production — each agent expands within its slice and nobody prunes. Budget for a trim pass.
+- Verify claims against artifacts, not reports. "Done" from a subagent is a hypothesis.
+- Record hard-won environment facts (install constraints, toolchain quirks) where the next session will read them.
+
+De-risking
+- Boot the legacy app early. Docs-only parity claims are assumptions; one run converts several into facts.
+- Identify what gates everything else and attack it first.
+- Verify visual/behavioral fidelity by comparison, not by value-matching config.
+```
+
+### Prompt 1: Establish the modernization mandate & principles
+
+```md
 Author the governing principles for a replatforming project into <architecture doc>. This is the contract section — the rules every later session inherits. Do not write the archetype mapping or the port checklist; separate prompts own those.
 
 Read first: <legacy source root>, any existing analysis of it, and the current <architecture doc> if present.
@@ -23,11 +94,11 @@ Produce, terse, at the top of the document:
 Rules: cite evidence as repo-relative paths. Do not duplicate file inventory, versions, or port steps — cross-reference them. Assume a competent reader who knows both technologies. If you find a contradiction with an existing doc, report it rather than authoring a second version of the same fact — one authority per fact.
 
 Report: which principles rest on assumption vs. verified evidence, and any decision that needs the user rather than you.
+```
 
----
-Prompt 2: Author the archetype mapping
----
+### Prompt 2: Author the archetype mapping
 
+```md
 Author <migration doc> — a type/archetype-level mapping from <source framework> to <target framework>. Not a file inventory; that lives in <code map doc>.
 
 Read first: <legacy source root> (verify against source, not summaries), <architecture doc> for the mandate and identity rule.
@@ -45,11 +116,11 @@ Produce, as tables:
 Rules: terse — the reader knows both frameworks; define the mapping, don't teach it. Verify legacy claims by reading source. Every row earns its place; delete rows that state the obvious. Do not restate the mandate — reference it.
 
 Report: archetypes with no clean target equivalent, and where a faithful mapping conflicts with target idiom.
+```
 
----
-Prompt 3: Define the test strategy & acceptance gate
----
+### Prompt 3: Define the test strategy & acceptance gate
 
+```md
 Add a test strategy section to <migration doc>, and reflect it in <architecture doc>'s testing section. This defines how the port is proven correct.
 
 Read first: the legacy test suite — read it, don't assume it's useful. Count files, lines, and real assertions.
@@ -68,11 +139,11 @@ Produce:
 Rules: terse. Ground every claim about the legacy suite in what you read. Do not restate the archetype mapping.
 
 Report: whether the legacy suite is usable as-is, what blocks running the original, and any coverage you cannot achieve.
+```
 
----
-Prompt 4: Generate migration/modernization session plans
----
+### Prompt 4: Generate migration/modernization session plans
 
+```md
 You are producing a graph of session plan files for an incremental modernization project. Each file will later be executed by a coding agent (a capable LLM with discovery, design, implementation, review, and verification skills of its own).
 
 Inputs you must read first
@@ -99,7 +170,7 @@ Hard rules for session files:
    - ordering constraints that aren't visible from dependencies alone
    - environment quirks already discovered
 5. Very Terse. Target 20–30 lines for WHAT, 40-50 lines for CHECKLIST. 
-6. Structure: # NN — Title, optional Depends on:, ## Do (numbered), optional ## Rules or ## Notes (only for traps), ## Done when (observable, verifiable outcomes — not "works correctly"), ## Checklist (examples showing aspects: `[ ] Unit tests coverage > 85%`, `[ ] PCI compliance`, `[ ] Integration tests coverage > 85%`, `[ ] Edge cases tested`, `[ ] Work protocol adhered`, `[ ] Documents updated`, `[ ] Code ran locally and manually tested by AI`, `[ ] DevOps implemented`, `[ ] SRE covered`, `[ ] Security checked`, etc).
+6. Structure: # NN — Title, optional Depends on:, ## Do (numbered), ## Subagents (name + responsibility + long-running or short-term), optional ## Rules or ## Notes (only for traps), ## Done when (observable, verifiable outcomes — not "works correctly"), ## Checklist (examples showing aspects: `[ ] Unit tests coverage > 85%`, `[ ] PCI compliance`, `[ ] Integration tests coverage > 85%`, `[ ] Edge cases tested`, `[ ] Work protocol adhered`, `[ ] Documents updated`, `[ ] Code ran locally and manually tested by AI`, `[ ] DevOps implemented`, `[ ] SRE covered`, `[ ] Security checked`, etc).
 
 Decomposition
 
@@ -124,51 +195,4 @@ Index file (plan.md) must contain
 Before finishing
 
 - State which sessions are genuinely parallelizable and why, and name any latent collision you resolved via ownership assignment.
-
----
-Migration Key Points (setting up the stage)
----
-
-Scope & intent
-- Rewrite ≠ redesign. Port behavior; change only the implementation.
-- "No new features" means no behavior change — not fewer files. Migrating more files, routes, or dead stubs is faithfulness, not scope creep.
-- Port defects as-is; log them separately. A known bug reproduced MUST BE CALLED OUT; a bug silently fixed is an unapproved behavior change. Bug not called out is a failure.
-- Name every deliberate deviation explicitly. Anything not named is an accident.
-- One stack substitution at a time, each explicitly approved. Framework defaults (fonts, icons, boilerplate) are silent substitutions — strip them.
-
-Identity & reviewability
-- Keep names 1:1: components, similar files, functions, params, fields, routes, CSS classes, ids. Adapt only the naming convention.
-- Same inputs, outputs, param order, shapes. No renaming, merging, splitting, or "while I'm here" improvements.
-- Target: easier migration and mapping old vs new
-
-Tests as the gate
-- Tests judge the code. Red test → fix the code, not the test. Only harness/selector/import/URL edits are legitimate.
-- Audit the legacy suite before trusting it — generator stubs pin nothing and give false confidence.
-- Author the golden master against the running original, before porting starts. Green-against-legacy defines truth.
-- Run the same spec set against both apps. Divergent suites destroy the gate.
-- Output fidelity (DOM/API shape) is a testability requirement, not just aesthetics — it's what lets one suite serve both.
-
-Sequencing
-- Leaf-first, dependency-resolved: port a unit only when all its dependencies already exist. No stubbing, no forward references.
-- Shared code (types, data access, shell) first.
-- Small sessions — one or a few units. Never big-bang.
-- App-wide/global behaviors land last and alone; early they break everything else's tests.
-- Preserve legacy asymmetries deliberately. Inconsistency you "clean up" is behavior you changed.
-
-Documentation discipline
-- Separate the contract to preserve from the plan to build it from the current state. Never let planned work read as landed.
-- Prescriptive "patterns" for code that doesn't exist yet are speculation — they drift, contradict, and mislead. Delete them.
-- One authority per fact. Two documents describing the same decision will disagree.
-- Archetype-level mapping (framework concept → framework concept) beats file-level inventory; the audience already knows both frameworks.
-- Terse each item and exhaustive overall. No fluff. Every extra line is a line that can go stale.
-
-Working with AI agents
-- Framework-idiom pull is strong: agents drift toward "better" over "same" even with explicit instruction. One correction pass is rarely enough.
-- Delegation amplifies over-production — each agent expands within its slice and nobody prunes. Budget for a trim pass.
-- Verify claims against artifacts, not reports. "Done" from a subagent is a hypothesis.
-- Record hard-won environment facts (install constraints, toolchain quirks) where the next session will read them.
-
-De-risking
-- Boot the legacy app early. Docs-only parity claims are assumptions; one run converts several into facts.
-- Identify what gates everything else and attack it first.
-- Verify visual/behavioral fidelity by comparison, not by value-matching config.
+```

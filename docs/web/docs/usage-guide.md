@@ -374,7 +374,7 @@ Large migration workflow for code conversions, platform upgrades, framework upgr
 /modernization-flow Re-architect monolith to microservices
 ```
 
-Read full workflow: [Modernization Flow](/rosetta/docs/modernization-flow/)
+Read full workflow: [Modernization Flow](/rosetta/docs/modernization-flow/). For principles, red flags, process, and start prompt templates: [Modernization Guide](/rosetta/docs/modernization/).
 
 </details>
 

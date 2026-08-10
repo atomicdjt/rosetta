@@ -120,42 +120,49 @@ R3 advances Rosetta from governed assistance to deterministic, self-guarding exe
 
 ### Week Mon 03.08 – Sun 09.08
 
-Requirements stopped repeating themselves. A requirement used to say the same thing three times: an EARS statement, then acceptance criteria restating it as Given/When/Then. Three renderings of one fact, re-read and re-paid on every turn, with nothing added. Each layer now carries different information. The statement holds the rule and what it excludes. Each criterion is a concrete, separately addressable case. Same tokens, far more content, and coverage is finally claimable per criterion instead of per requirement.
+The AI now writes requirements that say something different at every level. It used to state the rule as an EARS sentence, then restate it as Given/When/Then acceptance criteria, paying for the same fact three times on every turn. It now states the rule once, with the cases it covers and what it excludes, and spends the criteria on concrete, separately addressable cases. You get far more specification out of the same context, and your tests can claim coverage of exactly one criterion.
 
-Second, the repo's own automation went live and closed a full loop: it filed issues, planned them, and merged six of its own pull requests after user approval. Before that it had failed six runs in a row while reporting success, filing nothing.
+You can also take work from idea to merged pull request without opening an editor. You move a card to approve a plan, you answer comments, you review the pull request. The AI does everything in between. A full end-to-end implementation now runs from a phone.
 
 **Highlights**
 
-- Requirements say more per token: EARS moved onto the criteria, statements now carry scope and exclusions (#204)
-- Every criterion has a stable `<req-id>.AC#`, so a test claims one criterion and a gap shows as a missing row
-- NFRs sweep all nine ISO 25010 buckets; an empty bucket needs a written out-of-scope decision, not silence
-- Board automation live: 18 issues filed across two runs on 05.08, 6 merged the same day (#183, #184, #186, #188, #189, #190)
-- A run that quietly does nothing now fails the job instead of reporting success
-- Seven-lane board flow: no pipeline can re-process its own output, and a crashed run waits for a human instead of looping
-- New `docs/AUTOMATION-ARCHITECTURE.md`
-- `npx -y <pkg>@latest` became `npx <pkg>` across all instructions, dropping a registry round trip per call
-- Issue templates added (#202, from #201 by omaiesh); `RefSrc/` normalized to `refsrc/` (#190)
-- README Quick Start is a link-out now, not a duplicate; Copilot Marketplace documented for JetBrains
+- The AI states a requirement rule once and spends acceptance criteria on distinct cases (#204)
+- Your tests claim one criterion at a time, so a coverage gap shows up as a missing row
+- The AI sweeps all nine ISO 25010 quality buckets and writes down why it leaves any of them out of scope
+- The AI asks which feature flags exist before it designs, and writes code that holds in every flag state
+- Your Rosetta docs survive a format pass now: workspace init keeps them out of Prettier's way
+- The AI spends less on every session by not re-fetching its CLI helpers from the registry on each call
+- You drive development from the board: approve a plan, answer comments, review the pull request
+- The AI filed 18 issues across two runs on 05.08, and six reached merge the same day
+- The AI finds your reference sources on case-sensitive filesystems, where a capitalized folder used to come back empty (#190)
+- Anyone filing an issue gets a template that asks for what a maintainer needs (#202, from #201 by omaiesh)
+- You can read how the automation is wired in the new `docs/AUTOMATION-ARCHITECTURE.md`
+- Plugins 3.1.8 carries all of the above
 
-#### Requirements: each layer says something different (#204)
+#### The AI writes requirements that say more (#204)
 
-- **Change.** `[R3]` The statement is no longer an EARS sentence. It carries the governing rule, the cases it reaches, and its explicit exclusions. EARS moved down onto each acceptance criterion, which now declares its pattern and condition as attributes and gets a stable `<req-id>.AC#`. Single-value fields became attributes rather than child nodes. NFR IDs became `NFR-[ISO]-####` across the nine ISO 25010 buckets, all nine swept every time. The traceability matrix moved to one row per criterion. (Igor Solomatov)
-- **Why it helps.** The old shape paid three times for one fact. EARS is a one-trigger grammar, so a statement written in it could never express scope or exclusions, and the criteria could only restate it. Splitting the jobs means the same context now holds strictly more information. It also became greppable: `ears="unwanted"` finds every error path, `source="Inferred"` finds everything the AI wrote rather than the user, `implementation="ToBeModified"` finds spec-versus-code drift.
+- **Change.** `[R3]` The AI no longer writes a requirement statement as an EARS sentence. It states the governing rule, the cases it reaches, and what it explicitly excludes. It then writes each acceptance criterion as a distinct, separately identified case carrying its own EARS pattern, so a test can claim exactly one of them. For non-functional work it sweeps all nine ISO 25010 quality buckets every time and records a decision when it leaves one out of scope. It tracks coverage per criterion rather than per requirement. (Igor Solomatov)
+- **Why it helps.** EARS carries one trigger and one response, so a statement written in it had nowhere to put scope or exclusions, and the criteria could only echo it back. You now get strictly more specification out of the same context. You can also ask questions of a whole requirements set: which criteria cover error paths, which requirements the AI inferred rather than you stating them, where the spec has drifted from the code.
 
-#### Board automation goes live
+#### You drive development from the board
 
-- **Change.** `[CI]` `[Docs]` Six analysis runs had reported success while filing zero issues: subagents were backgrounded in a headless session, so their reports were queued for a turn that never came. With that fixed, the four pipelines were aligned and given real guards. `check_trace.py` fails any run that abandoned a subagent or changed nothing. `scrub_trace.py` redacts credentials before the trace is published. The board moved to seven lanes, where each pipeline loads, claims and ends in distinct lanes, and the two human gates (approve the plan, approve the PR) are board moves no agent can make. Analysis is now forbidden from quoting CodeQL or Dependabot detail into a public issue. `docs/AUTOMATION-ARCHITECTURE.md` records the design and the constraints behind it. (Igor Solomatov)
-- **Why it helps.** A pipeline that reports success while doing nothing is worse than one that fails, because nobody looks. The lane shape makes re-processing structurally impossible instead of asking an agent not to, and a crashed run parks visibly rather than retrying forever.
+- **Change.** `[CI]` `[Docs]` You now approve a plan by moving a card, and you review the result as a pull request. The AI files the issue, writes the plan into it, claims it, implements it, and opens the pull request, and it cannot promote its own work past either of your two decisions. When a run cannot finish, it leaves the card where nothing will pick it up again and tells you on the issue. It also holds back security-alert detail from public issues, referencing an alert by URL and severity only. You can read the whole design in `docs/AUTOMATION-ARCHITECTURE.md`. (Igor Solomatov)
+- **Why it helps.** You no longer need a checkout, an editor, or a laptop to get work merged. Two card moves and a few comment replies are the entire human interface, so an end-to-end implementation runs from a phone. The AI now also fails a run that produced nothing, so you learn about it the same day rather than after a week of green checkmarks.
 
-#### Six fixes the pipeline shipped
+#### The AI shipped six of its own fixes
 
-- **Change.** `[CI]` `[Server]` `[R3]` Filed, planned, approved and merged the same day: concurrency groups on seven CI pipelines (#189), `requirements.txt` added to MCP path filters (#188), `setup-node` v5 (#184), `InstructionDocCache` tests (#186), `RefSrc/` normalized to lowercase `refsrc/` (#190), and a `codemap` invariant that listed a nonexistent asset (#183). (Igor Solomatov)
-- **Why it helps.** These are the fixes a repo accumulates and nobody schedules. Getting them merged with a human approving each plan and each PR is what proves the loop works. `refsrc/` is the useful one to remember: a case difference is invisible on macOS and fatal in CI.
+- **Change.** `[CI]` `[Server]` `[R3]` Six issues the AI filed on 05.08 went through planning, your approval, and merge the same day. It made CI cancel stale runs, taught the MCP pipelines to notice a dependency change, brought the last workflow onto the current Node action, covered the instruction cache with tests, fixed reference-source lookups on case-sensitive filesystems, and dropped a stale invariant pointing at a file nobody ships (#183, #184, #186, #188, #189, #190). (Igor Solomatov)
+- **Why it helps.** These are the fixes a repository accumulates and nobody schedules. Getting them merged with you approving each plan and each pull request is what makes the loop trustworthy for real work.
 
-#### Faster npx, docs, hygiene
+#### The AI works cleaner inside your workspace
 
-- **Change.** `[R3]` `[Tooling]` `[Docs]` Every `npx -y <pkg>@latest` in r2 and r3 instructions became `npx <pkg>`. The `coding` skill now requires code to work across all feature-flag states. Issue templates added for bugs, features, docs and prompts (#201 by omaiesh, #202). README's Quick Start became a link-out, and a second tech demo covers frontend migration. Copilot Marketplace install is documented for JetBrains, with standalone reframed as a fallback. GitNexus licensing stated plainly as paid. Added `.prettierignore`; refreshed stats and the website. (Igor Solomatov)
-- **Why it helps.** `@latest` forces a registry lookup on every call, and the plan manager is called several times per step. The README was answering "how do I install this?" twice, and the copy that duplicated went stale first.
+- **Change.** `[R3]` `[Tooling]` The AI asks which feature flags exist before it designs, and writes code that holds whether a flag is on or off. It keeps your Rosetta docs out of Prettier's way, so the headers it navigates by survive a format pass. It stops re-fetching its CLI helpers from the registry on every call. It finds your reference sources on case-sensitive filesystems. And when it authors instructions for other agents, it states the rule instead of describing it. All of this reaches you in plugins 3.1.8. (Igor Solomatov)
+- **Why it helps.** A flag your spec never named is a branch the implementation never covered, and you meet it in production instead of review. The registry lookup ran several times per step, so dropping it saves real time and money on every session.
+
+#### Docs
+
+- **Change.** `[Docs]` Anyone landing on the repository gets one Quick Start instead of two competing ones, plus a second demo showing a frontend migration end to end. Copilot users on JetBrains can install from the Marketplace, with the standalone package presented as the fallback it is. Anyone filing an issue gets a template that asks for what a maintainer needs (#201 by omaiesh, #202). GitNexus licensing is stated plainly as paid. (Igor Solomatov)
+- **Why it helps.** The README answered "how do I install this?" twice, and the duplicate went stale first. JetBrains users were being sent down the harder path for no reason.
 
 ### Week Mon 27.07 – Sun 02.08
 

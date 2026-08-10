@@ -139,11 +139,35 @@ Verbosity kills documentation. These are hard rules.
 - **Casual grammar is fine.** Starting with "And" or "But" is OK if it reads naturally. Stiff formal prose is worse than slightly casual prose.
 - **Bullet > paragraph.** If content can be a list, make it a list.
 
-### Review tests (apply all three after every doc)
+### Forest, not trees (the failure mode that keeps happening)
+
+A changelog entry states the value of a change. It is not a summary of the diff.
+
+Field names, attribute lists, file paths, flag names, phase numbers, and enum values are trees. They belong in the code, not here. Name the mechanism once if the reader needs a handle on it, then spend the words on what it is worth.
+
+For every change, answer in this order and write in this order:
+1. What was wrong or costly before? Name it concretely.
+2. What is now possible, cheaper, safer, or more reliable?
+3. Only then, the minimum mechanism needed to make 1 and 2 credible.
+
+Worked example. A requirement format change:
+- Trees (wrong): "single-value fields became attributes ordered by volatility; criteria are self-closing elements carrying `ears`, a condition word, `system` and `shall`."
+- Forest (right): "The old shape said the same thing three times and paid for it on every turn. Each layer now carries different information, so the same context holds strictly more content."
+
+Test before writing each section: could a non-engineer explain to their manager why this change was worth doing? If the answer is only "they changed some fields", it is trees. Rewrite it.
+
+### Length
+
+- One weekly entry, not an essay. Summary of 2 short paragraphs, 8-12 highlight bullets, 4-6 detailed sections.
+- Each detailed section: Change 3-6 sentences, Why it helps 2-4 sentences. If it runs longer, it is trees.
+- Never enumerate every commit. Bundle routine work (stats refresh, site sync, changelog landing) into one line.
+
+### Review tests (apply all after every doc)
 
 1. Read it aloud. Does it sound like a real person wrote it, or does it sound like a bot?
 2. For every sentence, ask: "Does deleting this hurt the reader?" If no, delete it.
 3. Would an engineer skim past this section? If yes, it's too long or too obvious. Cut or restructure.
+4. For every detailed section, ask: "Is this the value or the diff?" If it is the diff, rewrite it as the value.
 
 # Working with user
 

@@ -118,6 +118,45 @@ R3 advances Rosetta from governed assistance to deterministic, self-guarding exe
 
 *Release scope: **R3** is the live, served release. **R2** is the previous release, receiving backports only. Other tags are release-agnostic: **Tooling** (plugin generator, rosettify), **Server** (MCP server, Helm), **Hooks**, **CI**, **Docs**.*
 
+### Week Mon 03.08 – Sun 09.08
+
+Requirements stopped repeating themselves. A requirement used to say the same thing three times: an EARS statement, then acceptance criteria restating it as Given/When/Then. Three renderings of one fact, re-read and re-paid on every turn, with nothing added. Each layer now carries different information. The statement holds the rule and what it excludes. Each criterion is a concrete, separately addressable case. Same tokens, far more content, and coverage is finally claimable per criterion instead of per requirement.
+
+Second, the repo's own automation went live and closed a full loop: it filed issues, planned them, and merged six of its own pull requests after user approval. Before that it had failed six runs in a row while reporting success, filing nothing.
+
+**Highlights**
+
+- Requirements say more per token: EARS moved onto the criteria, statements now carry scope and exclusions (#204)
+- Every criterion has a stable `<req-id>.AC#`, so a test claims one criterion and a gap shows as a missing row
+- NFRs sweep all nine ISO 25010 buckets; an empty bucket needs a written out-of-scope decision, not silence
+- Board automation live: 18 issues filed across two runs on 05.08, 6 merged the same day (#183, #184, #186, #188, #189, #190)
+- A run that quietly does nothing now fails the job instead of reporting success
+- Seven-lane board flow: no pipeline can re-process its own output, and a crashed run waits for a human instead of looping
+- New `docs/AUTOMATION-ARCHITECTURE.md`
+- `npx -y <pkg>@latest` became `npx <pkg>` across all instructions, dropping a registry round trip per call
+- Issue templates added (#202, from #201 by omaiesh); `RefSrc/` normalized to `refsrc/` (#190)
+- README Quick Start is a link-out now, not a duplicate; Copilot Marketplace documented for JetBrains
+
+#### Requirements: each layer says something different (#204)
+
+- **Change.** `[R3]` The statement is no longer an EARS sentence. It carries the governing rule, the cases it reaches, and its explicit exclusions. EARS moved down onto each acceptance criterion, which now declares its pattern and condition as attributes and gets a stable `<req-id>.AC#`. Single-value fields became attributes rather than child nodes. NFR IDs became `NFR-[ISO]-####` across the nine ISO 25010 buckets, all nine swept every time. The traceability matrix moved to one row per criterion. (Igor Solomatov)
+- **Why it helps.** The old shape paid three times for one fact. EARS is a one-trigger grammar, so a statement written in it could never express scope or exclusions, and the criteria could only restate it. Splitting the jobs means the same context now holds strictly more information. It also became greppable: `ears="unwanted"` finds every error path, `source="Inferred"` finds everything the AI wrote rather than the user, `implementation="ToBeModified"` finds spec-versus-code drift.
+
+#### Board automation goes live
+
+- **Change.** `[CI]` `[Docs]` Six analysis runs had reported success while filing zero issues: subagents were backgrounded in a headless session, so their reports were queued for a turn that never came. With that fixed, the four pipelines were aligned and given real guards. `check_trace.py` fails any run that abandoned a subagent or changed nothing. `scrub_trace.py` redacts credentials before the trace is published. The board moved to seven lanes, where each pipeline loads, claims and ends in distinct lanes, and the two human gates (approve the plan, approve the PR) are board moves no agent can make. Analysis is now forbidden from quoting CodeQL or Dependabot detail into a public issue. `docs/AUTOMATION-ARCHITECTURE.md` records the design and the constraints behind it. (Igor Solomatov)
+- **Why it helps.** A pipeline that reports success while doing nothing is worse than one that fails, because nobody looks. The lane shape makes re-processing structurally impossible instead of asking an agent not to, and a crashed run parks visibly rather than retrying forever.
+
+#### Six fixes the pipeline shipped
+
+- **Change.** `[CI]` `[Server]` `[R3]` Filed, planned, approved and merged the same day: concurrency groups on seven CI pipelines (#189), `requirements.txt` added to MCP path filters (#188), `setup-node` v5 (#184), `InstructionDocCache` tests (#186), `RefSrc/` normalized to lowercase `refsrc/` (#190), and a `codemap` invariant that listed a nonexistent asset (#183). (Igor Solomatov)
+- **Why it helps.** These are the fixes a repo accumulates and nobody schedules. Getting them merged with a human approving each plan and each PR is what proves the loop works. `refsrc/` is the useful one to remember: a case difference is invisible on macOS and fatal in CI.
+
+#### Faster npx, docs, hygiene
+
+- **Change.** `[R3]` `[Tooling]` `[Docs]` Every `npx -y <pkg>@latest` in r2 and r3 instructions became `npx <pkg>`. The `coding` skill now requires code to work across all feature-flag states. Issue templates added for bugs, features, docs and prompts (#201 by omaiesh, #202). README's Quick Start became a link-out, and a second tech demo covers frontend migration. Copilot Marketplace install is documented for JetBrains, with standalone reframed as a fallback. GitNexus licensing stated plainly as paid. Added `.prettierignore`; refreshed stats and the website. (Igor Solomatov)
+- **Why it helps.** `@latest` forces a registry lookup on every call, and the plan manager is called several times per step. The README was answering "how do I install this?" twice, and the copy that duplicated went stale first.
+
 ### Week Mon 27.07 – Sun 02.08
 
 An external open-source review of Rosetta was published on 25.07. This week closed most of what it flagged: CodeQL analysis, PR CI for `src/hooks` (the one item the review called genuinely missing), per-package pipelines for `rosetta-cli` and `rosetta-mcp`, and 7 Dependabot alerts patched. The larger delivery is `security-flow`, a full security review workflow with eight mandatory-subagent phases, a filename-only secret gate that runs before any target content reaches a model, and active testing bounded to pre-production. Repo automation dropped Atlassian entirely for GitHub Projects v2. Every CI workflow now routes its model calls through the Bifrost gateway instead of a raw Anthropic key.

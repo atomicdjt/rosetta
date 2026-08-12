@@ -1,6 +1,10 @@
-MUST read `docs/ARCHITECTURE.md` and `docs/CONTEXT.md`.
-Main goal: cover E2E AI PDLC engineering workflows at foundation level.
+Main goal: cover E2E AI PDLC engineering workflows at foundation level for enterprise clients.
+Top-level or orchestrator agents MUST READ `docs/ARCHITECTURE.md` contains technical details and guidance, and `docs/CONTEXT.md` - business context. Subagents - when needed.
 Monorepo with multiple solution components in `src` and golden instructions in `instructions`. R3 is current, R2 is KTLO.
 Defines reusable plugins/mcp for AI coding agents (claude code, codex, copilot, cursor, antigravity, etc) which users (engineers, developers) invoke on THEIR target repositories.
 `instructions` folder contains AI coding agent **instructions** for another repository (skills, subagents, rules, workflows), it is **not documentation**. 
-AI Coding Agents always load `instructions/r3/core/rules/bootstrap-alwayson.md` and one mode-specific file (plugin-files-mode.md, mcp-files-mode.md, local-files-mode.md).
+
+How it works: 
+1. User installs plugins XOR mcp. 
+2. On any user session start AI Coding Agents then load `instructions/r3/core/rules/bootstrap-alwayson.md` and one mode-specific file (plugin-files-mode.md, mcp-files-mode.md, local-files-mode.md).
+3. User uses slash or $ commands to do his work on his repo with our instructions.

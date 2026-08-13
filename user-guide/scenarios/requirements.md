@@ -1,6 +1,6 @@
 # Author requirements
 
-**Command:** `/requirements-authoring-flow` · *[← Scenarios](README.md) · [User guide](../README.md)*
+**Command:** `/requirements-authoring-flow` · *[← All scenarios](../README.md#scenarios-at-a-glance) · [User guide](../README.md)*
 
 > Capture what should be built *before* building it — as small, atomic, testable requirement units, each one approved by you.
 
@@ -28,8 +28,9 @@ The whole point is to stop the agent from drafting too early. It confirms **inte
 flowchart TB
     Start(["/requirements-authoring-flow + request"]) --> Disc["Discovery <br>existing reqs, constraints, scope"]
     Disc --> Research["Research <br>(standards, patterns — optional)"]
-    Research --> G1{"You approve <br>the intent"}
-    G1 -->|revise| Research
+    Research --> Intent["Capture intent, assumptions, questions"]
+    Intent --> G1{"You approve <br>the intent"}
+    G1 -->|revise| Intent
     G1 -->|approve| Outline["Propose structure & IDs"]
     Outline --> G2{"You approve <br>the outline"}
     G2 -->|revise| Outline
@@ -40,13 +41,13 @@ flowchart TB
     VOK -->|no| G3{"You review <br>each requirement"}
     G3 -->|request changes| Draft
     G3 -->|more batches| Draft
-    G3 -->|all approved| Final["Finalize: index, matrix, change log"]
+    G3 -->|all approved| Final["Finalize: index, change log"]
     Final --> Done(["Approved requirements set"])
 
     classDef step fill:#dae8ff,stroke:#3674b5,color:#102a43;
     classDef gate fill:#fff2cc,stroke:#b58b00,color:#493800;
     classDef done fill:#e5f7e8,stroke:#35834a,color:#153b20;
-    class Disc,Research,Outline,Draft,Val,Final step;
+    class Disc,Research,Intent,Outline,Draft,Val,Final step;
     class G1,G2,VOK,G3 gate;
     class Start,Done done;
 ```
@@ -55,11 +56,11 @@ Functional requirements are written in the EARS style; non-functional ones get m
 
 ## What you'll be asked to do
 
-Approve the **intent**, the **outline**, **each requirement unit**, and the final **validation**. Along the way, supply the actors, goals, scope boundaries, non-goals, priorities, and any measurable thresholds. The agent walks you through the finished set as a plain-language story (per actor where possible) so you can confirm it matches what you meant.
+Approve the **intent**, the **outline**, the **validation findings**, and then **each requirement unit**. Along the way, supply the actors, goals, scope boundaries, non-goals, priorities, and any measurable thresholds. The agent walks you through the finished set as a plain-language story (per actor where possible) so you can confirm it matches what you meant.
 
 ## What it creates
 
-A state file under `agents/TEMP/<feature>/`, then the deliverables: the approved requirements set, a validation pack, a traceability matrix, and a change log — with an index you can grep.
+A state file under `agents/TEMP/<feature>/`, then the deliverables under `docs/REQUIREMENTS/`: the approved requirements set, a validation pack, and a change log — with an index you can grep.
 
 ## Related
 

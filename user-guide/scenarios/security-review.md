@@ -1,6 +1,6 @@
 # Review security
 
-**Command:** `/security-flow` · *[← Scenarios](README.md) · [User guide](../README.md)*
+**Command:** `/security-flow` · *[← All scenarios](../README.md#scenarios-at-a-glance) · [User guide](../README.md)*
 
 > Run an authorized, evidence-preserving security review that ends with sanitized findings and concise remediation-task inputs. It reviews and reports — it does **not** fix anything or start coding.
 
@@ -29,7 +29,7 @@ flowchart TB
     SG -->|pass| Auth
     Auth --> G1{"You approve <br>the run scope"}
     G1 -->|adjust| Auth
-    G1 -->|approve| DG{"PR / pipeline <br>review?"}
+    G1 -->|approve| DG{"Development, change, <br>PR or pipeline review?"}
     DG -->|yes| Gates["Run deterministic gates"]
     DG -->|no| Model["Threat model + coverage plan"]
     Gates --> GR{"High+ findings?"}
@@ -58,14 +58,14 @@ flowchart TB
 ### The guardrails, plainly
 
 - **Secrets never enter the model.** The gate returns affected filenames only — never the values.
-- **It stops on high risk.** Candidate secret files in production or ambiguous environments halt the review and can't be overridden.
+- **It stops on high risk.** Candidate secret files in production or ambiguous environments, or a secret scanner that can't run, halt the review before any source is read — and can't be overridden.
 - **Active testing is pre-production only.** Testing against production is prohibited.
 - **New tools, network access, or credentials need separate approval.**
 - **It never remediates.** Findings are grouped by root cause and emitted as task inputs for a later, separate coding session.
 
 ## What you'll be asked to do
 
-Provide the authorized scope and environment; **approve the run contract** (activities, tools, data flows, stop conditions); approve any flagged DEV/QA candidate files; and approve the remediation **task index** at the end. The agent won't commit or delete on your behalf — you review and commit the artifacts.
+Provide the authorized scope and environment; **approve the run contract** (activities, tools, data flows, stop conditions, how much exploit detail the report carries); approve any flagged DEV/QA candidate files; and approve the remediation **task index** at the end. The agent won't commit or delete on your behalf — you review and commit the artifacts.
 
 ## What it creates
 

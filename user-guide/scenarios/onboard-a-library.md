@@ -1,6 +1,6 @@
 # Onboard a library
 
-**Command:** `/external-lib-flow` · *[← Scenarios](README.md) · [User guide](../README.md)*
+**Command:** `/external-lib-flow` · *[← All scenarios](../README.md#scenarios-at-a-glance) · [User guide](../README.md)*
 
 > Teach the agent how to *use* an external or private library — without giving it source access during later work — by packaging the library into compact reference material plus a short learning guide.
 
@@ -19,7 +19,7 @@ The only thing it needs from you is the project path.
 
 ## How it works
 
-It's a short, mostly hands-off routine: point it at the library, it detects the basics, packages the codebase into a compressed reference file, publishes a brief onboarding guide, and verifies the agent can find it later.
+It's a short, mostly hands-off routine: point it at the library, it detects the basics, packages the codebase into a compressed reference file (uses repomix), publishes a brief onboarding guide, and verifies the agent can find it later.
 
 ```mermaid
 flowchart TB
@@ -52,6 +52,9 @@ In `refsrc/`: `<project-name>.xml` (the compressed codebase) and `<project-name>
 
 [Write or change code](coding.md) then uses the onboarded library · [Modernize](modernize.md) if you're migrating onto it.
 
+Prerequisites: repomix (MCP or CLI).
+
 ## Sources
 
 - Workflow: [`instructions/r3/core/workflows/external-lib-flow.md`](../../instructions/r3/core/workflows/external-lib-flow.md)
+- Skills: [`reverse-engineering`](../../instructions/r3/core/skills/reverse-engineering/SKILL.md)

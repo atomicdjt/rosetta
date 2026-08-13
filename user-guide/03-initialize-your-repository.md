@@ -1,6 +1,6 @@
 # Set up your repository
 
-*[← Install Rosetta](02-install.md) · [Back to the guide](README.md) · Next: [Pick a scenario →](scenarios/README.md)*
+*[← Install Rosetta](02-install.md) · [Back to the guide](README.md) · Next: [Configure your ecosystem →](04-configure-your-ecosystem.md)*
 
 Before Rosetta can help with real tasks, it needs to understand your project. You do this **once per repository** with the *init workspace* workflow. The agent studies your code, writes a handful of context documents, and asks you a few questions to fill gaps.
 
@@ -8,7 +8,7 @@ Think of it as onboarding a new teammate: an hour of orientation now saves confu
 
 ## How to run it
 
-Just ask the agent in plain language. Use the version that matches your situation.
+Just ask the agent in plain language, which runs `/init-workspace-flow`. Use the version that matches your situation.
 
 ### Existing project (brownfield)
 
@@ -45,7 +45,7 @@ Initialize this repository using the respective Rosetta workflow, this is a comp
 If a repo was set up on an earlier Rosetta release:
 
 ```text
-Upgrade this repository from Rosetta R1 to R3
+Upgrade this repository from Rosetta R2 to R3
 ```
 
 ## What happens during setup
@@ -56,8 +56,9 @@ The agent works through several phases and does most of the heavy lifting itself
 2. Analyzes your project structure and tech stack.
 3. Extracts reusable coding and architecture patterns.
 4. Writes the context documents (below).
-5. **Asks you targeted questions** about domain and architecture that it can't infer from code.
-6. Verifies everything is complete.
+5. **Asks you to pick a code-navigation tool** — a language server, or an optional third-party code graph.
+6. **Asks you targeted questions** about domain and architecture that it can't infer from code.
+7. Verifies everything is complete.
 
 **Your job during setup:** answer the questions thoughtfully and skim the generated documents to make sure they match reality. The better your answers, the better every future task goes.
 
@@ -88,4 +89,4 @@ A few habits that noticeably improve results:
 
 ## Next step
 
-Your repo is ready. Time to do actual work — [pick a scenario →](scenarios/README.md), or open the visual [workflow map](workflow-map.md).
+Your repo is ready. Next, [configure your ecosystem →](04-configure-your-ecosystem.md) so the agent has the tools your scenarios need.

@@ -1,6 +1,6 @@
 # Author agent prompts
 
-**Command:** `/coding-agents-prompting-flow` · *[← Scenarios](README.md) · [User guide](../README.md)*
+**Command:** `/coding-agents-prompting-flow` · *[← All scenarios](../README.md#scenarios-at-a-glance) · [User guide](../README.md)*
 
 > Author or adapt prompts for AI coding agents — skills, subagents, workflows, rules — through a discover → brief → blueprint → draft/harden → simulate → validate pipeline.
 
@@ -24,7 +24,7 @@ It treats prompts like software. It extracts a **Prompt Brief** you approve, des
 
 ```mermaid
 flowchart TB
-    Start(["/coding-agents-prompting-flow + request"]) --> Disc["Discover context & references"]
+    Start(["/coding-agents-prompting-flow + request"]) --> Disc["Discover context & references, <br>extract intent"]
     Disc --> G1{"You approve <br>the Prompt Brief"}
     G1 -->|revise| Disc
     G1 -->|approve| Blue["Blueprint the structure"]
@@ -36,14 +36,15 @@ flowchart TB
     Pass -->|all done| Sim["Simulate realistic runs"]
     Sim --> Risk{"Major <br>risk?"}
     Risk -->|yes| Blue
-    Risk -->|no| G2{"You give <br>final approval"}
+    Risk -->|no| Val["Validate the prompt set"]
+    Val --> G2{"You give <br>final approval"}
     G2 -->|request changes| Draft
     G2 -->|approve| Done(["Validated prompt set"])
 
     classDef step fill:#dae8ff,stroke:#3674b5,color:#102a43;
     classDef gate fill:#fff2cc,stroke:#b58b00,color:#493800;
     classDef done fill:#e5f7e8,stroke:#35834a,color:#153b20;
-    class Disc,Blue,Draft,Harden,Sim step;
+    class Disc,Blue,Draft,Harden,Sim,Val step;
     class G1,Pass,Risk,G2 gate;
     class Start,Done done;
 ```
@@ -60,7 +61,7 @@ Analysis artifacts in the plan folder (`prompt-brief.md`, `open-questions.md`, `
 
 ## Related
 
-[Get help](get-help.md) to understand Rosetta's own skills and agents · contributing prompt changes is covered in the repo's developer docs.
+[Get help](get-help.md) to understand Rosetta's own skills and agents · contributing prompt changes is covered in [CONTRIBUTING](../../CONTRIBUTING.md#prompt-changes).
 
 ## Sources
 

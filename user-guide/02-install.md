@@ -29,7 +29,7 @@ That's it. Marketplace plugins update themselves over time.
 
 ### Cursor
 
-**Easiest option:** if you already have Rosetta installed in Claude Code, Cursor picks it up automatically — you don't need to install it again. (To avoid duplicates, don't install it separately in both.)
+**Easiest option:** if you already have Rosetta installed in Claude Code, Cursor picks it up automatically — you don't need to install it again. (To avoid duplicates, don't install it separately in both.) To stop Cursor picking them up at all, turn off **Include third-party Plugins, Skills, and other configs** in Cursor Settings → Rules, Skills, Subagents.
 
 **Team/Enterprise marketplace:** on a Cursor Teams or Enterprise plan, import the repository `https://github.com/griddynamics/rosetta` into your internal marketplace. Follow Cursor's guide at <https://cursor.com/docs/plugins#team-marketplaces>.
 
@@ -57,7 +57,7 @@ That's it. Marketplace plugins update themselves over time.
 
 ### Codex
 
-*(As of April 2026, Codex plugins support hooks, MCPs, and skills only.)*
+*(As of August 2026, Codex plugins do not support subagents. In Codex, invoke a workflow as `$coding-flow` rather than `/coding-flow`.)*
 
 1. Download `core-codex-*.zip` from the [latest release](https://github.com/griddynamics/rosetta/releases/latest).
 2. Extract into your repository.
@@ -86,12 +86,12 @@ Start a chat with your agent and ask:
 What can you do, Rosetta?
 ```
 
-If it's working, the agent recognizes Rosetta and lists the available workflows (it runs the built-in `self-help-flow` to do this). If it just answers like a generic assistant with no mention of Rosetta workflows, see [Tips → The agent isn't using Rosetta](05-tips-and-troubleshooting.md#the-agent-isnt-using-rosetta).
+If it's working, the agent recognizes Rosetta and lists the available workflows (it runs the built-in `help-flow` to do this). If it just answers like a generic assistant with no mention of Rosetta workflows, see [Tips → The agent isn't using Rosetta](05-tips-and-troubleshooting.md#the-agent-isnt-using-rosetta).
 
 ## Keeping it up to date
 
-- **Marketplace installs** usually update automatically.
-- **Standalone installs** don't — to upgrade, re-download the latest zip and replace the files (install again).
+- **Marketplace installs** usually update automatically. To force it: `claude plugin marketplace update rosetta` then `claude plugin update rosetta@rosetta`. To remove it: `claude plugin uninstall rosetta@rosetta`.
+- **Standalone installs** don't — to upgrade, re-download the latest zip and replace the files (install again). To remove it, delete the extracted files.
 
 ## Next step
 

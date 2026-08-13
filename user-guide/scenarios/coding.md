@@ -1,6 +1,6 @@
 # Write or change code
 
-**Command:** `/coding-flow` · *[← Scenarios](README.md) · [User guide](../README.md)*
+**Command:** `/coding-flow` · *[← All scenarios](../README.md#scenarios-at-a-glance) · [User guide](../README.md)*
 
 > Turn a request into working, reviewed, tested code — through discovery, a design you approve, a plan you approve, implementation, and a separate review-and-validation pass.
 
@@ -25,39 +25,40 @@ The agent doesn't just start editing. It proposes a **design**, then a **plan**,
 ```mermaid
 flowchart TB
     Start(["/coding-flow + your request"]) --> Clear{"Request clear?"}
-    Clear -->|no| Disc["Discovery <br>agent: discoverer"]
-    Clear -->|yes| Design["Design — 3 options <br>agent: architect"]
+    Clear -->|no| Disc["Discovery"]
+    Clear -->|yes| Design["Design — 3 options"]
     Disc --> Design
     Design --> G1{"You review <br>the design"}
     G1 -->|request changes| Design
-    G1 -->|approve| Plan["Tech plan: specs + plan <br>agent: architect"]
+    G1 -->|approve| Plan["Tech plan: specs + plan"]
     Plan --> Size{"Task size?"}
-    Size -->|medium / large| RevPlan["Plan review <br>agent: reviewer"]
+    Size -->|medium / large| RevPlan["Plan review"]
     Size -->|small| G2{"You review <br>the plan"}
     RevPlan --> G2
     G2 -->|request changes| Plan
-    G2 -->|approve| Impl["Implementation <br>agent: engineer"]
-    Impl --> RevCode["Code review + validation <br>reviewer + validator"]
+    G2 -->|approve| Impl["Implementation"]
+    Impl --> RevCode["Code review (all sizes) <br>+ validation (medium / large)"]
     RevCode --> Issues{"Issues found?"}
     Issues -->|yes| Impl
     Issues -->|no| G3{"You approve <br>the implementation"}
     G3 -->|request changes| Impl
-    G3 -->|approve| Tests["Write & run tests <br>agent: engineer"]
-    Tests --> Final{"Tests pass & <br>final check clean?"}
+    G3 -->|approve| Tests["Write & run tests"]
+    Tests --> RevTests["Test review (medium / large)"]
+    RevTests --> Final{"Tests pass & <br>final check clean?"}
     Final -->|no| Impl
     Final -->|yes| Done(["Shipped: working, tested code"])
 
     classDef step fill:#dae8ff,stroke:#3674b5,color:#102a43;
     classDef gate fill:#fff2cc,stroke:#b58b00,color:#493800;
     classDef done fill:#e5f7e8,stroke:#35834a,color:#153b20;
-    class Disc,Design,Plan,RevPlan,Impl,RevCode,Tests step;
+    class Disc,Design,Plan,RevPlan,Impl,RevCode,Tests,RevTests step;
     class Clear,G1,Size,G2,Issues,G3,Final gate;
     class Start,Done done;
 ```
 
 The work is split across specialist subagents — a *discoverer* to gather context, an *architect* to design and plan, an *engineer* to implement and test, and independent *reviewer* and *validator* subagents that check the work in fresh context (so nothing reviews its own output). Validation includes actually building and running things, not just reading the diff.
 
-**It scales to the task.** A small change merges the checkpoints and skips the heavier review/validation phases; medium and large tasks get the full sequence, and large tasks add a structured reasoning step during planning.
+**It scales to the task.** A small change merges the checkpoints and skips the heavier review/validation phases; medium and large tasks get the full sequence, including an explicit reasoning step during planning.
 
 ## What you'll be asked to do
 
@@ -71,7 +72,7 @@ The agent won't slide past these gates on a vague reply; give a clear confirmati
 ## What it creates
 
 - A state file under `agents/TEMP/<feature>/` so a long task can resume in a new session.
-- Planning artifacts: `discovery-notes.md`, `architecture-notes.md`, and `plans/<feature>/<FEATURE>-SPECS.md` + `<FEATURE>-PLAN.md`.
+- Planning artifacts: `plans/<feature>/discovery-notes.md`, `plans/<feature>/architecture-notes.md`, and `plans/<feature>/<FEATURE>-SPECS.md` + `<FEATURE>-PLAN.md`.
 - The code changes and passing tests, plus brief updates to your `docs/CONTEXT.md` / `docs/ARCHITECTURE.md` when relevant.
 
 ## Tips
@@ -87,4 +88,4 @@ The agent won't slide past these gates on a vague reply; give a clear confirmati
 ## Sources
 
 - Workflow: [`instructions/r3/core/workflows/coding-flow.md`](../../instructions/r3/core/workflows/coding-flow.md)
-- Skills: [`coding`](../../instructions/r3/core/skills/coding/SKILL.md), [`planning`](../../instructions/r3/core/skills/planning/SKILL.md), [`tech-specs`](../../instructions/r3/core/skills/tech-specs/SKILL.md), [`hitl`](../../instructions/r3/core/skills/hitl/SKILL.md)
+- Skills: [`coding`](../../instructions/r3/core/skills/coding/SKILL.md), [`planning`](../../instructions/r3/core/skills/planning/SKILL.md), [`tech-specs`](../../instructions/r3/core/skills/tech-specs/SKILL.md), [`testing`](../../instructions/r3/core/skills/testing/SKILL.md), [`hitl`](../../instructions/r3/core/skills/hitl/SKILL.md)

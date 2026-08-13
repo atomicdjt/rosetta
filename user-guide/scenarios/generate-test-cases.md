@@ -1,6 +1,6 @@
 # Generate test cases
 
-**Command:** `/testgen-flow` · *[← Scenarios](README.md) · [User guide](../README.md)*
+**Command:** `/testgen-flow` · *[← All scenarios](../README.md#scenarios-at-a-glance) · [User guide](../README.md)*
 
 > Turn a ticket (plus its linked docs) into a structured requirements document and a set of manual test cases — then export those cases to your test management system. No automation code is written here.
 
@@ -54,13 +54,15 @@ It reads the Jira ticket and its linked Confluence pages (including child pages,
 
 ## What it creates
 
-Everything lands under `plans/testgen-<TICKET-KEY>/`: the collected `raw-data.md`, a gap `analysis.md`, `questions.md` + `answers.md`, `requirements.md`, `test-scenarios.md`, and an `export-report.md` receipt with the created TMS IDs. A `testgen-state.md` tracks progress.
+Everything lands under `plans/testgen-<TICKET-KEY>/`: `testgen-project-config.md`, `initial-data.md`, the collected `raw-data.md`, a gap `analysis.md`, `questions.md` + `answers.md`, `requirements.md`, `test-scenarios.md`, and an `export-report.md` receipt with the created TMS IDs. A `testgen-state.md` tracks progress.
 
 ## Related
 
 [Automate UI tests](automate-ui-tests.md) / [Automate API tests](automate-api-tests.md) to turn cases into code · [Author requirements](requirements.md) for a full requirements engineering pass.
 
+Prerequisites: Issue Tracker; Test Management System for export.
+
 ## Sources
 
 - Workflow: [`instructions/r3/core/workflows/testgen-flow.md`](../../instructions/r3/core/workflows/testgen-flow.md) (plus the `testgen-flow-*.md` phase files)
-- Skills: [`qa-knowledge`](../../instructions/r3/core/skills/qa-knowledge/SKILL.md), [`qa-structure`](../../instructions/r3/core/skills/qa-structure/SKILL.md)
+- Skills: [`qa-knowledge`](../../instructions/r3/core/skills/qa-knowledge/SKILL.md), [`qa-structure`](../../instructions/r3/core/skills/qa-structure/SKILL.md), [`data-collection`](../../instructions/r3/core/skills/data-collection/SKILL.md), [`questioning`](../../instructions/r3/core/skills/questioning/SKILL.md), [`sensitive-data`](../../instructions/r3/core/skills/sensitive-data/SKILL.md)

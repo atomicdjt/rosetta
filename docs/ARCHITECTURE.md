@@ -384,7 +384,7 @@ Cursor and Copilot are the only plugins that need two distinct templates because
 We use `.github/workflows` pipelines to build and release: MCP PyPi package, Docker Image, Publish Instructions, Publish website.
 Triggers on push to `main` or manual dispatch. Use actionlint.
 
-Website: builds the Jekyll website from `docs/web/`, deploys to GitHub Pages.
+Website: builds the Jekyll website from `docs/web/`, deploys to GitHub Pages. Original web content is not generated, but adapted and synchronized. Jekyll uses that content to build the website. The one exception is `docs/web/user-guide/`, which is synchronized from `user-guide/` by `scripts/sync_user_guide_web.py` (rewrites relative links to permalinks, `instructions/**` refs to GitHub blob URLs, and wraps mermaid blocks in `{% raw %}` so Liquid does not consume `{{"..."}}` hexagon nodes).
 
 **Plugin distribution.** The publish-instructions pipeline zips each plugin folder and attaches the archives to a GitHub Release alongside `instructions.zip`. See [Plugins](#plugins) for how plugin files are generated.
 

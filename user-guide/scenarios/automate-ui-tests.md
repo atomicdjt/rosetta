@@ -1,6 +1,6 @@
 # Automate UI tests
 
-**Command:** `/ui-aqa-flow` · *[← Scenarios](README.md) · [User guide](../README.md)*
+**Command:** `/ui-aqa-flow` · *[← All scenarios](../README.md#scenarios-at-a-glance) · [User guide](../README.md)*
 
 > Turn a test case into a working automated UI/browser test that follows your repo's existing page objects and conventions — and help you get it green.
 
@@ -24,10 +24,10 @@ The defining rule: **it never guesses selectors, flows, or data.** It reads your
 flowchart TB
     Start(["/ui-aqa-flow + test case"]) --> Collect["Collect test case + context"]
     Collect --> G1{"You answer <br>clarifying questions"}
-    G1 --> Feas{"Feature & elements <br>actually exist?"}
+    G1 --> Analyze["Analyze code & page objects"]
+    Analyze --> Feas{"Feature & elements <br>actually exist?"}
     Feas -->|no| Stop(["Hard stop — <br>you choose how to proceed"])
-    Feas -->|yes| Analyze["Analyze code & page objects"]
-    Analyze --> Sel{"Selectors <br>found in code?"}
+    Feas -->|yes| Sel{"Selectors <br>found in code?"}
     Sel -->|no| Ask["You provide <br>page source"]
     Ask --> Impl["Implement page objects + test"]
     Sel -->|yes| Impl
@@ -49,7 +49,7 @@ flowchart TB
     class Stop halt;
 ```
 
-It reuses your existing page objects and helpers before creating new ones, and every assertion traces back to a requirement. If the feature or elements simply don't exist yet, it stops rather than inventing them — and offers you options (point it at the real feature, author the missing UI as a separate task, or mark the test pending).
+It reuses your existing page objects and helpers before creating new ones, and every assertion traces back to a requirement. If the feature or elements simply don't exist yet, it stops rather than inventing them — and offers you options (point it at the real feature, author the missing UI as a separate task, mark the test pending, or abort).
 
 ## What you'll be asked to do
 
@@ -57,7 +57,7 @@ Answer clarifying questions about assertions and behavior; provide page source i
 
 ## What it creates
 
-A plan folder `plans/ui-aqa-<test-name>/` with `test-plan.md` (including the explicit assertions) and `code-analysis.md`; the implemented/updated page-object and test files in your repo; and a `ui-aqa-state.md` tracking progress.
+A plan folder `plans/ui-aqa-<test-name>/` with `test-plan.md` (including the explicit assertions), `code-analysis.md`, `page-sources/` (captured page HTML) and `failure-analysis.md` (the root-cause write-up); the implemented/updated page-object and test files in your repo; and progress tracked in `agents/TEMP/<feature>/ui-aqa-state.md`, which is not committed.
 
 ## Related
 

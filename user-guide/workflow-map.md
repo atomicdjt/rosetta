@@ -2,17 +2,17 @@
 
 [User guide](README.md) › Workflow map
 
-Start from what you want to do, follow it to the right scenario, and see the shape every scenario shares. Boxes in **amber** are the moments a workflow stops and waits for your approval.
+Start from what you want to do, follow it to the right scenario, and see the shape every scenario shares.
 
 ## 1. What do I want to do?
 
-Find your task on the left, follow the arrows to a command. Open any command's scenario page from [Jump to a scenario](#3-jump-to-a-scenario) below.
+Find your task on the left, follow the arrows to a command. Open any command's scenario page from the [scenarios index](README.md#scenarios-at-a-glance).
 
 ```mermaid
 flowchart TB
     Work(["New work <br>or a question"]) --> Q{"What do I <br>want to do?"}
 
-    Q -->|"set up a repo for AI"| Init["Initialize workspace <br>(ask in plain language)"]
+    Q -->|"set up a repo for AI"| Init["/init-workspace-flow <br>(or ask in plain language)"]
     Q -->|"not sure"| Help["/help-flow"]
 
     Q ==>|"build or change something"| Build{{"Build / change"}}
@@ -54,6 +54,8 @@ flowchart TB
 - 🟣 **Purple** — category
 - 🔵 **Blue** — a command
 
+**Diagram key on scenario pages:** blue = a step the agent performs · amber diamond = a decision or your approval · red = a hard stop · green = start / finished. Arrows that curve back are feedback loops.
+
 > **Tip:** if the diagram doesn't route you cleanly, just ask your agent `/help-flow What should I use to …` and it will point you to the right scenario.
 
 ## 2. How the process works
@@ -62,8 +64,7 @@ Whichever scenario you pick, the work follows the same five phases — **Prepare
 
 ```mermaid
 flowchart LR
-    Prep["Prepare <br><small>once, at setup</small>"] --> Classify["Classify <br>your request"]
-    Classify --> Research["Research <br>gather context"]
+    Prep["Prepare <br><small>once, at setup</small>"] --> Research["Research <br>gather context"]
     Research --> Plan["Plan <br>specs &amp; approach"]
     Plan --> G1{"You approve <br>the plan"}
     G1 -->|approve| Act["Act <br>implement"]
@@ -75,7 +76,7 @@ flowchart LR
     classDef step fill:#dae8ff,stroke:#3674b5,color:#102a43;
     classDef gate fill:#fff2cc,stroke:#b58b00,color:#493800;
     classDef done fill:#e5f7e8,stroke:#35834a,color:#153b20;
-    class Prep,Classify,Research,Plan,Act,Validate step;
+    class Prep,Research,Plan,Act,Validate step;
     class G1,G2 gate;
     class Done done;
 ```

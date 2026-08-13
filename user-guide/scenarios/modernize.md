@@ -1,6 +1,6 @@
 # Modernize / migrate
 
-**Command:** `/modernization-flow` · *[← Scenarios](README.md) · [User guide](../README.md)*
+**Command:** `/modernization-flow` · *[← All scenarios](../README.md#scenarios-at-a-glance) · [User guide](../README.md)*
 
 > Migrate or upgrade a system through strictly sequential, spec-first phases — document what exists, prove behavior with evidence, map the target, get your approval, then implement one piece at a time.
 
@@ -34,7 +34,7 @@ This is the most disciplined flow. Phases run **one at a time**, and the agent w
 flowchart TB
     Start(["/modernization-flow + phase"]) --> Which{"Which phases <br>apply?"}
     Which --> P1["1. Analyze reusable libraries"]
-    P1 --> P2["2. Analyze the old code"]
+    P1 -->|"you confirm each transition"| P2["2. Analyze the old code"]
     P2 --> TC{"Add test coverage? <br>(optional)"}
     TC -->|yes| P3["3. Baseline test coverage"]
     TC -->|no| P4["4. Group classes / contexts"]
@@ -66,7 +66,7 @@ Approve which phases apply; confirm every phase transition; answer all clarifica
 
 ## What it creates
 
-Per-project spec documents in `docs/`: `reference-code-specs-*.md`, `original-code-specs-*.md`, optional `original-test-coverage-*.md`, `cross-project-analysis.md`, and `target-code-specs-*.md` — then the implemented target code and tests. A `modernization-flow-state.md` tracks which phases apply and their status.
+Per-project spec documents in `docs/`: `reference-code-specs-*.md`, `original-code-specs-*.md`, optional `original-test-coverage-*.md`, `cross-project-analysis.md`, and `target-code-specs-*.md` — then the implemented target code and tests, which must reach 80% coverage on migrated code. A `modernization-flow-state.md` tracks which phases apply and their status.
 
 ## Related
 
@@ -75,3 +75,4 @@ Per-project spec documents in `docs/`: `reference-code-specs-*.md`, `original-co
 ## Sources
 
 - Workflow: [`instructions/r3/core/workflows/modernization-flow.md`](../../instructions/r3/core/workflows/modernization-flow.md) (plus the `modernization-flow-*.md` phase files)
+- Skills: [`tech-specs`](../../instructions/r3/core/skills/tech-specs/SKILL.md), [`reverse-engineering`](../../instructions/r3/core/skills/reverse-engineering/SKILL.md)

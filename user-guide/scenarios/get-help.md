@@ -1,6 +1,6 @@
 # Get help
 
-**Command:** `/help-flow` · *[← Scenarios](README.md) · [User guide](../README.md)*
+**Command:** `/help-flow` · *[← All scenarios](../README.md#scenarios-at-a-glance) · [User guide](../README.md)*
 
 > A conversational way to discover what Rosetta can do and pick the right workflow — and hand off straight into it when you're ready.
 
@@ -51,7 +51,7 @@ Nothing — it's purely informational. The workflow it hands off to owns any fil
 
 ## Related
 
-The full menu is the [Scenarios index](README.md) and the visual [workflow map](../workflow-map.md).
+The full menu is the [Scenarios index](../README.md#scenarios-at-a-glance) and the visual [workflow map](../workflow-map.md).
 
 ## Sources
 

@@ -1,6 +1,6 @@
 # Research a question
 
-**Command:** `/research-flow` · *[← Scenarios](README.md) · [User guide](../README.md)*
+**Command:** `/research-flow` · *[← All scenarios](../README.md#scenarios-at-a-glance) · [User guide](../README.md)*
 
 > Systematic, grounded investigation tied to your project — the agent first writes the research prompt (which you approve), then runs it and produces a documented answer.
 
@@ -48,11 +48,13 @@ Review and approve the **research prompt** before the research runs — this is 
 
 ## What it creates
 
-`research-prompt.md` (the approved direction) and the final `docs/<feature>-research.md`, plus a state file.
+`plans/<feature>/research-prompt.md` (the approved direction) and the final `docs/<feature>-research.md`, plus a state file.
 
 ## Related
 
 [Analyze a codebase](analyze-a-codebase.md) for internal investigation · [Write or change code](coding.md) to act on the findings.
+
+Prerequisites: documentation search tools (DeepWiki, Context7).
 
 ## Sources
 

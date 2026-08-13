@@ -44,7 +44,7 @@ You'll see the agent pause and ask for approval at the important moments. That p
 
 ## What you get out of the box
 
-Rosetta covers about a dozen everyday engineering activities, each launched with a simple slash command:
+Rosetta covers thirteen everyday engineering activities, each launched with a simple slash command:
 
 - Writing features, fixing bugs, refactoring (`/coding-flow`)
 - Writing requirements before you build (`/requirements-authoring-flow`)
@@ -53,9 +53,16 @@ Rosetta covers about a dozen everyday engineering activities, each launched with
 - Research and technical comparisons (`/research-flow`)
 - Large migrations and upgrades (`/modernization-flow`)
 - Security reviews (`/security-flow`)
-- And a built-in helper (`/self-help-flow`) that explains what's available
+- And a built-in helper (`/help-flow`) that explains what's available
 
-See the [scenarios](scenarios/README.md) for how to run each one — one page per task.
+See the [scenarios](README.md#scenarios-at-a-glance) for how to run each one — one page per task.
+
+A few things every scenario shares:
+
+- **You start it with a slash command** and describe your request in plain language.
+- **The agent pauses at the important moments** and waits for you (this is "human-in-the-loop"). To approve, you use a clear confirmation; the agent won't proceed past a gate on a vague "ok."
+- **It scales to the task.** Small changes skip ceremony; large ones get full planning, review, and validation.
+- **It keeps state.** Long tasks save progress to a state file so you can resume in a fresh session.
 
 Underneath, it also applies guardrails you don't have to think about: it won't take dangerous actions without your OK, it avoids reading or leaking sensitive data (secrets, PII, and the like), and it flags risky setups before it can break something.
 

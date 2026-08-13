@@ -135,7 +135,7 @@ Validation: Each phase produces verifiable outputs; reviewer catches issues befo
 
 1. Present implementation, review findings, and validation findings. User MUST approve: "Yes, I approve the implementation".
 2. Strict approval required before proceeding to tests.
-3. SMALL: combined with Phase 12 checkpoint.
+3. SMALL: combined with Phase 13 final validation.
 
 </user_review_impl>
 

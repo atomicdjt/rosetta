@@ -5,6 +5,6 @@ Defines reusable plugins/mcp for AI coding agents (claude code, codex, copilot, 
 `instructions` folder contains AI coding agent **instructions** for another repository (skills, subagents, rules, workflows), it is **not documentation**. 
 
 How it works: 
-1. User installs plugins XOR mcp. 
+1. User installs plugin(s) xor mcp. 
 2. On any user session start AI Coding Agents then load `instructions/r3/core/rules/bootstrap-alwayson.md` and one mode-specific file (plugin-files-mode.md, mcp-files-mode.md, local-files-mode.md).
-3. User uses slash or $ commands to do his work on his repo with our instructions.
+3. User uses / or $ commands to do his work on his repo with any or all our instructions (skills, subagents, workflows, rules).

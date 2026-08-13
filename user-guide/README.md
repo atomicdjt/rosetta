@@ -15,12 +15,14 @@ Read these in order the first time. After that, jump to whatever you need.
 1. **[What is Rosetta?](01-what-is-rosetta.md)** — What it does for you and what to expect. 5-minute read.
 2. **[Install Rosetta](02-install.md)** — Add the plugin to your IDE and confirm it works.
 3. **[Set up your repository](03-initialize-your-repository.md)** — Run once per project so the agent understands your codebase.
-4. **[Pick a scenario](scenarios/README.md)** — One page per task: coding, requirements, QA, analysis, and more.
+4. **[Configure your ecosystem](04-configure-your-ecosystem.md)** — CLIs, MCPs, and reference code the agent needs for your scenarios.
 5. **[Tips & troubleshooting](05-tips-and-troubleshooting.md)** — Model choice, managing sessions, fixing common problems, and a plain-language glossary.
+
+Then pick your task from [Scenarios at a glance](#scenarios-at-a-glance) below.
 
 ## See it visually
 
-Open the **[workflow map](workflow-map.md)** — an diagram that starts from *"what do I want to do?"*, routes you to the right command, and shows the shape every workflow shares. It's the fastest way to get oriented.
+Open the **[workflow map](workflow-map.md)** — a diagram that starts from *"what do I want to do?"*, routes you to the right command, and shows the shape every workflow shares. It's the fastest way to get oriented.
 
 ## The 60-second path
 
@@ -42,7 +44,7 @@ That's the whole loop. Everything else in this guide is detail on those three st
 
 ## Scenarios at a glance
 
-Each task has its own page — see the full [scenarios index](scenarios/README.md) or jump straight in.
+Each task has its own page. Jump straight in.
 
 ### Build & change
 

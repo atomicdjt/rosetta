@@ -27,10 +27,14 @@ That's why we built Rosetta — open-source engineering governance and context f
 
 **Teach agents how to think, not what to do.** The model already knows Python and React; what it lacks is your engineering discipline. That's what Rosetta encodes.
 
-Rosetta-guided work follows five phases — **Prepare → Research → Plan → Act → Validate** — with approval gates at the key decision points. Read more in the [Usage Guide](USAGE_GUIDE.md#workflows).
-
 > [!NOTE]
 > If you are effectively using your current setup, writing your own skills, and managing AI using your own processes, you probably don't need Rosetta.
+
+## [User Guide](user-guide/README.md)
+
+Rosetta-guided work follows five phases — **Prepare → Research → Plan → Act → Validate** — with approval gates at the key decision points.
+
+Read more in the [User Guide](user-guide/README.md).
 
 ## [Quick Start](QUICKSTART.md)
 
@@ -212,6 +216,7 @@ Contributions welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for workflow and e
 
 | I want to...                                         | Read                                       |
 | ---------------------------------------------------- | ------------------------------------------ |
+| Use Rosetta day to day                               | [User Guide](user-guide/README.md)         |
 | Set up Rosetta                                       | [QUICKSTART.md](QUICKSTART.md)             |
 | Install as a plugin (recommended)                    | [PLUGINS.md](PLUGINS.md)                   |
 | Connect over MCP (optional, secondary)               | [MCPs.md](MCPs.md)                         |

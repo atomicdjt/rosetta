@@ -1,6 +1,6 @@
 # Analyze a codebase
 
-**Command:** `/code-analysis-flow` · *[← Scenarios](README.md) · [User guide](../README.md)*
+**Command:** `/code-analysis-flow` · *[← All scenarios](../README.md#scenarios-at-a-glance) · [User guide](../README.md)*
 
 > Reverse-engineer an existing codebase into grounded architecture documentation — every claim traced to real code, with no changes and no suggestions.
 
@@ -23,7 +23,8 @@ It loads project context, sizes the job, asks only the questions that actually a
 ```mermaid
 flowchart TB
     Start(["/code-analysis-flow + scope"]) --> Ctx["Load context, find entry points"]
-    Ctx --> G1{"You answer <br>key questions"}
+    Ctx --> Scope["Set scope boundaries & non-goals"]
+    Scope --> G1{"You answer <br>key questions"}
     G1 --> ReqB{"Extract requirements? <br>(only if you ask)"}
     ReqB -->|yes| ReqDocs["docs/REQUIREMENTS/"]
     ReqB -->|no| Size{"Scope size?"}
@@ -43,7 +44,7 @@ flowchart TB
     classDef step fill:#dae8ff,stroke:#3674b5,color:#102a43;
     classDef gate fill:#fff2cc,stroke:#b58b00,color:#493800;
     classDef done fill:#e5f7e8,stroke:#35834a,color:#153b20;
-    class Ctx,ReqDocs,Small,Large,Sum,Review,Revise step;
+    class Ctx,Scope,ReqDocs,Small,Large,Sum,Review,Revise step;
     class G1,ReqB,Size,Grounded,G2 gate;
     class Start,Done done;
 ```
@@ -58,7 +59,7 @@ Answer the handful of high-impact clarifying questions, and approve the final an
 
 ## What it creates
 
-Small scope → `docs/<feature>/analysis.md`. Large scope → `docs/<feature>/module-<module>.md` per module plus `docs/<feature>/summary.md`. The requirements branch adds `docs/REQUIREMENTS/`. It also drops a pointer into `IMPLEMENTATION.md`, and tracks progress in a state file.
+Small scope → `docs/<feature>/analysis.md`. Large scope → `docs/<feature>/module-<module>.md` per module plus `docs/<feature>/summary.md`. The requirements branch adds `docs/REQUIREMENTS/`. It also drops a pointer into `agents/IMPLEMENTATION.md`, and tracks progress in a state file.
 
 ## Related
 

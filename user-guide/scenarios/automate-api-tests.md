@@ -1,6 +1,6 @@
 # Automate API tests
 
-**Command:** `/api-aqa-flow` · *[← Scenarios](README.md) · [User guide](../README.md)*
+**Command:** `/api-aqa-flow` · *[← All scenarios](../README.md#scenarios-at-a-glance) · [User guide](../README.md)*
 
 > Turn API test cases and contracts into working, corrected, passing automated API tests in your repo.
 
@@ -56,11 +56,13 @@ Provide project info if there's no config yet; answer clarifying questions; **ex
 
 ## What it creates
 
-A session folder `plans/api-aqa-<identifier>/` with `raw-data.md`, `api-analysis.md`, `analysis.md`, `test-specs.md` (the Given-When-Then cases), and `execution-report.md`; the implemented/corrected test files in your repo; and an `api-aqa-state.md`.
+A session folder `plans/api-aqa-<identifier>/` with `api-aqa-project-config.md`, `initial-data.md`, `raw-data.md`, `api-analysis.md`, `analysis.md`, `test-specs.md` (the Given-When-Then cases), and `execution-report.md`; the implemented/corrected test files in your repo; and progress tracked in `agents/TEMP/<feature>/api-aqa-state.md`, which is not committed.
 
 ## Related
 
 [Automate UI tests](automate-ui-tests.md) for the frontend · [Generate test cases](generate-test-cases.md) to design cases first · unsure which? use the [`/aqa-flow` router](get-help.md).
+
+Prerequisites: Swagger/OpenAPI spec or backend source path.
 
 ## Sources
 

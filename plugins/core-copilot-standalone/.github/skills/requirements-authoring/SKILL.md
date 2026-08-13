@@ -76,10 +76,7 @@ HITL gates (use when):
 
 <core_principles_to_enforce>
 
-- Follow SRP always
-- Follow DRY always
-- Follow KISS always
-- Follow YAGNI always
+- Follow SRP, DRY, KISS, YAGNI always
 - Enforce MECE always
 - Enforce MoSCoW always
 - Keep requirement units short
@@ -103,8 +100,9 @@ HITL gates (use when):
 - Use strong success criteria
 - Avoid implementation details unless requested
 - Keep project terms and contracts explicit
-- Spec statements contain only requirements — never explanations of why a previous draft was wrong, how the author arrived at the wording, or definitions of concepts the reader should already know.
-- If a sentence would not survive in a spec that was never revised, delete it.
+- Spec statements contain only requirements — never explanations of why a previous draft was wrong, how the author arrived at the wording, or definitions of concepts the reader should already know
+- If a sentence would not survive in a spec that was never revised, delete it
+- Proactively show and resolve gaps, issues, inconsistencies, conflicts logically not mechanically
 
 </core_principles_to_enforce>
 

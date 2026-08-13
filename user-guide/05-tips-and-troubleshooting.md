@@ -1,12 +1,12 @@
 # Tips & troubleshooting
 
-*[← Scenarios](scenarios/README.md) · [Back to the guide](README.md)*
+*[← Configure your ecosystem](04-configure-your-ecosystem.md) · [Back to the guide](README.md)*
 
 A short collection of the things that make Rosetta run smoothly, the mistakes that cost people time and tokens, and fixes for the problems you're most likely to hit.
 
 ## Getting the best results
 
-- **Use slash commands.** Once your repo is set up, start every task with the right workflow command and describe your request naturally. See the [scenarios](scenarios/README.md).
+- **Use slash commands.** Once your repo is set up, start every task with the right workflow command and describe your request naturally. See the [scenarios](README.md#scenarios-at-a-glance).
 - **Be specific.** Context up front means better output and fewer questions.
 - **Read plans before approving.** The plan is your last checkpoint before work begins.
 - **Answer questions fully.** When Rosetta asks, it's targeting a specific gap. Short answers lead to incomplete work.
@@ -104,8 +104,9 @@ You don't need these to get started, but they show up in messages and docs.
 
 ## More help
 
-- Ask the agent directly: `/self-help-flow ...`
+- Ask the agent directly: `/help-flow ...`
 - Run `/post-mortem` after a rough run.
+- Open an issue: <https://github.com/griddynamics/rosetta/issues>
 - Email: [rosetta-support@griddynamics.com](mailto:rosetta-support@griddynamics.com)
 - Website: <https://griddynamics.github.io/rosetta/>
-- Deeper technical detail lives in the repo's [TROUBLESHOOTING](../TROUBLESHOOTING.md) and [FAQ](../FAQ.md).
+- Deeper technical detail lives in the repo's [TROUBLESHOOTING](../TROUBLESHOOTING.md#agent-not-using-rosetta) and [FAQ](../FAQ.md).

@@ -65,6 +65,19 @@ Before finishing:
 - Do not duplicate other documents => reference `file:line-range`
 - State which sessions are genuinely parallelizable and why, and name any latent collision you resolved via ownership assignment.
 
+Relevant:
+
+- USE SKILL `reasoning` if task is complex or multiple actors, roles, or system involved
+
+Pitfalls:
+
+- Planning before intent is clear
+- Mixing specs and plan responsibilities
+- Skipping dependencies and predecessors
+- Ambiguous acceptance criteria or checklists
+- Coding instead of planning
+- Making small sessions
+
 <output>
 
 - `plans/<FEATURE>/<FEATURE>-PLAN.md` — session index & tracker

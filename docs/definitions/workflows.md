@@ -1,6 +1,7 @@
 # Workflows
 
 - init-workspace-flow
+- arrange-workspace-flow
 - research-flow
 - code-analysis-flow
 - external-lib-flow

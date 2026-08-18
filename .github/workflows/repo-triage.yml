@@ -76,11 +76,24 @@ jobs:
           bun-version: 1.3.6
           token: ${{ github.token }}
 
+      # allowed_non_write_users bypasses claude-code-action's own actor-permission
+      # gate, which otherwise hard-fails the whole job for any PR/issue/comment
+      # from a non-collaborator -- i.e. every external contributor, which is
+      # exactly who triage exists to greet. "*" (not a named allow-list) is
+      # required because the point is unknown first-time contributors, not a
+      # known set of people. This is a deliberate, bounded tradeoff: it widens
+      # who can *trigger* a run, but grants no new capability once triggered --
+      # the GITHUB_TOKEN permissions above and the --allowedTools/--disallowedTools
+      # allowlist below are unchanged, so the worst case is a spammy/misleading
+      # gh comment or issue (still subject to the prompt-injection guardrail in
+      # repo-triage.md), or run-triggering cost abuse -- never code execution,
+      # `contents: write`, or secret exposure.
       - name: Triage
         uses: anthropics/claude-code-action@v1
         env:
           CLAUDE_CODE_DISABLE_BACKGROUND_TASKS: "1"
         with:
+          allowed_non_write_users: "*"
           anthropic_api_key: ${{ secrets.BIFROST_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           path_to_bun_executable: ${{ steps.bun.outputs.bun-path }}

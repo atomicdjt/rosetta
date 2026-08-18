@@ -18,6 +18,14 @@ If request is small or trivial -> SKIP, DO NOTHING.
 If one session only -> merge into `plans/<FEATURE>/<FEATURE>-PLAN.md` and `plans/<FEATURE>/HANDOFF.md`.
 If used together with tech-specs skill -> do not duplicate content, use references. 
 
+Core flow:
+
+1. Identify intent, close gaps and consistency issues.
+2. Draft plan using decomposition and top-down approach, save it.
+3. Recursively work on each session independently and deeply, save as soon as possible.
+4. Integrate mistake-proofing controls.
+5. Finalize dependency sequence and approval gates.
+
 Hard rules for session files:
 
 1. State only WHAT to do and final CHECKLIST. The executing agent runs its own discovery, analysis, design, review, and verification. Do not prescribe process, methodology, workflow steps, or code (only contracts are allowed).
@@ -30,7 +38,7 @@ Hard rules for session files:
    - ordering constraints that aren't visible from dependencies alone
    - environment quirks already discovered
 5. Very Terse. Target 20–30 lines for WHAT, 40-50 lines for CHECKLIST.
-6. Structure: # NN — Title, optional Depends on:, ## Do (numbered), ## Subagents (name + responsibility + long-running or short-term), optional ## Rules or ## Notes (only for traps), ## Done when (observable, verifiable outcomes — not "works correctly"), ## Checklist (examples showing aspects: `[ ] Unit tests coverage > 85%`, `[ ] PCI compliance`, `[ ] Integration tests coverage > 85%`, `[ ] Edge cases tested`, `[ ] Work protocol adhered`, `[ ] Documents updated`, `[ ] Code ran locally and manually tested by AI`, `[ ] DevOps implemented`, `[ ] SRE covered`, `[ ] Security checked`, etc).
+6. Structure: # NN — Title, optional Depends on:, ## Do (numbered), ## Subagents (name + responsibility + long-running or short-term), optional ## Rules or ## Notes (only for traps), ## Done when (observable, verifiable outcomes — not "works correctly"), ## Checklist (examples showing aspects: `[ ] Implemented`, `[ ] Unit tests coverage > 85%`, `[ ] PCI compliance`, `[ ] Integration tests coverage > 85%`, `[ ] Edge cases tested`, `[ ] Work protocol adhered`, `[ ] Documents updated`, `[ ] Code ran locally and manually tested by AI`, `[ ] DevOps implemented`, `[ ] SRE covered`, `[ ] Security checked`, etc).
 
 Decomposition:
 
@@ -76,14 +84,14 @@ Pitfalls:
 - Skipping dependencies and predecessors
 - Ambiguous acceptance criteria or checklists
 - Coding instead of planning
-- Making small sessions
+- Sessions too small to be worth a session
 
 <output>
 
 - `plans/<FEATURE>/<FEATURE>-PLAN.md` — session index & tracker
-- `plans/<FEATURE>/<NN>-plan-<slug>.md — one file per session, numbered in dependency order (if multiple sessions)
+- `plans/<FEATURE>/<NN>-plan-<slug>.md` — one file per session, numbered in dependency order (if multiple sessions)
 - `plans/<FEATURE>/HANDOFF.md` — handoff index plus common
-- `plans/<FEATURE>/<NN>-handoff.md — very concise terse session completion handoff (if multiple sessions)
+- `plans/<FEATURE>/<NN>-handoff.md` — very concise terse session completion handoff (if multiple sessions)
 
 </output>
 

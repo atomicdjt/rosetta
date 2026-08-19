@@ -3,12 +3,6 @@ name: requirements-authoring
 description: "To author, update, and validate functional/non-functional requirements as atomic units with user approval."
 license: Apache-2.0
 argument-hint: request, existing-requirements?, scope?, constraints?, stakeholders?
-context: default
-agent: requirements-engineer, reviewer
-metadata:
-  version: "1.0"
-  category: "requirements-engineering"
-  tags: "requirements functional non-functional traceability hitl"
 tags:
   - requirements-authoring
   - requirements-validation
@@ -456,7 +450,7 @@ The statement is still one pattern, one trigger, one response; criteria decompos
 - FRs and NFRs are separated
 - NFRs are measurable
 - Language is unambiguous
-- Acceptance uses Given/When/Then
+- Acceptance uses EARS vocabulary
 - Verification method exists per req
 - Trace links exist
 - Conflicts are resolved

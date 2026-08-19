@@ -34,6 +34,12 @@ describe('parseDirectives', () => {
     expect(result.conditions.has('overwrite')).toBe(true);
   });
 
+  it('accepts a trailing directive fence', () => {
+    expect(parseDirectives('file~overwrite~.md').conditions).toEqual(
+      new Set(['overwrite']),
+    );
+  });
+
   it('returns empty conditions when filename has no tilde', () => {
     const result = parseDirectives('rules-index.md');
     expect(result.conditions.size).toBe(0);
@@ -41,9 +47,15 @@ describe('parseDirectives', () => {
   });
 
   it('clean name does not include directive tokens', () => {
-    const result = parseDirectives('policy~overwrite~r2-only.md');
+    const result = parseDirectives('policy~overwrite~core-claude-only.md');
     expect(result.cleanName).toBe('policy.md');
     expect(result.conditions.size).toBe(2);
+  });
+
+  it('rejects unknown target-only tokens with filename context and allowed directives', () => {
+    expect(() => parseDirectives('policy~clade-only.md')).toThrow(
+      'Unknown filename directive "clade-only" in "policy~clade-only.md". Allowed directives: overwrite, core-claude-only',
+    );
   });
 });
 
@@ -66,7 +78,7 @@ describe('matchesTarget', () => {
   });
 
   it('returns false when only condition is target-only for different target', () => {
-    expect(matchesTarget(new Set(['acme-only']), 'core')).toBe(false);
+    expect(matchesTarget(new Set(['core-cursor-only']), 'core-claude')).toBe(false);
   });
 
   it('handles combination of overwrite and target-only — target-only still filters', () => {

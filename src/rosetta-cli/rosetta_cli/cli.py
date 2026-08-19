@@ -378,7 +378,8 @@ Frontmatter Metadata (publish flow):
             chunk_method=config.chunk_method,
             parser_config=config.parser_config,
             page_size=config.page_size,
-            timeout=config.timeout
+            dataset_default=config.dataset_default,
+            timeout=config.timeout,
         )
         
         return execute_command(args.command, args, client, config)

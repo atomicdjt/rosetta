@@ -16,12 +16,12 @@ name: Validate Prompts
 # - Creates a PR comment with all issues by severity
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, reopened, ready_for_review]
-    paths:
-      - "instructions/r*/**"
-      - ".github/workflows/validate-prompts.yml"
-      - ".github/prompts/prompt-comparison.md"
+  #pull_request_target:
+  #  types: [opened, synchronize, reopened, ready_for_review]
+  #  paths:
+  #    - "instructions/r*/**"
+  #    - ".github/workflows/validate-prompts.yml"
+  #    - ".github/prompts/prompt-comparison.md"
   workflow_dispatch:
 
 concurrency:

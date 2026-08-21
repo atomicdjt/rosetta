@@ -28,6 +28,8 @@
    - If it is clear, rather small, and honestly AI can handle it autonomously itself -> approve it yourself.
    - If it is clear that is noise / nitpicking -> ask advisor, then comment author, if absolutely sure -> close it with comment.
 
+5. Merge Approved PRs
+
 # REMEMBER
 
 There is no urgency to get things merged, instead we are looking for high quality solutions and your deep understanding.

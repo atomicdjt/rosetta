@@ -1,3 +1,4 @@
+0. Load project context in each subagent
 1. Create a branch for the entire work.
 2. Implement issue reliably, validate it fully, run/check locally, always follow `docs/ARCHTIECTURE.md`.
 3. If fixing multiple issues => combine them in contextually disjoint areas => make one subagent to solve few issues at once in its own worktree.

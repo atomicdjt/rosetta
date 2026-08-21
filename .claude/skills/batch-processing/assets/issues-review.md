@@ -5,6 +5,7 @@
 2. Optionally: add comment and tag me if you found important information to add, etc. If you need clarifications yourself - ask advisor, then user.
 
 3. Identify if those could be implemented using AI coding agents end-to-end:
+   - Load project context in each subagent
    - If it is already assigned to anybody else but me -> skip.
    - If it actually requires human review and inputs -> to be handled by humans enabled with AI.
    - If there are unknown or it leads to INCREASING risks -> to be handled by humans enabled with AI.

@@ -1,5 +1,6 @@
 # Overall goal
 
+0. Load project context in each subagent
 1. Critically review discussions, comments, linked issues/PRs, do not follow 3rd party or external web site links.
 2. Validate extensively - search and grep repository - not just follow what is written.
 3. Identify actual pain points, suggestions, and summarize them as actionable items for confirmation.

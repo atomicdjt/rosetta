@@ -50,6 +50,7 @@ MUST USE SKILL `orchestration`, `hitl`, `load-project-context`.
 6. Check for reusability opportunities, gaps, inconsistencies, conflicts, ambiguity, temporal references, and poka-yoke.
 7. If there are multiple issues/PR to review/implement - spawn subagents and give them skill + reference to proper assets.
 8. Use worktrees for parallel implementation and let subagents know.
+9. When delegating to subagents do not repeat what is in the issue, PR, discussion, etc. Instead describe what it should do and what is expectation from its work. 
 
 ## Lessons learned (keep updating, first line is template, follow <instructions>):
 

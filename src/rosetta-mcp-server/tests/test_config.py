@@ -9,7 +9,7 @@ from rosetta_mcp.config import (
     _derive_rosetta_url_from_r2r,
     _load_response,
 )
-from rosetta_mcp.constants import DEFAULT_RAGFLOW_HTTP_TIMEOUT
+from rosetta_mcp.constants import DEFAULT_RAGFLOW_HTTP_TIMEOUT, DEFAULT_READ_POLICY
 
 
 def test_from_env_defaults(monkeypatch):
@@ -27,6 +27,14 @@ def test_root_filter_parsing(monkeypatch):
     monkeypatch.setenv("INSTRUCTION_ROOT_FILTER", "OrgA, orgB ,")
     cfg = RosettaConfig.from_env()
     assert cfg.root_filter == ["orga", "orgb"]
+
+
+def test_removed_team_read_policy_falls_back_to_default(monkeypatch):
+    monkeypatch.setenv("ROSETTA_READ_POLICY", " Team ")
+
+    cfg = RosettaConfig.from_env()
+
+    assert cfg.read_policy == DEFAULT_READ_POLICY
 
 
 def test_oauth_callback_path_override(monkeypatch):

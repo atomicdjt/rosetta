@@ -9,6 +9,9 @@ MUST update this document on new features and capabilities discovered and tested
 Derived from code in `refsrc/ragflow-0.25.1/`:
 - `api/apps/sdk/doc.py` — public SDK download + retrieval routes (chunk APIs and `POST /retrieval`)
 - `api/apps/restful_apis/document_api.py` — public document CRUD + metadata routes (list/get/upload/PATCH/delete + new metadata endpoints)
+- `api/apps/services/dataset_api_service.py` — dataset-list response shape
+- `api/db/services/knowledgebase_service.py` — dataset visibility and owner-tenant fields
+- `api/db/services/user_service.py` — team membership and roles
 - `api/apps/sdk/dify_retrieval.py` — Dify-compatible retrieval
 - `api/apps/document_app.py` — internal document downloads only (`GET /get/<doc_id>`, `GET /download/<attachment_id>`); the legacy `POST /document/list` is gone in 0.25.1
 - `common/metadata_utils.py` — `meta_filter`, `convert_conditions`
@@ -41,6 +44,20 @@ For tenant-level API access derived from a frontend login session:
 - Use `data.token` from those responses as `Authorization: Bearer <token>` for `/api/v1/...` and `ragflow-sdk`.
 
 Server version probe: `GET /api/v1/system/version` (returns `{"data":"v0.25.1"}`).
+
+### Dataset Ownership Contract (0.25.1)
+
+`RAGFlow.list_datasets()` calls `GET /api/v1/datasets`. Each returned dataset is
+materialized as an SDK `DataSet` and carries its owning tenant in `tenant_id`.
+The server populates that field from the knowledge-base record returned by
+`KnowledgebaseService.get_list()`.
+
+Dataset names are not globally unique across all teams visible to a user. Code
+that makes an authorization decision from a dataset name must therefore resolve
+exactly one dataset and use that dataset's `tenant_id`; zero or multiple matches
+must deny. For team-policy reads, match that `tenant_id` to an `owner` entry from
+`GET /v1/tenant/list`, then inspect only that tenant's members through
+`GET /v1/tenant/{tenant_id}/user/list`.
 
 ### Metadata Condition (Public API Shape)
 

@@ -68,6 +68,18 @@ def test_list_datasets_reuses_cached_refresh():
     assert rag.calls == 1
 
 
+def test_duplicate_names_are_ambiguous_but_ids_remain_addressable():
+    first = _Dataset("d1", "shared-name")
+    second = _Dataset("d2", "shared-name")
+    lookup = DatasetLookup(ragflow=_Rag(datasets=[first, second]), ttl_seconds=300)
+
+    assert lookup.get_id("shared-name") is None
+    assert lookup.get_dataset(name="shared-name") is None
+    assert lookup.get_dataset(dataset_id="d1") is first
+    assert lookup.get_dataset(dataset_id="d2") is second
+    assert lookup.list_datasets() == [first, second]
+
+
 def test_api_error_propagates():
     """Real API errors must propagate, not be silently swallowed."""
     class _BrokenRag:

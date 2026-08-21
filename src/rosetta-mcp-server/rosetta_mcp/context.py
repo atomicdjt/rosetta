@@ -31,4 +31,5 @@ class CallContext:
             self.authorizer = Authorizer(
                 self.config.read_policy,
                 config=self.config,
+                dataset_lookup=self.dataset_lookup,
             )

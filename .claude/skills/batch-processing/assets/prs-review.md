@@ -24,6 +24,7 @@
    - If it actually requires human review and inputs -> ask advisor, then user.
    - If there are unknown or it leads to INCREASING risks -> identify better solutions -> ask advisor, then comment author.
    - If it is not passing checks above or it is not fully ready and requires more work -> request for changes.
+   - If you have any concerns -> do not approve, ask advisor, then ask user.
    - If it is clear, rather small, and honestly AI can handle it autonomously itself -> approve it yourself.
    - If it is clear that is noise / nitpicking -> ask advisor, then comment author, if absolutely sure -> close it with comment.
 

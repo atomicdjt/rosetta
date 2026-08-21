@@ -100,7 +100,16 @@ const GIT_FORCE_REFSPEC_LA = String.raw`(?=(?:\s+-\S+)*\s+(?!-)(?!['"]?\+)\S+(?:
 // independent so ordinary `-d` / `--delete` remains outside this guardrail.
 // Lookaheads stop at common shell command separators so a later command cannot
 // accidentally supply the missing force/delete flag for an earlier branch command.
-const GIT_BRANCH = String.raw`\bgit\s+branch\b`;
+// Start local-command matching at a segment boundary and stop the prefix at its
+// first `git branch`. If that candidate has no delete/force pair, no later local
+// candidate in the same segment can have one because its remaining suffix is a
+// subset. This avoids rescanning the same suffix from every candidate.
+const GIT_BRANCH_LOCAL = String.raw`\bgit[^\S\r\n]+branch\b`;
+const GIT_BRANCH_SEGMENT_PREFIX = String.raw`(?:^|[;&|\r\n])(?:(?!${GIT_BRANCH_LOCAL})[^;&|\r\n])*`;
+// Preserve the prior `\s+` behavior when `git` and `branch` straddle CR/LF. Such
+// candidates necessarily cross a separator, so their lookahead windows stay bounded.
+const GIT_BRANCH_CROSS_LINE = String.raw`\bgit[^\S\r\n]*[\r\n]\s*branch\b`;
+const GIT_BRANCH = String.raw`(?:${GIT_BRANCH_SEGMENT_PREFIX}${GIT_BRANCH_LOCAL}|${GIT_BRANCH_CROSS_LINE})`;
 const GIT_BRANCH_DELETE_LA = String.raw`(?=[^;&|\r\n]*(?:\s--delete\b|\s-[a-zA-Z]*[dD][a-zA-Z]*\b))`;
 const GIT_BRANCH_FORCE_LA = String.raw`(?=[^;&|\r\n]*(?:\s--force\b|\s-[a-zA-Z]*[fD][a-zA-Z]*\b))`;
 

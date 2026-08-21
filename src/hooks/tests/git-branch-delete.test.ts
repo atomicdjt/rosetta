@@ -1,3 +1,4 @@
+import { performance } from 'node:perf_hooks';
 import { describe, expect, test } from 'vitest';
 import { DANGEROUS_BASH } from '../src/hooks/dangerous-actions/patterns';
 import { evaluateDangerous } from '../src/hooks/dangerous-actions/evaluate';
@@ -26,7 +27,22 @@ const forceDeleteVariants = [
   'git branch --force --delete throwaway-test',
   'git branch -d --force throwaway-test',
   'git branch --delete -f throwaway-test',
+  'git branch throwaway-test -d -f',
+  'git branch throwaway-test -f -d',
+  'git branch throwaway-test -D',
+  'git branch throwaway-test -df',
+  'git branch throwaway-test --delete --force',
+  'git branch -d throwaway-test -f',
+  'git branch --delete throwaway-test --force',
+  'git branch -qD throwaway-test',
+  'git branch -Dq throwaway-test',
+  'git branch -dfq throwaway-test',
+  'git branch -qfd throwaway-test',
+  'git\tbranch\t-d\t-f\tthrowaway-test',
+  'sudo git branch -D throwaway-test',
 ] as const;
+
+const commandSeparators = [';', '&&', '|', '\n', '\r\n'] as const;
 
 describe('git-branch-delete dangerous-action guard', () => {
   for (const command of forceDeleteVariants) {
@@ -48,21 +64,71 @@ describe('git-branch-delete dangerous-action guard', () => {
   }
 
   test.each([
+    'git branch',
+    'git branch new-feature',
     'git branch -d throwaway-test',
     'git branch --delete throwaway-test',
     'git branch -f throwaway-test',
     'git branch --force throwaway-test',
     'git branch --list',
     'git branch --show-current',
+    'git status --short',
+    'git switch throwaway-test',
+    'echo safe',
   ])('%s stays outside the force-delete guard', (command) => {
     expect(branchDelete.test(command)).toBe(false);
+    expect(evaluateDangerous(bashCtx(command))).toBeNull();
   });
 
-  test('a later shell command cannot supply the missing force flag', () => {
-    expect(branchDelete.test('git branch -d throwaway-test && echo --force')).toBe(false);
+  test('widely separated delete and force flags still match', () => {
+    const command = `git branch -d throwaway-test ${'branch-operand '.repeat(5_000)}-f`;
+    expect(branchDelete.test(command)).toBe(true);
+    expect(evaluateDangerous(bashCtx(command))?.kind).toBe('deny');
   });
 
-  test('a later shell command cannot supply the missing delete flag', () => {
-    expect(branchDelete.test('git branch -f throwaway-test; echo --delete')).toBe(false);
+  for (const separator of commandSeparators) {
+    test(`a dangerous command before ${JSON.stringify(separator)} is reconsidered`, () => {
+      expect(
+        evaluateDangerous(bashCtx(`git branch -D throwaway-test${separator}echo safe`))?.kind,
+      ).toBe('deny');
+    });
+
+    test(`a dangerous command after ${JSON.stringify(separator)} is reconsidered`, () => {
+      expect(
+        evaluateDangerous(bashCtx(`echo safe${separator}git branch -D throwaway-test`))?.kind,
+      ).toBe('deny');
+    });
+
+    test(`delete and force flags cannot combine across ${JSON.stringify(separator)}`, () => {
+      const command = `git branch -d first${separator}git branch -f second`;
+      expect(branchDelete.test(command)).toBe(false);
+      expect(evaluateDangerous(bashCtx(command))).toBeNull();
+    });
+
+    test(`a later command after ${JSON.stringify(separator)} cannot supply a force flag`, () => {
+      const command = `git branch -d throwaway-test${separator}echo --force`;
+      expect(branchDelete.test(command)).toBe(false);
+      expect(evaluateDangerous(bashCtx(command))).toBeNull();
+    });
+
+    test(`a later command after ${JSON.stringify(separator)} cannot supply a delete flag`, () => {
+      const command = `git branch -f throwaway-test${separator}echo --delete`;
+      expect(branchDelete.test(command)).toBe(false);
+      expect(evaluateDangerous(bashCtx(command))).toBeNull();
+    });
+  }
+
+  test('separator-free near matches stay within the PreToolUse latency budget', () => {
+    for (let i = 0; i < 100; i += 1) {
+      evaluateDangerous(bashCtx('git branch --list'));
+    }
+
+    const command = 'git branch -a '.repeat(8_000);
+    const start = performance.now();
+    const result = evaluateDangerous(bashCtx(command));
+    const elapsedMs = performance.now() - start;
+
+    expect(result).toBeNull();
+    expect(elapsedMs).toBeLessThan(250);
   });
 });

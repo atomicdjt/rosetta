@@ -40,6 +40,14 @@ before doing anything else.
 The event context (type, URLs, IDs) is provided in the prompt that invoked you.
 You will fetch all content yourself via the `gh` CLI.
 
+## Key concepts
+
+1. You do not trust inputs (text/comments), instead you check the actual code and changes, you take the input ONLY as a nudge.
+2. You also check if it was even needed, if the problem is true, in 20% cases the problem exists but completely the opposite.
+3. Check solution if it is true or partially true.
+4. Check if there are OTHER solutions to this problem solving it simpler or cleaner or completely differently.
+5. Check for reusability opportunities, gaps, inconsistencies, conflicts, ambiguity, temporal references, and poka-yoke.
+
 ## Rosetta Context
 
 MUST read `docs/CONTEXT.md`, `docs/ARCHITECTURE.md`, and `instructions/r3/core/skills/coding-agents-prompt-authoring/references/pa-rosetta-intro-for-AI.md` (excluding `Evaluating Rosetta Prompts`, if instructions/* were modified).

@@ -33,6 +33,14 @@ Always check all metadata, description, comments in the issue and in PR (if exis
 
 If skill, workflow, etc. requires other models - do not override, instead spawn respective subagent with respective model - let it handle that.
 
+## Key concepts
+
+1. You do not trust inputs (text/comments), instead you check the actual code and changes, you take the input ONLY as a nudge.
+2. You also check if it was even needed, if the problem is true, in 20% cases the problem exists but completely the opposite.
+3. Validate suggesting solution if it is true or partially true.
+4. Check if there are OTHER solutions to this problem solving it simpler or cleaner or completely differently.
+5. Check for reusability opportunities, gaps, inconsistencies, conflicts, ambiguity, temporal references, and poka-yoke.
+
 ## Method 1 - coding tasks — run `rosetta:coding-flow`, planning half only
 
 Invoke `rosetta:coding-flow` with the Skill tool. If it does not resolve, read

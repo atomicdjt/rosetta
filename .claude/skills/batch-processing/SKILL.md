@@ -56,11 +56,17 @@ MUST USE SKILL `orchestration`, `hitl`, `load-project-context`.
 11. Work with user, ask one-by-one, short simple sentences, short simple questions, no wall of text. Few sentences max with < 15 words each. No mechanics. Actual problem. Straight to the point. Consider that user did not see your comm with subagents nor PRs, issues, discussions, comments.
 12. STOP RUNNING AHEAD. THERE IS NO URGENCY. TAKE THE TASK SERIOUSLY AND CAREFULLY. QUALITY IS THE PRIORITY.
 
+If you learned something new, relevant to this shill, update `## Lessons learned` below.
+
 ## Lessons learned (keep updating, first line is template, follow <instructions>):
 
-- **<key action item>** <concise: what happened, why, root cause, reasoning>.
+- **<key action item, less then 7 words>** <concise: what happened, why, root cause, reasoning, less then 25 words>.
 - **Verified correct != ready to merge.** Proposed approving a PR whose new security-guard branch had zero tests, citing a prior approve-with-note. Root cause: conflated "the fix works" with "the work is finished". Untested new code, or any concrete ask, means request changes — an approval plus a comment is incoherent.
 - **Check the code path executes before reviewing a fix to it.** Reviewed a cross-tenant authorization fix in depth before finding `can_read` short-circuits on `aia-` so the policy can never run. Root cause: trusted the issue's framing of where the problem lived. Ask "can this line execute?" first; the right ask may be deletion, not repair.
 - **Never infer configuration from a permission-gated 404.** Claimed `main` had no branch protection from a 404 and an empty ruleset list, while `mergeStateStatus: BLOCKED` sat in hand contradicting it. Root cause: absence of visibility read as absence of the thing. Check own permission level; state "cannot determine".
 - **Author-facing comments carry only what the author can act on.** Wrote findings into a contributor's comment while labelling them not-theirs-to-fix. Root cause: showing work instead of serving the reader. Internal findings go to internal notes.
 - **Take findings to the person already in context.** Started to file fresh issues for defects found while reviewing a PR whose author had just worked in that exact file. Root cause: treated the tracker as the default sink. Work in the PR with the author; extend the existing issue.
+- **A repeated question means the explanation was unclear, not that the finding is bigger.** Asked five times about one unread boolean, escalated it from MINOR to an invented destructive-path hazard, then had to retract. Root cause: read repetition as "there must be more here" and manufactured significance. Re-explain at the same severity, or say plainly there is nothing there.
+- **Check whether the surprising value is simply configured.** Called a fallback to `dataset_default` a hazard. The user had configured that default and the CLI printed it. Root cause: skipped reading the config before naming a defect.
+- **Ask, do not flag.** Repeatedly noted open items in prose instead of asking, forcing the user to chase them. Root cause: treated flagging as lower-friction than a question. One question, asked, beats three observations parked in a paragraph.
+- **When the user's own explanation lands, put THAT wording in the artifact.** Wrote a docstring in my framing after a plain numbered list was what finally made the behavior clear. Root cause: preferred my summary to the version proven to work.

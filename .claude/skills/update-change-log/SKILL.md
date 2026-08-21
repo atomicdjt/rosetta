@@ -184,3 +184,9 @@ Value written, not value appended.
 - Related links are for sure list; Terms definition is for sure a table
 - Fix web site content inconsistencies
 - Ask questions instead of assuming
+
+If you learned something new, relevant to this shill, update `## Lessons learned` below.
+
+## Lessons learned (keep updating, first line is template, follow <instructions>):
+
+- **<key action item, less then 7 words>** <concise: what happened, why, root cause, reasoning, less then 25 words>.

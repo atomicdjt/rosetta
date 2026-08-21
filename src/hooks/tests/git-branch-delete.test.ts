@@ -44,6 +44,13 @@ const forceDeleteVariants = [
 
 const commandSeparators = [';', '&&', '|', '\n', '\r\n'] as const;
 
+const crossLineForceDeleteVariants = [
+  ['LF', 'git\nbranch -D x'],
+  ['CRLF', 'git\r\nbranch -D x'],
+  ['CR', 'git\rbranch -D x'],
+  ['surrounding spaces and LF', 'git \n branch -d -f x'],
+] as const;
+
 describe('git-branch-delete dangerous-action guard', () => {
   for (const command of forceDeleteVariants) {
     test(`${command} matches the guard`, () => {
@@ -84,6 +91,29 @@ describe('git-branch-delete dangerous-action guard', () => {
     const command = `git branch -d throwaway-test ${'branch-operand '.repeat(5_000)}-f`;
     expect(branchDelete.test(command)).toBe(true);
     expect(evaluateDangerous(bashCtx(command))?.kind).toBe('deny');
+  });
+
+  // Each command puts CR/LF between `git` and `branch`, which the line-local
+  // alternative excludes, so these cases pin the dedicated cross-line path.
+  for (const [lineBreak, command] of crossLineForceDeleteVariants) {
+    test(`${lineBreak} between git and branch preserves force-delete detection`, () => {
+      expect(branchDelete.test(command)).toBe(true);
+      const result = evaluateDangerous(bashCtx(command));
+      expect(result?.kind).toBe('deny');
+      expect((result as { kind: 'deny'; reason: string }).reason).toContain(
+        '[git-branch-delete]',
+      );
+    });
+  }
+
+  test('a later dangerous git branch candidate in the same segment is reconsidered', () => {
+    const command = 'git branch -a git branch -D x';
+    expect(branchDelete.test(command)).toBe(true);
+    const result = evaluateDangerous(bashCtx(command));
+    expect(result?.kind).toBe('deny');
+    expect((result as { kind: 'deny'; reason: string }).reason).toContain(
+      '[git-branch-delete]',
+    );
   });
 
   for (const separator of commandSeparators) {

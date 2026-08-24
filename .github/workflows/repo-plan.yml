@@ -37,6 +37,7 @@ permissions:
 jobs:
   # ── Orchestrator ─────────────────────────────────────────────────────────────
   load-stories:
+    if: github.repository == 'griddynamics/rosetta'
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.load.outputs.plan_matrix }}

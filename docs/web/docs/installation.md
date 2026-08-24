@@ -331,7 +331,7 @@ STDIO runs Rosetta MCP as a local process. Your IDE launches it and communicates
 
 #### Join Your Team's Datasets
 
-Your team lead shares Instructions and Project datasets. You must accept the invite before you can see them. Check your Rosetta Server inbox for pending invitations.
+Your team lead shares Instructions datasets. You must accept the invite before you can see them. Check your Rosetta Server inbox for pending invitations.
 
 #### Configure Your IDE
 

@@ -77,7 +77,7 @@ For detailed change history, use git history and PRs instead of expanding this f
 
 ### Authorization and Security
 
-- Dataset access is policy-driven, with separate read/write behavior for project datasets.
+- MCP serves the configured `aia-*` instruction dataset; read-policy support is limited to `all` and `none`.
 - OAuth configuration supports both generic OAuth token introspection and OIDC discovery-based validation.
 - Token/session handling includes encryption hooks, TTL controls, and negative-cache behavior for introspection.
 - Public documentation and examples were scrubbed to remove internal infrastructure details while retaining public OSS references.

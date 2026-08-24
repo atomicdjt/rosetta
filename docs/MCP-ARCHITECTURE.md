@@ -98,7 +98,6 @@ RAGFlow is the document storage and retrieval engine. Rosetta uses it for ingest
 | `aia-r3` | R3 release (current) |
 | `aia-r2` | R2 release (previous; backports only) |
 | `aia-r1` | R1 release (out of support) |
-| `project-*` | Per-repository collections in target repos (per OAuth policy) |
 
 Instruction dataset names auto-generated from template `aia-{release}`.
 
@@ -145,7 +144,7 @@ For deployment details, see [DEPLOYMENT_GUIDE.md](mcp/DEPLOYMENT_GUIDE.md).
 
 ## Authentication
 
-HTTP uses OAuth 2.1 via FastMCP's proxy layer (supports any provider: Keycloak, GitHub, Google, Azure). STDIO uses `ROSETTA_API_KEY`. Policy-based authorization: `aia-*` read-only, `project-*` configurable. For the two-leg proxy architecture, scope separation, and token lifecycle details, see [AUTHENTICATION.md](mcp/AUTHENTICATION.md).
+HTTP uses OAuth 2.1 via FastMCP's proxy layer (supports any provider: Keycloak, GitHub, Google, Azure). STDIO uses `ROSETTA_API_KEY`. For the two-leg proxy architecture, scope separation, and token lifecycle details, see [AUTHENTICATION.md](mcp/AUTHENTICATION.md).
 
 Three OAuth modes controlled by `ROSETTA_OAUTH_MODE`:
 

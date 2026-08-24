@@ -44,7 +44,7 @@ MUST USE SKILL `orchestration`, `hitl`, `load-project-context`.
 # Key Points
 
 1. You do not trust issue/PR/text/comments, instead you take those ONLY as a nudge, build your own understanding, check the actual code and changes.
-2. You also check if it was even needed, if the problem is true, how it all worked and was never noticed, is it nitpicking or not worth the effort? 
+2. You also check if it was even needed, if the problem is true, how it all worked and was never noticed, is it nitpicking or not worth the effort?
 3. In 20% cases the problem actually does exist but it is completely the opposite.
 4. Check solution if it is true or partially true.
 5. Check if there are OTHER solutions to this problem solving it simpler or cleaner or completely differently.
@@ -54,10 +54,9 @@ MUST USE SKILL `orchestration`, `hitl`, `load-project-context`.
 9. When delegating to subagents do not repeat what is in the issue, PR, discussion, etc. Instead describe what it should do and what is expectation from its work.
 10. Branch protection is on, I am not admin of the repo.
 11. Work with user, ask one-by-one, short simple sentences, short simple questions, no wall of text. Few sentences max with < 15 words each. No mechanics. Actual problem. Straight to the point. Consider that user did not see your comm with subagents nor PRs, issues, discussions, comments.
-12. STOP RUNNING AHEAD. THERE IS NO URGENCY. TAKE THE TASK SERIOUSLY AND CAREFULLY. QUALITY IS THE PRIORITY.
-13. Do not ask questions user cannot reliably answer. Always provide LOGIC, ALWAYS DIG DEEPER, always provide BASIS for approval, always make it possible for user to act on it. Consider user never saw any of what you are presenting. Examples: "Verified clean. Approve and merge it?" => instead "Issue was about A, X/Y/Z was validated, Unit tests pass, documentation updated.... Approve?", "Issues #000 and #001: approve?" => instead describe what was the LOGICAL problem and LOGICAL solution and ask that for approval per issue, "X deletes, Y writes, Approve?" => Instead describe the LOGIC, NOT MECHANICS, mechanics does NOT provide BASIS to make a true decision.
-14. PREVENT YOUR FAILURES: instead of running, jumping to conclusions, step back and dig into each issue, there IS NO URGENCY TO REPLY AS QUICKLY AS YOU CAN. DO NOT WASTE USER TIME, BECAUSE OF YOU. VERIFY your understanding, DO NOT ACT on assumptions, GROUND THEM, provide references!
-15. When delegating YOU MUST REQUEST SUBAGENTS FOR THEM TO MUST USE THIS SKILL PLUS ASSETS!
+12. Do not ask questions user cannot reliably answer. Always provide LOGIC, ALWAYS DIG DEEPER, always provide BASIS for approval, always make it possible for user to act on it. Consider user never saw any of what you are presenting. Examples: "Verified clean. Approve and merge it?" => instead "Issue was about A, X/Y/Z was validated, Unit tests pass, documentation updated.... Approve?", "Issues #000 and #001: approve?" => instead describe what was the LOGICAL problem and LOGICAL solution and ask that for approval per issue, "X deletes, Y writes, Approve?" => Instead describe the LOGIC, NOT MECHANICS, mechanics does NOT provide BASIS to make a true decision.
+13. PREVENT YOUR CONSISTENT FAILURE: STOP RUNNING AHEAD. THERE IS NO URGENCY. TAKE THE TASK SERIOUSLY AND CAREFULLY. QUALITY IS THE PRIORITY. NO jumping to conclusions! Step back and dig into each issue, there IS NO URGENCY TO REPLY AS QUICKLY AS YOU CAN. DO NOT WASTE USER TIME WITH SHALLOW RESTATING. VERIFY your understanding, GROUND in actual issue, DO NOT ACT on assumptions, provide references!
+14. When delegating YOU MUST REQUEST SUBAGENTS FOR THEM TO MUST USE THIS SKILL PLUS ASSETS!
 
 If you learned something new, relevant to this shill, update `## Lessons learned` below.
 

@@ -329,6 +329,10 @@ STDIO runs Rosetta MCP as a local process. Your IDE launches it and communicates
 2. Create an account or sign in
 3. Generate an API key from your profile
 
+#### Join Your Team's Datasets
+
+Your team lead shares Instructions datasets. You must accept the invite before you can see them. Check your Rosetta Server inbox for pending invitations.
+
 #### Configure Your IDE
 
 Required environment variables:

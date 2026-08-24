@@ -55,6 +55,9 @@ MUST USE SKILL `orchestration`, `hitl`, `load-project-context`.
 10. Branch protection is on, I am not admin of the repo.
 11. Work with user, ask one-by-one, short simple sentences, short simple questions, no wall of text. Few sentences max with < 15 words each. No mechanics. Actual problem. Straight to the point. Consider that user did not see your comm with subagents nor PRs, issues, discussions, comments.
 12. STOP RUNNING AHEAD. THERE IS NO URGENCY. TAKE THE TASK SERIOUSLY AND CAREFULLY. QUALITY IS THE PRIORITY.
+13. Do not ask questions user cannot reliably answer. Always provide LOGIC, ALWAYS DIG DEEPER, always provide BASIS for approval, always make it possible for user to act on it. Consider user never saw any of what you are presenting. Examples: "Verified clean. Approve and merge it?" => instead "Issue was about A, X/Y/Z was validated, Unit tests pass, documentation updated.... Approve?", "Issues #000 and #001: approve?" => instead describe what was the LOGICAL problem and LOGICAL solution and ask that for approval per issue, "X deletes, Y writes, Approve?" => Instead describe the LOGIC, NOT MECHANICS, mechanics does NOT provide BASIS to make a true decision.
+14. PREVENT YOUR FAILURES: instead of running, jumping to conclusions, step back and dig into each issue, there IS NO URGENCY TO REPLY AS QUICKLY AS YOU CAN. DO NOT WASTE USER TIME, BECAUSE OF YOU. VERIFY your understanding, DO NOT ACT on assumptions, GROUND THEM, provide references!
+15. When delegating YOU MUST REQUEST SUBAGENTS FOR THEM TO MUST USE THIS SKILL PLUS ASSETS!
 
 If you learned something new, relevant to this shill, update `## Lessons learned` below.
 
@@ -70,3 +73,5 @@ If you learned something new, relevant to this shill, update `## Lessons learned
 - **Check whether the surprising value is simply configured.** Called a fallback to `dataset_default` a hazard. The user had configured that default and the CLI printed it. Root cause: skipped reading the config before naming a defect.
 - **Ask, do not flag.** Repeatedly noted open items in prose instead of asking, forcing the user to chase them. Root cause: treated flagging as lower-friction than a question. One question, asked, beats three observations parked in a paragraph.
 - **When the user's own explanation lands, put THAT wording in the artifact.** Wrote a docstring in my framing after a plain numbered list was what finally made the behavior clear. Root cause: preferred my summary to the version proven to work.
+- **Pushback is a prompt to show evidence, not to reverse.** Dropped a correct finding the moment the user disagreed, then had to reinstate it once they saw the full context. Root cause: treated disagreement as refutation. Restate the evidence and let them decide.
+- **Questions carry the logic, never the mechanics.** Asked "verified clean, approve?" and "X deletes, Y writes, which way?" — neither gives the user a basis to answer. State the problem, the solution, and what was proven, then ask.

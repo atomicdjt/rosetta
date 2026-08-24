@@ -1,6 +1,6 @@
 ---
-name: batch-processing
-description: Batch processing issues, PRs, etc.
+name: daily-oss
+description: Batch processing issues, PRs, discussions, implementations, etc.
 disable-model-invocation: true
 ---
 
@@ -54,7 +54,7 @@ MUST USE SKILL `orchestration`, `hitl`, `load-project-context`.
 9. When delegating to subagents do not repeat what is in the issue, PR, discussion, etc. Instead describe what it should do and what is expectation from its work.
 10. Branch protection is on, I am not admin of the repo.
 11. Work with user, ask one-by-one, short simple sentences, short simple questions, no wall of text. Few sentences max with < 15 words each. No mechanics. Actual problem. Straight to the point. Consider that user did not see your comm with subagents nor PRs, issues, discussions, comments.
-12. Do not ask questions user cannot reliably answer. Always provide LOGIC, ALWAYS DIG DEEPER, always provide BASIS for approval, always make it possible for user to act on it. Consider user never saw any of what you are presenting. Examples: "Verified clean. Approve and merge it?" => instead "Issue was about A, X/Y/Z was validated, Unit tests pass, documentation updated.... Approve?", "Issues #000 and #001: approve?" => instead describe what was the LOGICAL problem and LOGICAL solution and ask that for approval per issue, "X deletes, Y writes, Approve?" => Instead describe the LOGIC, NOT MECHANICS, mechanics does NOT provide BASIS to make a true decision.
+12. Ask questions for user to be able to reliably answer. Do not lead in -> straight to the point. Always provide LOGIC, ALWAYS DIG DEEPER, always provide BASIS for approval, always make it possible for user to act on it. Consider user never saw any of what you are presenting. Examples: "Verified clean. Approve and merge it?" => instead "Issue was about A, X/Y/Z was validated, Unit tests pass, documentation updated.... Approve?", "Issues #000 and #001: approve?" => instead describe what was the LOGICAL problem and LOGICAL solution and ask that for approval per issue, "X deletes, Y writes, Approve?" => Instead describe the LOGIC, NOT MECHANICS, mechanics does NOT provide BASIS to make a true decision.
 13. PREVENT YOUR CONSISTENT FAILURE: STOP RUNNING AHEAD. THERE IS NO URGENCY. TAKE THE TASK SERIOUSLY AND CAREFULLY. QUALITY IS THE PRIORITY. NO jumping to conclusions! Step back and dig into each issue, there IS NO URGENCY TO REPLY AS QUICKLY AS YOU CAN. DO NOT WASTE USER TIME WITH SHALLOW RESTATING. VERIFY your understanding, GROUND in actual issue, DO NOT ACT on assumptions, provide references!
 14. When delegating YOU MUST REQUEST SUBAGENTS FOR THEM TO MUST USE THIS SKILL PLUS ASSETS!
 

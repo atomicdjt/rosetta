@@ -4,6 +4,7 @@ description: "Discover project context, patterns, affected areas, dependencies, 
 mode: subagent
 model: GPT-5.6 Luna
 effort: medium
+color: cyan
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

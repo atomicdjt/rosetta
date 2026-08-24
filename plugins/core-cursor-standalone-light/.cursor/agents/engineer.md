@@ -4,6 +4,7 @@ description: "Implement and test to high quality under the orchestrator-assigned
 mode: subagent
 model: gpt-5.6-luna
 effort: medium
+color: blue
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

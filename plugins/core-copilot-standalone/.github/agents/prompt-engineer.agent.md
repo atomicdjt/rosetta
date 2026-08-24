@@ -4,6 +4,7 @@ description: "Author and adapt prompts — discover, draft, deliver — under HI
 mode: subagent
 model: Claude Opus 5
 effort: high
+color: pink
 readonly: false
 tags: ["subagent", "agent"]
 baseSchema: docs/schemas/agent.md

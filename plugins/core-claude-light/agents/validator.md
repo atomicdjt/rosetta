@@ -4,6 +4,7 @@ description: "Validate that implementation matches intent via execution and evid
 mode: subagent
 model: claude-sonnet-5
 effort: high
+color: red
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

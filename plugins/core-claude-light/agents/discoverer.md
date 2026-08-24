@@ -4,6 +4,7 @@ description: "Discover project context, patterns, affected areas, dependencies, 
 mode: subagent
 model: claude-haiku-4-5
 effort: medium
+color: cyan
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

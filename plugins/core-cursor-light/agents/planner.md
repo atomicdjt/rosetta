@@ -4,6 +4,7 @@ description: "Plan execution: turn approved intent/specs into a sequenced plan s
 mode: subagent
 model: gpt-5.6-terra
 effort: xhigh
+color: orange
 readonly: false
 tags: ["subagent", "agent", "planning"]
 baseSchema: docs/schemas/agent.md

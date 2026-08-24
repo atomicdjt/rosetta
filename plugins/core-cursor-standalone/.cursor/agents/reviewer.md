@@ -4,6 +4,7 @@ description: "Review artifacts against intent and contracts, recommend, etc. Ful
 mode: subagent
 model: gpt-5.6-terra
 effort: medium
+color: yellow
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

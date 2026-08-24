@@ -4,6 +4,7 @@ description: "Run deep research with grounded references, systematic exploration
 mode: subagent
 model: claude-sonnet-5
 effort: medium
+color: yellow
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

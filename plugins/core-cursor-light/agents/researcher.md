@@ -4,6 +4,7 @@ description: "Run deep research with grounded references, systematic exploration
 mode: subagent
 model: gemini-3.7-flash
 effort: high
+color: yellow
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

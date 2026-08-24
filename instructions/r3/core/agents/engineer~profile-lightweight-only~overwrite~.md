@@ -4,6 +4,7 @@ description: "Implement and test to high quality under the orchestrator-assigned
 mode: subagent
 model: gpt-5.6-luna-xhigh, gpt-5.6-terra-medium, claude-sonnet-5-medium, gemini-3.7-flash-medium, grok-4.6-medium, composer-2.5
 effort: medium
+color: blue
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

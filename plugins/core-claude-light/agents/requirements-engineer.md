@@ -4,6 +4,7 @@ description: "Author, refine, and finalize requirements and specifications with 
 mode: subagent
 model: claude-sonnet-5
 effort: xhigh
+color: pink
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

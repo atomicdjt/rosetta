@@ -4,6 +4,7 @@ description: "Run deep research with grounded references, systematic exploration
 mode: subagent
 model: claude-sonnet-5-medium, gpt-5.6-terra-medium, gemini-3.7-flash-high, grok-4.6-medium
 effort: medium
+color: yellow
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

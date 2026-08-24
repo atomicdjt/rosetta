@@ -4,6 +4,7 @@ description: "Review artifacts against intent and contracts, recommend, etc. Ful
 mode: subagent
 model: gemini-3.7-flash
 effort: high
+color: yellow
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

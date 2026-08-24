@@ -4,6 +4,7 @@ description: "Architect solution, transform intent into reliable tech specs, etc
 mode: subagent
 model: gpt-5.6-terra
 effort: xhigh
+color: purple
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

@@ -4,6 +4,7 @@ description: "Review artifacts against intent and contracts, recommend, etc. Ful
 mode: subagent
 model: claude-sonnet-5
 effort: high
+color: yellow
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

@@ -4,6 +4,7 @@ description: "Plan execution: turn approved intent/specs into a sequenced plan s
 mode: subagent
 model: claude-opus-5
 effort: high
+color: orange
 readonly: false
 tags: ["subagent", "agent", "planning"]
 baseSchema: docs/schemas/agent.md

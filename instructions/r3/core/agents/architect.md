@@ -4,6 +4,7 @@ description: "Architect solution, transform intent into reliable tech specs, etc
 mode: subagent
 model: claude-opus-5-high, gpt-5.6-sol-high, gemini-3.7-flash-high, grok-4.6-high
 effort: high
+color: purple
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

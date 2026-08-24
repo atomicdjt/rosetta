@@ -4,6 +4,7 @@ description: "Validate that implementation matches intent via execution and evid
 mode: subagent
 model: GPT-5.6 Terra
 effort: medium
+color: red
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

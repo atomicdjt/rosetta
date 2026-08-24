@@ -4,6 +4,7 @@ description: "Architect solution, transform intent into reliable tech specs, etc
 mode: subagent
 model: claude-opus-5
 effort: high
+color: purple
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

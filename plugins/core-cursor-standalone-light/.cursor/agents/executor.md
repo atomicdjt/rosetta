@@ -4,6 +4,7 @@ description: "Run simple commands, collect and summarize results to protect pare
 mode: subagent
 model: gpt-5.6-luna
 effort: medium
+color: cyan
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

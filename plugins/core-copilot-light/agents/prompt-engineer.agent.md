@@ -4,6 +4,7 @@ description: "Author and adapt prompts — discover, draft, deliver — under HI
 mode: subagent
 model: GPT-5.6 Terra
 effort: xhigh
+color: pink
 readonly: false
 tags: ["subagent", "agent"]
 baseSchema: docs/schemas/agent.md

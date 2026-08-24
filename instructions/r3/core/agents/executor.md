@@ -4,6 +4,7 @@ description: "Run simple commands, collect and summarize results to protect pare
 mode: subagent
 model: claude-haiku-4-5, gpt-5.6-terra-low, gemini-3.7-flash-low, composer-2.5, gpt-5.6-luna-medium, grok-4.6-low
 effort: medium
+color: cyan
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

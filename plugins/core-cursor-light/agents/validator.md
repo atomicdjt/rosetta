@@ -4,6 +4,7 @@ description: "Validate that implementation matches intent via execution and evid
 mode: subagent
 model: gemini-3.7-flash
 effort: high
+color: red
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

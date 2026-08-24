@@ -4,6 +4,7 @@ description: "Implement and test to high quality under the orchestrator-assigned
 mode: subagent
 model: claude-sonnet-5-medium, gpt-5.6-terra-medium, gemini-3.7-flash-low, grok-4.6-medium
 effort: medium
+color: blue
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

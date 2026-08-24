@@ -2,7 +2,8 @@
 name: architect
 description: "Architect solution, transform intent into reliable tech specs, etc. Full subagent."
 mode: subagent
-model: GPT-5.6 Sol
+model: GPT-5.6 Terra
+effort: xhigh
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

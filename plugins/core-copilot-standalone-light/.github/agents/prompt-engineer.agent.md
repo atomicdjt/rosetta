@@ -2,7 +2,8 @@
 name: prompt-engineer
 description: "Author and adapt prompts — discover, draft, deliver — under HITL approvals. Full subagent."
 mode: subagent
-model: GPT-5.6 Sol
+model: GPT-5.6 Terra
+effort: xhigh
 readonly: false
 tags: ["subagent", "agent"]
 baseSchema: docs/schemas/agent.md

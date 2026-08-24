@@ -3,6 +3,7 @@ name: requirements-engineer
 description: "Author, refine, and finalize requirements and specifications with traceability. Full subagent."
 mode: subagent
 model: Claude Opus 5
+effort: high
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

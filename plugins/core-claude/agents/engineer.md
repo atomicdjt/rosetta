@@ -3,6 +3,7 @@ name: engineer
 description: "Implement and test to high quality under the orchestrator-assigned identity. Full subagent."
 mode: subagent
 model: claude-sonnet-5
+effort: medium
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

@@ -3,6 +3,7 @@ name: engineer
 description: "Implement and test to high quality under the orchestrator-assigned identity. Full subagent."
 mode: subagent
 model: gpt-5.6-luna
+effort: medium
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

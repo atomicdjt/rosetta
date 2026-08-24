@@ -3,6 +3,7 @@ name: validator
 description: "Validate that implementation matches intent via execution and evidence. Full subagent."
 mode: subagent
 model: Gemini 3.7 Flash
+effort: high
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

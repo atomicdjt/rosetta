@@ -3,6 +3,7 @@ name: reviewer
 description: "Review artifacts against intent and contracts, recommend, etc. Full subagent."
 mode: subagent
 model: Gemini 3.7 Flash
+effort: high
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

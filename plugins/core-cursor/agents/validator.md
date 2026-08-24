@@ -3,6 +3,7 @@ name: validator
 description: "Validate that implementation matches intent via execution and evidence. Full subagent."
 mode: subagent
 model: gpt-5.6-terra
+effort: medium
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

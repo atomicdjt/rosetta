@@ -3,6 +3,7 @@ name: reviewer
 description: "Review artifacts against intent and contracts, recommend, etc. Full subagent."
 mode: subagent
 model: gpt-5.6-terra
+effort: medium
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

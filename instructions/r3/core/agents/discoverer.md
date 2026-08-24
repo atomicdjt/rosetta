@@ -2,7 +2,8 @@
 name: discoverer
 description: "Discover project context, patterns, affected areas, dependencies, etc. Lightweight subagent."
 mode: subagent
-model: claude-sonnet-5, gpt-5.6-terra-medium, gemini-3.7-flash-high, grok-4.6
+model: claude-sonnet-5-medium, gpt-5.6-terra-medium, gemini-3.7-flash-high, grok-4.6-medium
+effort: medium
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

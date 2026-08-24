@@ -3,6 +3,7 @@ name: executor
 description: "Run simple commands, collect and summarize results to protect parent context. Lightweight subagent."
 mode: subagent
 model: gpt-5.6-luna
+effort: medium
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

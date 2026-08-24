@@ -2,7 +2,8 @@
 name: architect
 description: "Architect solution, transform intent into reliable tech specs, etc. Full subagent."
 mode: subagent
-model: claude-opus-5
+model: claude-sonnet-5
+effort: xhigh
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

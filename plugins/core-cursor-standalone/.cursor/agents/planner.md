@@ -3,6 +3,7 @@ name: planner
 description: "Plan execution: turn approved intent/specs into a sequenced plan scaled to size. Full subagent."
 mode: subagent
 model: claude-opus-5
+effort: high
 readonly: false
 tags: ["subagent", "agent", "planning"]
 baseSchema: docs/schemas/agent.md

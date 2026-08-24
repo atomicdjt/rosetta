@@ -2,7 +2,8 @@
 name: requirements-engineer
 description: "Author, refine, and finalize requirements and specifications with traceability. Full subagent."
 mode: subagent
-model: GPT-5.6 Sol
+model: GPT-5.6 Terra
+effort: xhigh
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

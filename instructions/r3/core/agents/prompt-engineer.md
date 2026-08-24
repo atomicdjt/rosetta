@@ -2,7 +2,8 @@
 name: prompt-engineer
 description: "Author and adapt prompts — discover, draft, deliver — under HITL approvals. Full subagent."
 mode: subagent
-model: claude-opus-5, gpt-5.6-sol-high, gemini-3.7-flash-high
+model: claude-opus-5-high, gpt-5.6-sol-high, gemini-3.7-flash-high, grok-4.6-high
+effort: high
 readonly: false
 tags: ["subagent", "agent"]
 baseSchema: docs/schemas/agent.md

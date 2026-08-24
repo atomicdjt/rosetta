@@ -1,12 +1,15 @@
 from types import SimpleNamespace
 
+from rosetta_cli.rosetta_config import RosettaConfig
 from rosetta_cli.services.dataset_service import DatasetService
 
 
-def _config() -> SimpleNamespace:
-    return SimpleNamespace(
-        dataset_template="aia-{release}",
+def _config() -> RosettaConfig:
+    return RosettaConfig(
+        base_url="https://example.invalid",
+        api_key="ragflow-test",
         dataset_default="aia-default",
+        dataset_template="aia-{release}",
         page_size=1000,
     )
 
@@ -30,7 +33,7 @@ def test_resolve_dataset_name_uses_explicit_name_without_listing() -> None:
 
 
 def test_resolve_dataset_name_auto_detects_single_prefix_match(capsys) -> None:
-    client = _client("other", "aia-1.0")
+    client = _client("legacy-aia-1.0", "aia-1.0")
     service = DatasetService(client, _config())
 
     assert service.resolve_dataset_name(None) == ("aia-1.0", True)

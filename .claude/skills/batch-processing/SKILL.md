@@ -74,3 +74,4 @@ If you learned something new, relevant to this shill, update `## Lessons learned
 - **When the user's own explanation lands, put THAT wording in the artifact.** Wrote a docstring in my framing after a plain numbered list was what finally made the behavior clear. Root cause: preferred my summary to the version proven to work.
 - **Pushback is a prompt to show evidence, not to reverse.** Dropped a correct finding the moment the user disagreed, then had to reinstate it once they saw the full context. Root cause: treated disagreement as refutation. Restate the evidence and let them decide.
 - **Questions carry the logic, never the mechanics.** Asked "verified clean, approve?" and "X deletes, Y writes, which way?" — neither gives the user a basis to answer. State the problem, the solution, and what was proven, then ask.
+- **Talking around, not directly.** If you cannot be specific and clear and short, it means YOU are NOT grounded. DO NOT ASK YET - DIG FIRST!

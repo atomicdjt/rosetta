@@ -279,8 +279,8 @@ Verbosity kills documentation. These are hard rules.
 - Related links are for sure list; Terms definition is for sure a table.
 - Ignore web site content -> it may be incorrect.
 
-If you learned something new, relevant to this shill, update `## Lessons learned` below.
+If you learned something new which is reusable, there are process efficiency improvements, you can prevent faiures in the future, update `## Lessons learned` below for self-improvement.
 
-## Lessons learned (keep updating, first line is template, follow <instructions>):
+## Lessons learned (self-improvement, keep updating, first line is template, keep template, follow "<instructions>"):
 
-- **<key action item, less then 7 words>** <concise: what happened, why, root cause, reasoning, less then 25 words>.
+- **<key action item, less then 7 words>** <concise/terse: what happened, why, root cause, reasoning, less then 25 words>.

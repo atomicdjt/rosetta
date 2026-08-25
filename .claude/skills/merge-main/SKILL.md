@@ -18,11 +18,11 @@ Workspace root:
 - `instructions` is the actual instructions, use by plugin generator, which are sent to AI coding agents working on separate their own repositories.
 - `src` contains MCPs, additional packages, and tools.
 
-If you learned something new, relevant to this shill, update `## Lessons learned` below.
+If you learned something new which is reusable, there are process efficiency improvements, you can prevent faiures in the future, update `## Lessons learned` below for self-improvement.
 
-## Lessons learned (keep updating, first line is template, follow <instructions>):
+## Lessons learned (self-improvement, keep updating, first line is template, keep template, follow "<instructions>"):
 
-- **<key action item, less then 7 words>** <concise: what happened, why, root cause, reasoning, less then 25 words>.
+- **<key action item, less then 7 words>** <concise/terse: what happened, why, root cause, reasoning, less then 25 words>.
 - **Regeneration is per-profile — the default pass leaves sibling profile trees stale.** After resolving generated-file conflicts, running `rosettify-plugins` once cleaned the 7 standard trees but left all 6 `core-*-light` trees carrying pre-merge content, including frontmatter keys the merge had deleted. No conflict, no test failure — `scripts/pre_commit.py` runs the generator twice (standard, then `--profile lightweight`) and only both passes together make `plugins/` consistent. Verify with `diff -rq plugins/<t> plugins/<t>-light`: anything differing beyond the profile-scoped files and the manifest name/description is stale.
 - **Check whether a doc reference survives the plugin boundary.** Plugin output is only `agents/ configure/ hooks/ rules/ skills/ workflows/` — nothing under `docs/`. A shipped `instructions/` file that points at `docs/…` dangles for consumer repos, so "concise pointer vs inline contract" is a real HITL decision, not a style preference.
 - **Hunt semantic conflicts after the textual merge; git flags none of them.** Three appeared here: main documented paths this branch had deleted, main asserted "no plugin directory yet" for a target this branch added, and main deleted `instructions/` rule files whose generated copies survived in a branch-only plugin. Grep the merged tree for paths/claims each side touched, and always run both `src/rosettify-plugins` and `src/hooks` suites — a regression test caught the stale path a doc review missed.

@@ -58,11 +58,11 @@ MUST USE SKILL `orchestration`, `hitl`, `load-project-context`.
 13. PREVENT YOUR CONSISTENT FAILURE: STOP RUNNING AHEAD. THERE IS NO URGENCY. TAKE THE TASK SERIOUSLY AND CAREFULLY. QUALITY IS THE PRIORITY. NO jumping to conclusions! Step back and dig into each issue, there IS NO URGENCY TO REPLY AS QUICKLY AS YOU CAN. DO NOT WASTE USER TIME WITH SHALLOW RESTATING. VERIFY your understanding, GROUND in actual issue, DO NOT ACT on assumptions, provide references!
 14. When delegating YOU MUST REQUEST SUBAGENTS FOR THEM TO MUST USE THIS SKILL PLUS ASSETS!
 
-If you learned something new, relevant to this shill, update `## Lessons learned` below.
+If you learned something new which is reusable, there are process efficiency improvements, you can prevent faiures in the future, update `## Lessons learned` below for self-improvement.
 
-## Lessons learned (keep updating, first line is template, follow <instructions>):
+## Lessons learned (self-improvement, keep updating, first line is template, keep template, follow "<instructions>"):
 
-- **<key action item, less then 7 words>** <concise: what happened, why, root cause, reasoning, less then 25 words>.
+- **<key action item, less then 7 words>** <concise/terse: what happened, why, root cause, reasoning, less then 25 words>.
 - **Verified correct != ready to merge.** Proposed approving a PR whose new security-guard branch had zero tests, citing a prior approve-with-note. Root cause: conflated "the fix works" with "the work is finished". Untested new code, or any concrete ask, means request changes — an approval plus a comment is incoherent.
 - **Check the code path executes before reviewing a fix to it.** Reviewed a cross-tenant authorization fix in depth before finding `can_read` short-circuits on `aia-` so the policy can never run. Root cause: trusted the issue's framing of where the problem lived. Ask "can this line execute?" first; the right ask may be deletion, not repair.
 - **Never infer configuration from a permission-gated 404.** Claimed `main` had no branch protection from a 404 and an empty ruleset list, while `mergeStateStatus: BLOCKED` sat in hand contradicting it. Root cause: absence of visibility read as absence of the thing. Check own permission level; state "cannot determine".

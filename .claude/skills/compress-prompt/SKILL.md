@@ -115,8 +115,8 @@ INVARIANTS (always-on, declared once): `## KEEP verbatim` + `## NEVER`. Run pass
 7. HITL: present to the user → proposed artifact + word Δ (before→after, %) + where the cuts came from + your reasoned take on the subagent findings.
 8. On explicit user approval → write the TARGET file only.
 
-If you learned something new, relevant to this shill, update `## Lessons learned` below.
+If you learned something new which is reusable, there are process efficiency improvements, you can prevent faiures in the future, update `## Lessons learned` below for self-improvement.
 
-## Lessons learned (keep updating, first line is template, follow <instructions>):
+## Lessons learned (self-improvement, keep updating, first line is template, keep template, follow "<instructions>"):
 
-- **<key action item, less then 7 words>** <concise: what happened, why, root cause, reasoning, less then 25 words>.
+- **<key action item, less then 7 words>** <concise/terse: what happened, why, root cause, reasoning, less then 25 words>.

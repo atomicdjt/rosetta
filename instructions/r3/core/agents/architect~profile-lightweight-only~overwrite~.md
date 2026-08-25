@@ -2,8 +2,8 @@
 name: architect
 description: "Architect solution, transform intent into reliable tech specs, etc. Full subagent."
 mode: subagent
-model: gpt-5.6-terra-xhigh, claude-sonnet-5-xhigh, grok-4.6-high, gemini-3.7-flash-high
-effort: xhigh
+model: claude-opus-5-high, gpt-5.6-sol-high, grok-4.6-high, gpt-5.6-terra-xhigh, claude-sonnet-5-xhigh, gemini-3.7-flash-high
+effort: high
 color: purple
 readonly: false
 baseSchema: docs/schemas/agent.md

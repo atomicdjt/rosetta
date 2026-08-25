@@ -126,7 +126,7 @@ Verbosity kills documentation. These are hard rules.
 
 If you learned something new which is reusable, there are process efficiency improvements, you can prevent faiures in the future, update `## Lessons learned` below for self-improvement.
 
-## Lessons learned (self-improvement, keep updating, first line is template, keep template, follow "<instructions>"):
+## Lessons learned (self-improvement, keep updating, first line is template, keep template, follow "<instructions>", high confidence only):
 
 - **<key action item, less then 7 words>** <concise/terse: what happened, why, root cause, reasoning, less then 25 words>.
 - **npm/src/* tools are public, not internal.** `rosettify`, `rosettify-prompts`, `curiocity`, and similar packages under `src/` are published and user-facing. Default to mirroring their ARCHITECTURE.md sections on the web page — don't assume "internal tooling" and drop them.

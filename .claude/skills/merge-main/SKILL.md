@@ -20,7 +20,7 @@ Workspace root:
 
 If you learned something new which is reusable, there are process efficiency improvements, you can prevent faiures in the future, update `## Lessons learned` below for self-improvement.
 
-## Lessons learned (self-improvement, keep updating, first line is template, keep template, follow "<instructions>"):
+## Lessons learned (self-improvement, keep updating, first line is template, keep template, follow "<instructions>", high confidence only):
 
 - **<key action item, less then 7 words>** <concise/terse: what happened, why, root cause, reasoning, less then 25 words>.
 - **Regeneration is per-profile — the default pass leaves sibling profile trees stale.** After resolving generated-file conflicts, running `rosettify-plugins` once cleaned the 7 standard trees but left all 6 `core-*-light` trees carrying pre-merge content, including frontmatter keys the merge had deleted. No conflict, no test failure — `scripts/pre_commit.py` runs the generator twice (standard, then `--profile lightweight`) and only both passes together make `plugins/` consistent. Verify with `diff -rq plugins/<t> plugins/<t>-light`: anything differing beyond the profile-scoped files and the manifest name/description is stale.

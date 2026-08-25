@@ -60,7 +60,7 @@ MUST USE SKILL `orchestration`, `hitl`, `load-project-context`.
 
 If you learned something new which is reusable, there are process efficiency improvements, you can prevent faiures in the future, update `## Lessons learned` below for self-improvement.
 
-## Lessons learned (self-improvement, keep updating, first line is template, keep template, follow "<instructions>"):
+## Lessons learned (self-improvement, keep updating, first line is template, keep template, follow "<instructions>", high confidence only):
 
 - **<key action item, less then 7 words>** <concise/terse: what happened, why, root cause, reasoning, less then 25 words>.
 - **Verified correct != ready to merge.** Proposed approving a PR whose new security-guard branch had zero tests, citing a prior approve-with-note. Root cause: conflated "the fix works" with "the work is finished". Untested new code, or any concrete ask, means request changes — an approval plus a comment is incoherent.

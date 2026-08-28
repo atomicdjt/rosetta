@@ -1,6 +1,6 @@
 ---
 name: self-learning
-description: "MUST STOP and activate on: execution failure/error, your mistake, wrong/unexpected result, expected≠actual mismatch, 2 consecutive mismatches, unhappy/upset user, user WRITING IN CAPS, something failed/didn't work. No edits, no reverses, no actions, except this skill."
+description: "MUST STOP and activate on: any failure/error, mistakes, wrong/unexpected result, expected≠actual mismatch, 2 consecutive mismatches, unhappy/upset user, user WRITING IN CAPS, something didn't work. No edits, no reverses, no actions, except this skill."
 ---
 
 <self_learning>

@@ -1,6 +1,6 @@
 ---
 name: hitl
-description: "CRITICAL. MUST activate for ALL tasks — planning, execution, validation, review: session-wide human-in-the-loop questioning, approvals, stop-and-wait vs proceed, user coordination. NEVER assume approval. MANDATORY unless user requested EXACTLY `fully autonomous` or `No HITL`."
+description: "MUST activate for ALL tasks — planning, execution, validation, review: session-wide work with human together, human-in-the-loop questioning, approvals, stop-and-wait vs proceed. NEVER assume approval. MANDATORY unless user requested EXACTLY `fully autonomous` or `No HITL`."
 license: Apache-2.0
 baseSchema: docs/schemas/skill.md
 ---

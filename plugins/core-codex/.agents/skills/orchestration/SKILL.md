@@ -1,6 +1,6 @@
 ---
 name: orchestration
-description: "To delegate, prompt and manage subagents. MUST activate to spawn subagent with a quality prompt. MANDATORY unless trivial one-liner."
+description: "To delegate, prompt and manage subagents. MUST activate to spawn subagent with a quality prompt, unless trivial."
 license: Apache-2.0
 baseSchema: docs/schemas/skill.md
 ---
@@ -69,6 +69,7 @@ You are <role/specialization>. {Lightweight|Full} subagent.
 Tasks*: <list>
 Scope*: root <path> [git worktree] · DO <in-scope + expected outputs> · DO NOT <out-of-scope · read-only · untouchable — no improvising beyond scope>
 [Constraints: <naming · patterns · case sensitivity>]
+References: <list of <action:read/write/search> <resource>>
 Checklist*: <ACs · NFRs · FRs · open-ended · Severity-based · Unlimited by item count · Domain Specific · Tasks Specific>
 Skills*: MUST USE SKILL `subagent-directives`[, `load-project-context`, <required>] · [RECOMMEND USE SKILL <skill>]
 Original request*: <verbatim + agreed clarifications — carry through every step>

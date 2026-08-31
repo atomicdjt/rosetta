@@ -192,3 +192,4 @@ If you learned something new which is reusable, there are process efficiency imp
 ## Lessons learned (self-improvement, keep updating, first line is template, keep template, follow "<instructions>", high confidence only):
 
 - **<key action item, less then 7 words>** <concise/terse: what happened, why, root cause, reasoning, less then 25 words>.
+- **Verify asymmetric changes before flagging** Model/effort differences across similar items (e.g. one role restored, others not) can be deliberate tuning, not a gap; confirm with the user before calling it out.

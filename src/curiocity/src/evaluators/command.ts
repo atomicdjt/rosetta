@@ -1,3 +1,4 @@
+import { execFile } from 'node:child_process';
 import { z } from 'zod';
 import type { EvalContext, EvalResult, Evaluator } from './types';
 
@@ -19,10 +20,15 @@ export const commandParamsSchema = z.object({
   run: z.string().min(1),
   /** Expected exit code (default 0). */
   expectExitCode: z.number().int().default(0),
+  /** Wall-clock cap; exceeding it fails the evaluator (default 60s). */
+  timeoutSec: z.number().positive().default(60),
 });
 
 /** Tail length (chars) of captured command output appended to failure `details`. */
 const OUTPUT_TAIL_CHARS = 1500;
+
+/** Extra time allowed for the Windows process-tree fallback to report failure. */
+const WINDOWS_TREE_KILL_GRACE_MS = 1000;
 
 export const command: Evaluator = {
   id: 'command',
@@ -30,18 +36,43 @@ export const command: Evaluator = {
 
   async evaluate(ctx: EvalContext, params: unknown): Promise<EvalResult> {
     const p = commandParamsSchema.parse(params);
+    const timeoutMs = Math.max(1, Math.round(p.timeoutSec * 1000));
     let exitCode: number;
     let details: string;
+    let timedOut = false;
+    let windowsTreeKillTimer: ReturnType<typeof setTimeout> | undefined;
     try {
-      const res = await ctx.exec(p.run, {
+      // With shell:true, execa's Windows timeout terminates cmd.exe but a nested
+      // child can keep the inherited output handles open. Give the fallback a
+      // short grace period while the process-tree kill below enforces the actual
+      // configured deadline.
+      const subprocess = ctx.exec(p.run, {
         shell: true,
         cwd: ctx.workspace,
         reject: false,
+        timeout: process.platform === 'win32' ? timeoutMs + WINDOWS_TREE_KILL_GRACE_MS : timeoutMs,
         all: true,
       });
-      exitCode = typeof res.exitCode === 'number' ? res.exitCode : (res.failed ? 1 : 0);
-      details = `\`${p.run}\` exited ${exitCode} (expected ${p.expectExitCode})`;
-      if (exitCode !== p.expectExitCode) {
+      if (process.platform === 'win32' && typeof subprocess.once === 'function') {
+        subprocess.once('spawn', () => {
+          windowsTreeKillTimer = setTimeout(() => {
+            const pid = subprocess.pid;
+            if (pid === undefined) return;
+            timedOut = true;
+            execFile('taskkill', ['/pid', String(pid), '/t', '/f'], { windowsHide: true }, () => {});
+          }, timeoutMs);
+        });
+      }
+      const res = await subprocess;
+      if (res.timedOut || timedOut) {
+        timedOut = true;
+        exitCode = -1;
+        details = `\`${p.run}\` timed out after ${p.timeoutSec}s`;
+      } else {
+        exitCode = typeof res.exitCode === 'number' ? res.exitCode : (res.failed ? 1 : 0);
+        details = `\`${p.run}\` exited ${exitCode} (expected ${p.expectExitCode})`;
+      }
+      if (timedOut || exitCode !== p.expectExitCode) {
         const output = (res.all ?? res.stdout ?? res.stderr ?? '').toString();
         const tail = output.slice(-OUTPUT_TAIL_CHARS);
         if (tail.length > 0) {
@@ -51,7 +82,9 @@ export const command: Evaluator = {
     } catch (err) {
       exitCode = -1;
       details = `\`${p.run}\` failed to run: ${(err as Error).message}`;
+    } finally {
+      if (windowsTreeKillTimer !== undefined) clearTimeout(windowsTreeKillTimer);
     }
-    return { pass: exitCode === p.expectExitCode, gate: false, details };
+    return { pass: exitCode === p.expectExitCode && !timedOut, gate: false, details };
   },
 };

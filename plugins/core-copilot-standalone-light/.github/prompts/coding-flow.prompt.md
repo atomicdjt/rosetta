@@ -1,6 +1,6 @@
 ---
 name: coding-flow
-description: "Workflow for all coding: features, fixes, refactors, unit tests, etc.; scales small to large."
+description: "Light coding workflow: features, fixes, refactors, unit tests, etc.; scales small to large."
 tags: ["workflow"]
 baseSchema: docs/schemas/workflow.md
 ---
@@ -32,6 +32,7 @@ Lightweight variant: a single architect pass produces discovery, design, specs, 
 10. If migrate/modernize: implementation phase MUST use tiny batches ONLY (1-3 files), never bulk-read (other phases may); specs/plan enforce; FS-copy RECOMMENDED; no behavior change/new code; mirror source; subagents same; REQUIRED TO log <file> started/completed; Use impl subagents like MAP-REDUCE;
 11. Run architect subagent with required model in the background and consult with it if already supported or prefer advisor if already available
 12. Coding workflow state MUST be saved to `agents/TEMP/<FEATURE>/coding-flow-state.md` file.
+13. If context already contains request for TDD => implement properly red and green adjusting this workflow, including by moving execution of phases `tests` and `review_tests` to be after `user_review_design` and before `implementation`.
 
 </prerequisites>
 

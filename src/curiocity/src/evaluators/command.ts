@@ -27,8 +27,8 @@ export const commandParamsSchema = z.object({
 /** Tail length (chars) of captured command output appended to failure `details`. */
 const OUTPUT_TAIL_CHARS = 1500;
 
-/** Extra time allowed for the Windows process-tree fallback to report failure. */
-const WINDOWS_TREE_KILL_GRACE_MS = 1000;
+/** Extra time allowed for Execa to report after the process tree is killed. */
+const PROCESS_TREE_KILL_GRACE_MS = 1000;
 
 export const command: Evaluator = {
   id: 'command',
@@ -40,26 +40,36 @@ export const command: Evaluator = {
     let exitCode: number;
     let details: string;
     let timedOut = false;
-    let windowsTreeKillTimer: ReturnType<typeof setTimeout> | undefined;
+    let processTreeKillTimer: ReturnType<typeof setTimeout> | undefined;
     try {
-      // With shell:true, execa's Windows timeout terminates cmd.exe but a nested
-      // child can keep the inherited output handles open. Give the fallback a
+      // With shell:true, Execa's timeout can terminate only the shell while a
+      // nested child keeps inherited output handles open. Give the fallback a
       // short grace period while the process-tree kill below enforces the actual
-      // configured deadline.
+      // configured deadline. On POSIX, detached creates the process group that
+      // lets the fallback terminate the shell and its descendants together.
       const subprocess = ctx.exec(p.run, {
         shell: true,
         cwd: ctx.workspace,
         reject: false,
-        timeout: process.platform === 'win32' ? timeoutMs + WINDOWS_TREE_KILL_GRACE_MS : timeoutMs,
+        timeout: timeoutMs + PROCESS_TREE_KILL_GRACE_MS,
+        ...(process.platform !== 'win32' ? { detached: true } : {}),
         all: true,
       });
-      if (process.platform === 'win32' && typeof subprocess.once === 'function') {
+      if (typeof subprocess.once === 'function') {
         subprocess.once('spawn', () => {
-          windowsTreeKillTimer = setTimeout(() => {
+          processTreeKillTimer = setTimeout(() => {
             const pid = subprocess.pid;
             if (pid === undefined) return;
             timedOut = true;
-            execFile('taskkill', ['/pid', String(pid), '/t', '/f'], { windowsHide: true }, () => {});
+            if (process.platform === 'win32') {
+              execFile('taskkill', ['/pid', String(pid), '/t', '/f'], { windowsHide: true }, () => {});
+              return;
+            }
+            try {
+              process.kill(-pid, 'SIGKILL');
+            } catch {
+              // The shell may have exited between the timer and the group kill.
+            }
           }, timeoutMs);
         });
       }
@@ -83,7 +93,7 @@ export const command: Evaluator = {
       exitCode = -1;
       details = `\`${p.run}\` failed to run: ${(err as Error).message}`;
     } finally {
-      if (windowsTreeKillTimer !== undefined) clearTimeout(windowsTreeKillTimer);
+      if (processTreeKillTimer !== undefined) clearTimeout(processTreeKillTimer);
     }
     return { pass: exitCode === p.expectExitCode && !timedOut, gate: false, details };
   },

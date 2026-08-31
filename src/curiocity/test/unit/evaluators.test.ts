@@ -83,9 +83,9 @@ describe('command (§11)', () => {
     });
 
     expect(exec).toHaveBeenCalledWith('echo ok', expect.objectContaining({
-      // Windows gets a short reporting grace period after the configured
+      // Execa gets a short reporting grace period after the configured
       // deadline so the process-tree fallback can terminate shell children.
-      timeout: 1250 + (process.platform === 'win32' ? 1000 : 0),
+      timeout: 2250,
     }));
     expect(res.pass).toBe(true);
   });

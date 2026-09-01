@@ -32,6 +32,15 @@ on:
           - codex
           - claude
         default: codex
+      agent-timeout-minutes:
+        # Step-level cap on the agent itself, separate from the job's 240. A full
+        # analysis legitimately runs ~2h, so the default matches the job. Lower it
+        # (e.g. 15) to iterate on the pipeline: the agent step fails on timeout, but
+        # the scrub/upload/verify steps are `if: always()`, so the execution trace is
+        # still published and the run stays diagnosable.
+        description: 'Minutes the agent step may run before it is cut off'
+        type: string
+        default: '240'
 
 permissions:
   contents: read
@@ -83,6 +92,7 @@ jobs:
 
       - name: Run Claude
         if: env.ROSETTA_AGENT == 'claude'
+        timeout-minutes: ${{ fromJSON(inputs.agent-timeout-minutes || '240') }}
         uses: anthropics/claude-code-action@v1
         env:
           CLAUDE_CODE_DISABLE_BACKGROUND_TASKS: "1"
@@ -118,6 +128,7 @@ jobs:
       # action's own steps and `codex exec` both inherit it.
       - name: Run Codex
         if: env.ROSETTA_AGENT == 'codex'
+        timeout-minutes: ${{ fromJSON(inputs.agent-timeout-minutes || '240') }}
         uses: openai/codex-action@v1
         env:
           GH_TOKEN: ${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}

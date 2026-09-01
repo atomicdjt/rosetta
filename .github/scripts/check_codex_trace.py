@@ -81,6 +81,51 @@ def json_objects(text):
     return found
 
 
+def split_chained(command):
+    """Split a shell string into its separate commands, respecting quotes.
+
+    MUTATING is anchored at the start of a command, but this Codex build chains
+    freely -- the first real rollout contains `pwd && sed -n ... && sed -n ...`. Without
+    splitting, `cd x && gh issue create ...` is extracted but never matched, and the
+    strict gate would fail a run that did exactly what it was asked to. Codex itself
+    splits before evaluating exec policy (`parse_shell_lc_plain_commands`); this is the
+    same idea, kept deliberately simple because a missed split only costs a false
+    "changed nothing", never a false pass.
+    """
+    parts, buf = [], []
+    quote = None
+    i = 0
+    while i < len(command):
+        ch = command[i]
+        if quote:
+            buf.append(ch)
+            if ch == "\\" and quote == '"' and i + 1 < len(command):
+                buf.append(command[i + 1])
+                i += 2
+                continue
+            if ch == quote:
+                quote = None
+        elif ch in "'\"":
+            quote = ch
+            buf.append(ch)
+        elif ch in ";\n":
+            parts.append("".join(buf))
+            buf = []
+        elif ch in "&|" and i + 1 < len(command) and command[i + 1] == ch:
+            parts.append("".join(buf))
+            buf = []
+            i += 2
+            continue
+        elif ch == "|":
+            parts.append("".join(buf))
+            buf = []
+        else:
+            buf.append(ch)
+        i += 1
+    parts.append("".join(buf))
+    return [p.strip() for p in parts if p.strip()]
+
+
 def commands_from_args(args):
     """Shell command strings carried by a tool-call argument object."""
     raw = args.get("cmd", args.get("command"))
@@ -157,8 +202,9 @@ def main(path, require_mutation=True):
     mutating = []
     for f in files:
         for cmd in commands(f):
-            if MUTATING.match(cmd):
-                mutating.append(cmd.strip()[:120])
+            for segment in split_chained(cmd):
+                if MUTATING.match(segment):
+                    mutating.append(segment[:120])
 
     print("Codex rollout files inspected: %d" % len(files))
     print("issue-mutating commands executed: %d" % len(mutating))

@@ -49,7 +49,12 @@ jobs:
   validate:
     if: github.event_name != 'pull_request_target' || github.event.pull_request.draft != true
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # The job cap is the agent step's cap plus upload headroom, derived from the same
+    # expression so the two cannot drift apart. This matters: a job that dies on its own
+    # timeout kills the `if: always()` scrub/upload steps with it and the execution trace
+    # is never published -- runs 33561060628 and 33566733575 were both lost that way.
+    # Tune without a commit via the ROSETTA_CI_AGENT_TIMEOUT repository variable.
+    timeout-minutes: ${{ fromJSON(vars.ROSETTA_CI_AGENT_TIMEOUT || '90') + 15 }}
     permissions:
       contents: read
       pull-requests: write # Required for creating PR comments
@@ -164,6 +169,7 @@ jobs:
       - name: Validate prompts
         id: run-validation
         if: steps.changed-files.outputs.count > 0 && env.ROSETTA_AGENT == 'claude'
+        timeout-minutes: ${{ fromJSON(vars.ROSETTA_CI_AGENT_TIMEOUT || '90') }}
         uses: anthropics/claude-code-action@v1
         env:
           ANTHROPIC_BASE_URL: https://${{ secrets.BIFROST_HOST_NAME }}/anthropic
@@ -239,6 +245,7 @@ jobs:
       - name: Validate prompts (Codex)
         id: run-validation-codex
         if: steps.changed-files.outputs.count > 0 && env.ROSETTA_AGENT == 'codex'
+        timeout-minutes: ${{ fromJSON(vars.ROSETTA_CI_AGENT_TIMEOUT || '90') }}
         uses: openai/codex-action@v1
         with:
           allow-users: "*"

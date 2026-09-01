@@ -33,8 +33,8 @@ on:
           - claude
         default: codex
       agent-timeout-minutes:
-        # Step-level cap on the agent itself, separate from the job's 240. A full
-        # analysis legitimately runs ~2h, so the default matches the job. Lower it
+        # Per-run override of the agent step's cap; the job cap is derived from it.
+        # A full analysis legitimately runs ~2h, hence the 240 default. Lower it
         # (e.g. 15) to iterate on the pipeline: the agent step fails on timeout, but
         # the scrub/upload/verify steps are `if: always()`, so the execution trace is
         # still published and the run stays diagnosable.
@@ -48,7 +48,12 @@ permissions:
 jobs:
   analyze:
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    # The job cap is the agent step's cap plus upload headroom, derived from the same
+    # expression so the two cannot drift apart. This matters: a job that dies on its own
+    # timeout kills the `if: always()` scrub/upload steps with it and the execution trace
+    # is never published -- runs 33561060628 and 33566733575 were both lost that way.
+    # Tune without a commit via the ROSETTA_CI_AGENT_TIMEOUT repository variable.
+    timeout-minutes: ${{ fromJSON(inputs.agent-timeout-minutes || vars.ROSETTA_CI_AGENT_TIMEOUT || '240') + 15 }}
     env:
       # The agent switch. A dispatch input wins; otherwise the repository variable
       # ROSETTA_CI_AGENT; otherwise codex. Every agent-specific step below keys off
@@ -92,7 +97,7 @@ jobs:
 
       - name: Run Claude
         if: env.ROSETTA_AGENT == 'claude'
-        timeout-minutes: ${{ fromJSON(inputs.agent-timeout-minutes || '240') }}
+        timeout-minutes: ${{ fromJSON(inputs.agent-timeout-minutes || vars.ROSETTA_CI_AGENT_TIMEOUT || '240') }}
         uses: anthropics/claude-code-action@v1
         env:
           CLAUDE_CODE_DISABLE_BACKGROUND_TASKS: "1"
@@ -122,13 +127,13 @@ jobs:
       #     Claude branch's `gh`-subcommand allow-list.
       #   - No subagents: the Codex plugin has no Agent tool, so an analysis run is
       #     single-threaded where the Claude run fans out.
-      #   - `model` is deliberately unset so Codex uses its own default; pin it once
-      #     the model identifiers Bifrost exposes on `/openai/v1` are confirmed.
+      #   - `model`/`effort` are set below to the Codex tier paired with the Claude
+      #     branch's `--model opus --effort high`; see "Model tiers" in the doc.
       # GH_TOKEN is passed as step env because Codex has no `github_token` input; the
       # action's own steps and `codex exec` both inherit it.
       - name: Run Codex
         if: env.ROSETTA_AGENT == 'codex'
-        timeout-minutes: ${{ fromJSON(inputs.agent-timeout-minutes || '240') }}
+        timeout-minutes: ${{ fromJSON(inputs.agent-timeout-minutes || vars.ROSETTA_CI_AGENT_TIMEOUT || '240') }}
         uses: openai/codex-action@v1
         env:
           GH_TOKEN: ${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}

@@ -105,8 +105,12 @@ jobs:
     needs: load-stories
     if: needs.load-stories.outputs.has_work == 'true'
     runs-on: ubuntu-latest
-    # 30 of these can go to the debounce loop before the agent starts.
-    timeout-minutes: 90
+    # The job cap is the agent step's cap plus upload headroom, derived from the same
+    # expression so the two cannot drift apart. This matters: a job that dies on its own
+    # timeout kills the `if: always()` scrub/upload steps with it and the execution trace
+    # is never published -- runs 33561060628 and 33566733575 were both lost that way.
+    # Tune without a commit via the ROSETTA_CI_AGENT_TIMEOUT repository variable.
+    timeout-minutes: ${{ fromJSON(vars.ROSETTA_CI_AGENT_TIMEOUT || '90') + 15 }}
     env:
       # The agent switch. A dispatch input wins; otherwise the repository variable
       # ROSETTA_CI_AGENT; otherwise codex. Every agent-specific step below keys off
@@ -187,6 +191,7 @@ jobs:
 
       - name: Plan — issue #${{ matrix.issue_number }}
         if: env.ROSETTA_AGENT == 'claude'
+        timeout-minutes: ${{ fromJSON(vars.ROSETTA_CI_AGENT_TIMEOUT || '90') }}
         uses: anthropics/claude-code-action@v1
         env:
           CLAUDE_CODE_DISABLE_BACKGROUND_TASKS: "1"
@@ -223,6 +228,7 @@ jobs:
       #     the model identifiers Bifrost exposes on `/openai/v1` are confirmed.
       - name: Plan (Codex) — issue #${{ matrix.issue_number }}
         if: env.ROSETTA_AGENT == 'codex'
+        timeout-minutes: ${{ fromJSON(vars.ROSETTA_CI_AGENT_TIMEOUT || '90') }}
         uses: openai/codex-action@v1
         env:
           GH_TOKEN: ${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}

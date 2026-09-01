@@ -27,7 +27,11 @@ on:
 jobs:
   triage:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Must stay ABOVE the agent steps' own timeout-minutes below. A job that dies on
+    # its own timeout kills the `if: always()` scrub/upload steps with it, so the
+    # execution trace is lost and the run cannot be diagnosed -- which is exactly how
+    # run 33566733575 was lost. The agent gets 25 minutes; the rest is upload headroom.
+    timeout-minutes: 35
     permissions:
       contents: read
       issues: write
@@ -113,6 +117,7 @@ jobs:
       # `contents: write`, or secret exposure.
       - name: Triage
         if: env.ROSETTA_AGENT == 'claude'
+        timeout-minutes: 25
         uses: anthropics/claude-code-action@v1
         env:
           CLAUDE_CODE_DISABLE_BACKGROUND_TASKS: "1"
@@ -192,6 +197,7 @@ jobs:
       # See docs/AUTOMATION-ARCHITECTURE.md, "Command policy".
       - name: Triage (Codex)
         if: env.ROSETTA_AGENT == 'codex'
+        timeout-minutes: 25
         uses: openai/codex-action@v1
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

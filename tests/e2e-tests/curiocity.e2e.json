@@ -12,6 +12,10 @@
     "claude-code": {
       "agentModel": "claude-sonnet-5",
       "agentEffort": "low"
+    },
+    "codex": {
+      "agentModel": "gpt-5.6-terra",
+      "agentEffort": "low"
     }
   },
   "gate": { "minScore": 60, "minPassRate": 0.8, "maxStddev": 10 },

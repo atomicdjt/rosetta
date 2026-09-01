@@ -4,9 +4,15 @@ name: Rosetta GitHub Triage
 # Reviews PRs and issues, adds labels, posts triage comments,
 # and handles /rosetta slash commands in comments.
 #
+# Runs on EITHER agent -- see docs/AUTOMATION-ARCHITECTURE.md, "Agent switch".
+# This workflow has no workflow_dispatch trigger, so the agent is chosen only by the
+# `ROSETTA_CI_AGENT` repository variable, defaulting to codex.
+#
 # Required GitHub Secrets:
-#   - BIFROST_HOST_NAME: Bifrost gateway hostname (no protocol/port/path), routes Anthropic API calls through Bifrost
-#   - BIFROST_API_KEY: Bifrost-issued API key
+#   - BIFROST_HOST_NAME: Bifrost gateway hostname (no protocol/port/path). Routes
+#     Anthropic API calls (Claude branch, `/anthropic`) and OpenAI Responses API
+#     calls (Codex branch, `/openai/v1/responses`) through Bifrost.
+#   - BIFROST_API_KEY: Bifrost-issued API key. Used by both branches.
 
 on:
   pull_request_target:
@@ -33,6 +39,12 @@ jobs:
       checks: read
       actions: read
     env:
+      # The agent switch. No dispatch trigger here, so this is the repository variable
+      # ROSETTA_CI_AGENT, defaulting to codex. Every agent-specific step keys off this
+      # one value, so the two branches can never both run.
+      ROSETTA_AGENT: ${{ vars.ROSETTA_CI_AGENT || 'codex' }}
+      # Claude-branch only; inert on the Codex branch, which reaches Bifrost through
+      # openai/codex-action's Responses API proxy instead of a base-URL env var.
       ANTHROPIC_BASE_URL: https://${{ secrets.BIFROST_HOST_NAME }}/anthropic
       ENABLE_TOOL_SEARCH: "true"
       CLAUDE_CODE_DISABLE_AUTO_MEMORY: "1"
@@ -70,11 +82,22 @@ jobs:
           enable-cache: false
 
       - name: Install Bun
+        if: env.ROSETTA_AGENT == 'claude'
         id: bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: 1.3.6
           token: ${{ github.token }}
+
+      # Codex has no `plugins:` input and no `--allowedTools`; both are arranged here.
+      # Safe under pull_request_target because the base repo is checked out at `ref: main`
+      # above, so this local action is trusted code, never the fork's.
+      - name: Set up Codex
+        if: env.ROSETTA_AGENT == 'codex'
+        id: codex
+        uses: ./.github/actions/codex-setup
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       # allowed_non_write_users bypasses claude-code-action's own actor-permission
       # gate, which otherwise hard-fails the whole job for any PR/issue/comment
@@ -89,6 +112,7 @@ jobs:
       # repo-triage.md), or run-triggering cost abuse -- never code execution,
       # `contents: write`, or secret exposure.
       - name: Triage
+        if: env.ROSETTA_AGENT == 'claude'
         uses: anthropics/claude-code-action@v1
         env:
           CLAUDE_CODE_DISABLE_BACKGROUND_TASKS: "1"
@@ -132,26 +156,116 @@ jobs:
             --model sonnet
             --effort high
 
+      # Codex counterpart of the step above. `allow-users: "*"` is the same deliberate,
+      # bounded tradeoff as `allowed_non_write_users` on the Claude branch, for the same
+      # reason -- see the comment there.
+      #
+      # SECURITY DELTA, stated plainly because this is the workflow that reads untrusted
+      # fork content. What bounds a Codex triage run:
+      #   - the `rosetta-read-net` permission profile: read-only filesystem, so nothing
+      #     in the checkout or in `pr/` can be modified, with `/proc` and `/etc` denied
+      #     -- the same reads the Claude branch's disallowedTools blocks;
+      #   - the enforced execpolicy deny-list at /etc/codex/requirements.toml, written by
+      #     the setup step: no `gh auth`, no secrets, no egress outside gh/git, no
+      #     merge/close/review, no destructive repo/board/label operations. This is the
+      #     counterpart of `--disallowedTools`, and it cannot be relaxed by codex-args,
+      #     project config, or the model, because the strictest layer wins;
+      #   - the job's GITHUB_TOKEN permissions block above, unchanged;
+      #   - `safety-strategy: drop-sudo` (the action's default), which revokes the
+      #     runner's sudo before Codex starts -- a protection the Claude branch lacks.
+      #
+      # What genuinely has NO counterpart -- exactly two things:
+      #   1. Allow-list semantics. execpolicy is structurally a deny-list: an unmatched
+      #      command yields no decision, and the strictest match wins, so "forbid all,
+      #      then permit these" is unexpressible. `--allowedTools` cannot be ported. So
+      #      a `gh` subcommand that is neither needed nor explicitly forbidden (e.g.
+      #      `gh gist create`) runs on Codex and would be refused on Claude.
+      #   2. `gh api <endpoint> -X POST`. Pattern tokens are `token` or `any_of` with no
+      #      wildcard, and matching is prefix-only, so a flag that follows the endpoint
+      #      argument cannot be matched. The Claude branch's `Bash(gh api * -X*)` denies
+      #      have no exact equivalent; a rule covering only the flag-first form would be
+      #      worse than none, so none is written.
+      # Both are bounded by this job's GITHUB_TOKEN: worst case is a misleading comment,
+      # label or gist. Not code execution, not `contents: write`, and not secret exposure
+      # -- the Bifrost key never enters the Codex process, because openai/codex-action
+      # pipes it into a separate proxy process instead of the agent's environment.
+      # See docs/AUTOMATION-ARCHITECTURE.md, "Command policy".
+      - name: Triage (Codex)
+        if: env.ROSETTA_AGENT == 'codex'
+        uses: openai/codex-action@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          allow-users: "*"
+          allow-bots: "true"
+          openai-api-key: ${{ secrets.BIFROST_API_KEY }}
+          # Uncomment to pin the CLI if a floating `latest` ever regresses the beta
+          # permission profiles (they need >= 0.138.0). This is the rollback lever.
+          # codex-version: "0.142.2"
+          responses-api-endpoint: https://${{ secrets.BIFROST_HOST_NAME }}/openai/v1/responses
+          codex-home: ${{ steps.codex.outputs.codex-home }}
+          permission-profile: rosetta-read-net
+          # Mirrors the Claude branch's `--model sonnet --effort high`. The tier ladder is
+          # the one instructions/r3/core/agents/*.md already pairs, position by position:
+          # opus<->gpt-5.6-sol, sonnet<->gpt-5.6-terra, haiku<->gpt-5.6-luna. Effort is a
+          # separate axis on Codex, so the `-high` suffix form collapses to model+effort.
+          model: gpt-5.6-terra
+          effort: high
+          output-file: ${{ runner.temp }}/codex-final-message.md
+          prompt: |
+            Event: ${{ github.event_name }}
+            Action: ${{ github.event.action }}
+            Repository: ${{ github.repository }}
+            PR Number: ${{ github.event.pull_request.number }}
+            PR URL: ${{ github.event.pull_request.html_url }}
+            PR Content Path: ${{ github.event_name == 'pull_request_target' && 'pr' || '' }}
+            Issue Number: ${{ github.event.issue.number }}
+            Issue URL: ${{ github.event.issue.html_url }}
+            Comment ID: ${{ github.event.comment.id }}
+            Comment URL: ${{ github.event.comment.html_url }}
+
+            MUST APPLY AND FULLY EXECUTE FULLY AUTONOMOUSLY WITHOUT ANY USER INTERACTION OR QUESTIONS, No HITL: .github/prompts/repo-triage.md
+
       # The trace is a full tool transcript published as a downloadable artifact,
       # outside Actions log masking. Redact credentials before it leaves the runner.
+      # Both branches are named: the one that did not run has no files and is a no-op.
       - name: Scrub credentials from execution trace
         if: always()
         env:
           SCRUB_VALUES: |
             ${{ secrets.GITHUB_TOKEN }}
             ${{ secrets.BIFROST_API_KEY }}
-        run: python3 .github/scripts/scrub_trace.py /home/runner/work/_temp/claude-execution-output.json
+        run: |
+          python3 .github/scripts/scrub_trace.py \
+            /home/runner/work/_temp/claude-execution-output.json \
+            "${{ steps.codex.outputs.sessions-dir }}"
 
       # Triage is event-driven, so a run that finds nothing to say is legitimate:
       # --allow-no-op keeps the abandoned-subagent check and drops the did-it-mutate one.
       - name: Verify the run did real work
-        if: always()
+        if: always() && env.ROSETTA_AGENT == 'claude'
         run: python3 .github/scripts/check_trace.py /home/runner/work/_temp/claude-execution-output.json --allow-no-op
 
+      # Codex has no subagents, so with --allow-no-op this check has nothing left to
+      # assert. It runs anyway for its one remaining job: failing the run when no
+      # rollout exists at all, i.e. the agent step never really started.
+      - name: Verify the run did real work (Codex)
+        if: always() && env.ROSETTA_AGENT == 'codex'
+        run: python3 .github/scripts/check_codex_trace.py "${{ steps.codex.outputs.sessions-dir }}" --allow-no-op
+
       - name: Upload Claude execution trace
-        if: always()
+        if: always() && env.ROSETTA_AGENT == 'claude'
         uses: actions/upload-artifact@v6
         with:
           name: claude-execution-output
           path: /home/runner/work/_temp/claude-execution-output.json
           retention-days: 3
+
+      - name: Upload Codex execution trace
+        if: always() && env.ROSETTA_AGENT == 'codex'
+        uses: actions/upload-artifact@v6
+        with:
+          name: codex-execution-output
+          path: ${{ steps.codex.outputs.sessions-dir }}
+          retention-days: 3
+          if-no-files-found: warn

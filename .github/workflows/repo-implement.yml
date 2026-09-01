@@ -12,9 +12,15 @@ name: Rosetta Story Implementer
 #   invoking the agent; the agent implements, opens a PR referencing the issue, and
 #   moves the card to "In review" for the user to review.
 #
+# Runs on EITHER agent -- see docs/AUTOMATION-ARCHITECTURE.md, "Agent switch".
+# Codex is the default; pick per run with the `agent` input, or repo-wide with the
+# `ROSETTA_CI_AGENT` repository variable.
+#
 # Required GitHub Secrets:
-#   - BIFROST_HOST_NAME: Bifrost gateway hostname (no protocol/port/path), routes Anthropic API calls through Bifrost
-#   - BIFROST_API_KEY: Bifrost-issued API key
+#   - BIFROST_HOST_NAME: Bifrost gateway hostname (no protocol/port/path). Routes
+#     Anthropic API calls (Claude branch, `/anthropic`) and OpenAI Responses API
+#     calls (Codex branch, `/openai/v1/responses`) through Bifrost.
+#   - BIFROST_API_KEY: Bifrost-issued API key. Used by both branches.
 #   - SELF_AUTOMATION_PROJECTS_TOKEN: PAT with org Projects (read/write) plus repo
 #     Issues/Pull requests/Contents (read/write) scope. The default GITHUB_TOKEN
 #     cannot read or write GitHub Projects v2 items, so this PAT is used for all
@@ -30,6 +36,14 @@ on:
   # projects_v2_item, which a repository workflow cannot subscribe to.
   issues:
   workflow_dispatch:
+    inputs:
+      agent:
+        description: 'Coding agent to run'
+        type: choice
+        options:
+          - codex
+          - claude
+        default: codex
 
 jobs:
   # ── Orchestrator ─────────────────────────────────────────────────────────────
@@ -94,6 +108,12 @@ jobs:
       pull-requests: write
       issues: write
     env:
+      # The agent switch. A dispatch input wins; otherwise the repository variable
+      # ROSETTA_CI_AGENT; otherwise codex. Every agent-specific step below keys off
+      # this one value, so the two branches can never both run.
+      ROSETTA_AGENT: ${{ inputs.agent || vars.ROSETTA_CI_AGENT || 'codex' }}
+      # Claude-branch only; inert on the Codex branch, which reaches Bifrost through
+      # openai/codex-action's Responses API proxy instead of a base-URL env var.
       ANTHROPIC_BASE_URL: https://${{ secrets.BIFROST_HOST_NAME }}/anthropic
       ENABLE_TOOL_SEARCH: "true"
       CLAUDE_CODE_DISABLE_AUTO_MEMORY: "1"
@@ -114,11 +134,23 @@ jobs:
           persist-credentials: false
 
       - name: Install Bun
+        if: env.ROSETTA_AGENT == 'claude'
         id: bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: 1.3.6
           token: ${{ github.token }}
+
+      # Codex has no `plugins:` input and no `--allowedTools`; both are arranged here.
+      # The plugin lands as untracked files at the workspace root, so the setup step
+      # also adds them to .git/info/exclude -- this is the one pipeline that commits
+      # from the working tree, and the agent must not commit the plugin with the story.
+      - name: Set up Codex
+        if: env.ROSETTA_AGENT == 'codex'
+        id: codex
+        uses: ./.github/actions/codex-setup
+        with:
+          github-token: ${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}
 
       - name: Configure git
         run: |
@@ -168,6 +200,7 @@ jobs:
           gh issue comment "$ISSUE" --body "🤖 Implementation started by AI agent."
 
       - name: Implement — issue #${{ matrix.issue_number }}
+        if: env.ROSETTA_AGENT == 'claude'
         uses: anthropics/claude-code-action@v1
         env:
           CLAUDE_CODE_DISABLE_BACKGROUND_TASKS: "1"
@@ -195,30 +228,91 @@ jobs:
             --model sonnet
             --effort medium
 
+      # Codex counterpart of the step above.
+      #
+      # `rosetta-workspace-net` is the widest of the three Rosetta profiles -- writes
+      # anywhere in the workspace (including `.git`, so the agent can commit), network
+      # for `gh` and `git push`, `/proc` and `/etc` denied. That is the intended
+      # counterpart of the Claude branch's `Bash(*)`: this pipeline builds and pushes,
+      # so a narrow sandbox cannot do the job on either agent. `safety-strategy`
+      # stays at the action's `drop-sudo` default, which revokes the runner's sudo
+      # before Codex starts -- a protection the Claude branch does not have.
+      #
+      # No subagents on Codex: the plugin has no Agent tool, so the coding flow runs
+      # single-threaded here.
+      - name: Implement (Codex) — issue #${{ matrix.issue_number }}
+        if: env.ROSETTA_AGENT == 'codex'
+        uses: openai/codex-action@v1
+        env:
+          GH_TOKEN: ${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}
+        with:
+          openai-api-key: ${{ secrets.BIFROST_API_KEY }}
+          # Uncomment to pin the CLI if a floating `latest` ever regresses the beta
+          # permission profiles (they need >= 0.138.0). This is the rollback lever.
+          # codex-version: "0.142.2"
+          responses-api-endpoint: https://${{ secrets.BIFROST_HOST_NAME }}/openai/v1/responses
+          codex-home: ${{ steps.codex.outputs.codex-home }}
+          permission-profile: rosetta-workspace-net
+          # Mirrors the Claude branch's `--model sonnet --effort medium`. The tier ladder is
+          # the one instructions/r3/core/agents/*.md already pairs, position by position:
+          # opus<->gpt-5.6-sol, sonnet<->gpt-5.6-terra, haiku<->gpt-5.6-luna. Effort is a
+          # separate axis on Codex, so the `-medium` suffix form collapses to model+effort.
+          model: gpt-5.6-terra
+          effort: medium
+          output-file: ${{ runner.temp }}/codex-final-message.md
+          prompt: |
+            Issue: #${{ matrix.issue_number }} — ${{ matrix.issue_title }}
+            Project item ID: ${{ matrix.item_id }}
+            Project ID: ${{ needs.load-stories.outputs.project_id }}
+            Status field ID: ${{ needs.load-stories.outputs.status_field_id }}
+            Status option IDs (JSON, name -> id): ${{ needs.load-stories.outputs.status_option_ids }}
+
+            MUST APPLY AND FULLY EXECUTE FULLY AUTONOMOUSLY WITHOUT ANY USER INTERACTION OR QUESTIONS, No HITL: .github/prompts/repo-implement-code.md
+
       # The trace is a full tool transcript published as a downloadable artifact,
       # outside Actions log masking. Redact credentials before it leaves the runner.
+      # This is the pipeline that puts a PAT in the git remote URL, so the scrub matters
+      # most here. Both branches are named: the one that did not run has no files.
       - name: Scrub credentials from execution trace
         if: always()
         env:
           SCRUB_VALUES: |
             ${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}
             ${{ secrets.BIFROST_API_KEY }}
-        run: python3 .github/scripts/scrub_trace.py /home/runner/work/_temp/claude-execution-output.json
+        run: |
+          python3 .github/scripts/scrub_trace.py \
+            /home/runner/work/_temp/claude-execution-output.json \
+            "${{ steps.codex.outputs.sessions-dir }}"
 
       - name: Upload Claude execution trace
-        if: always()
+        if: always() && env.ROSETTA_AGENT == 'claude'
         uses: actions/upload-artifact@v6
         with:
           name: claude-execution-trace-${{ matrix.issue_number }}
           path: /home/runner/work/_temp/claude-execution-output.json
           retention-days: 3
 
+      - name: Upload Codex execution trace
+        if: always() && env.ROSETTA_AGENT == 'codex'
+        uses: actions/upload-artifact@v6
+        with:
+          name: codex-execution-trace-${{ matrix.issue_number }}
+          path: ${{ steps.codex.outputs.sessions-dir }}
+          retention-days: 3
+          if-no-files-found: warn
+
       # claude-code-action decides success from `subtype`/`is_error` alone, so a run
       # that abandons its subagents and changes nothing is indistinguishable from a
       # clean one. This inspects the trace and fails the job instead.
       - name: Verify the run did real work
-        if: always()
+        if: always() && env.ROSETTA_AGENT == 'claude'
         run: python3 .github/scripts/check_trace.py /home/runner/work/_temp/claude-execution-output.json
+
+      # Codex equivalent, minus the abandoned-subagent check, which has no Codex
+      # analogue -- see check_codex_trace.py.
+      - name: Verify the run did real work (Codex)
+        if: always() && env.ROSETTA_AGENT == 'codex'
+        run: python3 .github/scripts/check_codex_trace.py "${{ steps.codex.outputs.sessions-dir }}"
 
       # The card stays in the In progress lane, which no pipeline loads, so a failed
       # run waits for a human instead of being retried. Say so on the issue.

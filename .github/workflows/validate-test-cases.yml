@@ -7,10 +7,16 @@
 # - Runs prompt-request on both workspaces
 # - Runs prompt-validation (subagent) to compare results
 #
-# Required: Claude Code CLI. Set VALIDATE_CLI_CMD env or use default (claude).
-# CLI runs from workspace: cd <dir> && claude -p "$(cat prompt-file)" --output-format text
+# Runs on EITHER agent -- see docs/AUTOMATION-ARCHITECTURE.md, "Agent switch".
+# Codex is the default; pick per run with the `agent` input, or repo-wide with the
+# `ROSETTA_CI_AGENT` repository variable. The workflow installs only the selected
+# CLI; run-test-cases.sh renders the per-agent invocation.
 #
-# Optional: BIFROST_API_KEY + BIFROST_HOST_NAME (routes via Bifrost) or Claude Code auth for CI.
+# Required: the selected agent's CLI (`claude` or `codex`), installed below.
+# VALIDATE_CLI_CMD still overrides the command name for either branch.
+#
+# Optional: BIFROST_API_KEY + BIFROST_HOST_NAME routes both branches via Bifrost
+# (`/anthropic` for Claude, `/openai/v1` for Codex); otherwise each CLI's own auth.
 
 name: Validate Test Cases
 
@@ -25,6 +31,14 @@ on:
 #      - 'instructions/r3/**'
 #      - '.github/workflows/validate-test-cases.yml'
   workflow_dispatch:
+    inputs:
+      agent:
+        description: 'Coding agent to run'
+        type: choice
+        options:
+          - codex
+          - claude
+        default: codex
 
 permissions:
   contents: read
@@ -43,6 +57,9 @@ jobs:
     # if a change fans out to many cases.
     timeout-minutes: 180
     env:
+      # The agent switch. A dispatch input wins; otherwise the repository variable
+      # ROSETTA_CI_AGENT; otherwise codex. run-test-cases.sh reads the same variable.
+      ROSETTA_AGENT: ${{ inputs.agent || vars.ROSETTA_CI_AGENT || 'codex' }}
       PR_COMMENT_FILE: .tmp/pr-comment.md
     steps:
       - name: Checkout repository
@@ -51,10 +68,18 @@ jobs:
           fetch-depth: 0
       
       - name: Install Claude Code CLI
+        if: env.ROSETTA_AGENT == 'claude'
         run: |
           echo "Installing Claude Code CLI..."
           npm install -g @anthropic-ai/claude-code
           claude --version
+
+      - name: Install Codex CLI
+        if: env.ROSETTA_AGENT == 'codex'
+        run: |
+          echo "Installing Codex CLI..."
+          npm install -g @openai/codex
+          codex --version
 
       - name: Get changed files in instructions folder
         id: changed
@@ -97,8 +122,15 @@ jobs:
         id: validate
         if: steps.changed.outputs.count > 0
         env:
+          # Both credential sets are exported; each CLI reads only its own pair, and
+          # run-test-cases.sh invokes exactly one of them.
           ANTHROPIC_API_KEY: ${{ secrets.BIFROST_API_KEY }}
           ANTHROPIC_BASE_URL: https://${{ secrets.BIFROST_HOST_NAME }}/anthropic
+          # The raw Codex CLI honours OPENAI_BASE_URL/OPENAI_API_KEY directly -- unlike
+          # openai/codex-action, which routes through its own Responses API proxy. The
+          # base URL therefore stops at /openai/v1; Codex appends the endpoint path.
+          OPENAI_API_KEY: ${{ secrets.BIFROST_API_KEY }}
+          OPENAI_BASE_URL: https://${{ secrets.BIFROST_HOST_NAME }}/openai/v1
           ENABLE_TOOL_SEARCH: "true"
           CLAUDE_CODE_DISABLE_AUTO_MEMORY: "1"
           CHANGED_FILES: ${{ steps.changed.outputs.files }}

@@ -176,13 +176,34 @@ sanitize it) defining three profiles, and each pipeline selects the least it nee
 
 | Profile | Filesystem | Network | Used by |
 |---|---|---|---|
-| `rosetta-read-net` | read-only, `/proc` + `/etc` denied | yes (`gh`) | analysis, planning, triage |
-| `rosetta-workspace` | workspace-write, `/proc` + `/etc` denied | no | prompt validation |
-| `rosetta-workspace-net` | workspace-write incl. `.git`, `/proc` + `/etc` denied | yes (`gh`, `git push`) | implementer |
+| `rosetta-read-net` | read-only | yes (`gh`) | analysis, planning, triage |
+| `rosetta-workspace` | workspace-write | no | prompt validation |
+| `rosetta-workspace-net` | workspace-write incl. `.git` | yes (`gh`, `git push`) | implementer |
 
 The same file sets `[features] hooks = true` — the on-disk effect of
 `codex features enable hooks`, without which the plugin's `.codex/hooks.json` is inert.
 Permission profiles are beta and need Codex CLI ≥ 0.138.0.
+
+### A profile denies the PROCESS, not a tool
+
+The first Codex smoke run failed on this, so it is worth stating outright. The profiles
+originally carried `"/proc" = "deny"` and `"/etc" = "deny"`, ported from the Claude
+branch's `--disallowedTools "Read(//proc/**),Read(//etc/**)"`. That port is invalid:
+Claude's deny removes a **tool**, a Codex permission profile removes the path from the
+**process**. Denying `/etc` took out `/etc/ssl/certs` (TLS trust store),
+`/etc/resolv.conf` and `/etc/gitconfig`, so the run produced:
+
+```
+gh api ...   -> error connecting to api.github.com
+git ls-files -> fatal: unable to access '/etc/gitconfig': Permission denied
+```
+
+Both denies are gone. `/proc` is the same class of risk (node, git and gh all read
+`/proc/self/*`) and buys little here: `openai/codex-action` pipes the Bifrost key into a
+separate proxy process, so it is never in the agent's environment and
+`/proc/self/environ` exposes only the `GH_TOKEN` the agent is handed anyway. **The
+filesystem boundary on Codex is the read-only sandbox, not a path deny-list.** Before
+adding any filesystem deny, check what the runtime reads from that path.
 
 ### Maturity of what the Codex branch relies on
 
@@ -480,7 +501,12 @@ have nothing to say about a PR. It parses the trace **structurally** — substri
 the prompt text is echoed inside the trace via `Read` results, so
 `grep 'gh issue create'` matches on runs that never called it.
 
-`.github/scripts/check_codex_trace.py` is the Codex counterpart. It applies the same
+`.github/scripts/check_codex_trace.py` is the Codex counterpart. It parses **two**
+record shapes, because Codex changed which one it emits: `response_item.function_call`
+(JSON `arguments`) and `response_item.custom_tool_call` (`name: "exec"`, with the call
+embedded in a JavaScript snippet, so the object literal is recovered by a balanced-brace
+scan). Handling only the first made it report zero tool calls for a run that executed
+four — a gate that reports nothing is worse than no gate, so keep both paths. It applies the same
 mutating-command vocabulary (imported from `check_trace.py`, so both branches share one
 definition of "did real work") to the shell calls in the rollout JSONL. It has no
 abandoned-subagent check, because Codex has no subagents. Under `--allow-no-op` its only

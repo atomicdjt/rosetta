@@ -28,11 +28,71 @@ import sys
 
 from check_trace import MUTATING
 
-# Codex reaches the shell through more than one tool name across CLI versions, and
-# the argument key differs with it: `exec_command` carries a `cmd` STRING (see the
-# recorded sample at docs/hooks/codex-019f0634-transcript.jsonl), while `shell` and
-# `local_shell_call` carry a `command` ARRAY, usually ["bash", "-lc", "<script>"].
+# Codex reaches the shell through more than one record shape, and which one you get
+# depends on the CLI version. BOTH are handled, because a parser that knows only one
+# silently reports zero tool calls for a run that made several -- observed live on
+# 2026-09-01, where this script saw 0 commands in a run that executed 4.
+#
+#   1. `response_item.function_call` with `name` in SHELL_TOOLS and JSON `arguments`
+#      carrying `cmd` (string) or `command` (array). This is the shape in the recorded
+#      sample at docs/hooks/codex-019f0634-transcript.jsonl.
+#   2. `response_item.custom_tool_call` with `name: "exec"` and `input` holding a
+#      JavaScript snippet rather than JSON, e.g.
+#          const r = await tools.exec_command({"cmd":"gh issue view 1","workdir":"..."})
+#      The object literal inside is JSON, so it is extracted by balanced-brace scan.
 SHELL_TOOLS = ("shell", "exec_command", "local_shell_call", "container.exec")
+CUSTOM_SHELL_TOOLS = ("exec", "shell", "container.exec")
+
+
+def json_objects(text):
+    """Every balanced {...} span in `text` that parses as a JSON object.
+
+    A regex cannot do this safely: the commands contain braces and escaped quotes.
+    Scanning for balance while tracking string state is short and exact.
+    """
+    found = []
+    depth = start = 0
+    in_str = esc = False
+    for i, ch in enumerate(text):
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == '"':
+                in_str = False
+            continue
+        if ch == '"':
+            in_str = True
+        elif ch == "{":
+            if depth == 0:
+                start = i
+            depth += 1
+        elif ch == "}":
+            if depth:
+                depth -= 1
+                if depth == 0:
+                    try:
+                        obj = json.loads(text[start:i + 1])
+                    except ValueError:
+                        continue
+                    if isinstance(obj, dict):
+                        found.append(obj)
+    return found
+
+
+def commands_from_args(args):
+    """Shell command strings carried by a tool-call argument object."""
+    raw = args.get("cmd", args.get("command"))
+    if isinstance(raw, str):
+        return [raw]
+    if isinstance(raw, list):
+        parts = [p for p in raw if isinstance(p, str)]
+        # Match the wrapper's own argv AND each element: `gh issue create ...` arrives
+        # as the last element of ["bash", "-lc", "<script>"], and a direct argv form
+        # has it spread across the whole list.
+        return parts + [" ".join(parts)]
+    return []
 
 
 def rollouts(path):
@@ -65,28 +125,23 @@ def commands(path):
             payload = rec.get("payload")
             if not isinstance(payload, dict):
                 continue
-            if payload.get("type") != "function_call":
-                continue
-            if payload.get("name") not in SHELL_TOOLS:
-                continue
-            args = payload.get("arguments")
-            if isinstance(args, str):
-                try:
-                    args = json.loads(args)
-                except ValueError:
-                    args = {}
-            if not isinstance(args, dict):
-                continue
-            raw = args.get("cmd", args.get("command"))
-            if isinstance(raw, str):
-                out.append(raw)
-            elif isinstance(raw, list):
-                parts = [p for p in raw if isinstance(p, str)]
-                # Match the wrapper's own argv AND each element: `gh issue create ...`
-                # arrives as the last element of ["bash", "-lc", "<script>"], and a
-                # direct argv form has it spread across the whole list.
-                out += parts
-                out.append(" ".join(parts))
+            kind = payload.get("type")
+
+            if kind == "function_call" and payload.get("name") in SHELL_TOOLS:
+                args = payload.get("arguments")
+                if isinstance(args, str):
+                    try:
+                        args = json.loads(args)
+                    except ValueError:
+                        args = {}
+                if isinstance(args, dict):
+                    out += commands_from_args(args)
+
+            elif kind == "custom_tool_call" and payload.get("name") in CUSTOM_SHELL_TOOLS:
+                src = payload.get("input")
+                if isinstance(src, str):
+                    for obj in json_objects(src):
+                        out += commands_from_args(obj)
     return out
 
 

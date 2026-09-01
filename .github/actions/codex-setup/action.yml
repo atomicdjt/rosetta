@@ -104,10 +104,15 @@ runs:
             --pattern 'core-codex-[0-9]*.zip' --dir "$dl" --clobber
         fi
 
-        # One release can carry several dated builds of the same version; take the
-        # newest. `|| true` so an empty match reports the message below instead of
-        # `set -e` aborting on the glob.
-        zip=$(ls -t "$dl"/core-codex-[0-9]*.zip 2>/dev/null | head -n1 || true)
+        # One release can carry several dated builds of the same version and `gh`
+        # downloads every match, so pick deterministically by NAME, descending. Sorting
+        # by mtime (`ls -t`) ordered by download completion instead, which is arbitrary:
+        # it installed the 2026-08-31 build on 2026-09-01 when both were present.
+        # The name embeds version then ISO date; `sort -Vr` handles both, where a plain
+        # `sort -r` would rank 3.1.9 above 3.1.13.
+        # `|| true` so an empty match reports the message below instead of `set -e`
+        # aborting on the glob.
+        zip=$(ls -1 "$dl"/core-codex-[0-9]*.zip 2>/dev/null | sort -Vr | head -n1 || true)
         [ -n "$zip" ] || { echo "::error::no core-codex asset found in the release"; exit 1; }
         echo "Rosetta core-codex asset: $(basename "$zip")"
 

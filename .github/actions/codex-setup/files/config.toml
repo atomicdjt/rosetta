@@ -19,13 +19,15 @@ hooks = true
 description = "Rosetta CI: read-only filesystem, network allowed for the gh CLI."
 extends = ":read-only"
 
-# `:read-only` still permits reading ANY path. These denies mirror the Claude
-# branch's `--disallowedTools "Read(//proc/**),Read(//etc/**)"`, which exists so a
-# prompt-injected instruction cannot read the runner's process environment. A
-# deny covers the whole subtree.
-[permissions.rosetta-read-net.filesystem]
-"/proc" = "deny"
-"/etc" = "deny"
+# NOTE: no `/proc` or `/etc` filesystem denies here, deliberately. The Claude branch's
+# `--disallowedTools "Read(//etc/**)"` denies a TOOL; a Codex permission profile denies
+# the PROCESS. Denying /etc removed /etc/ssl/certs (TLS trust store), /etc/resolv.conf
+# and /etc/gitconfig, so every HTTPS call failed with "error connecting to
+# api.github.com" and git refused to start. /proc is the same class of risk (node, git
+# and gh all read /proc/self/*) and buys little here: openai/codex-action keeps the
+# Bifrost key out of the agent's environment entirely, so /proc/self/environ exposes
+# only the GH_TOKEN the agent is handed anyway. The filesystem boundary on Codex is the
+# read-only sandbox, not a path deny-list.
 
 [permissions.rosetta-read-net.network]
 enabled = true
@@ -36,9 +38,6 @@ enabled = true
 description = "Rosetta CI: workspace-write, no network."
 extends = ":workspace"
 
-[permissions.rosetta-workspace.filesystem]
-"/proc" = "deny"
-"/etc" = "deny"
 
 [permissions.rosetta-workspace.network]
 enabled = false
@@ -49,9 +48,6 @@ enabled = false
 description = "Rosetta CI: workspace-write, network allowed for gh and git push."
 extends = ":workspace"
 
-[permissions.rosetta-workspace-net.filesystem]
-"/proc" = "deny"
-"/etc" = "deny"
 
 # `.git` is spelled out rather than relied on: the implementer must be able to
 # commit, and `:workspace` documents keeping the workspace `.codex` read-only

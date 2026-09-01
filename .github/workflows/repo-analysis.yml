@@ -33,7 +33,7 @@ on:
           - claude
         default: codex
       agent-timeout-minutes:
-        # Per-run override of the agent step's cap; the job cap is derived from it.
+        # Per-run override of the agent step's cap; keep it under the job's 255.
         # A full analysis legitimately runs ~2h, hence the 240 default. Lower it
         # (e.g. 15) to iterate on the pipeline: the agent step fails on timeout, but
         # the scrub/upload/verify steps are `if: always()`, so the execution trace is
@@ -48,12 +48,13 @@ permissions:
 jobs:
   analyze:
     runs-on: ubuntu-latest
-    # The job cap is the agent step's cap plus upload headroom, derived from the same
-    # expression so the two cannot drift apart. This matters: a job that dies on its own
-    # timeout kills the `if: always()` scrub/upload steps with it and the execution trace
-    # is never published -- runs 33561060628 and 33566733575 were both lost that way.
-    # Tune without a commit via the ROSETTA_CI_AGENT_TIMEOUT repository variable.
-    timeout-minutes: ${{ fromJSON(inputs.agent-timeout-minutes || vars.ROSETTA_CI_AGENT_TIMEOUT || '240') + 15 }}
+    # Keep this ABOVE the agent steps' timeout-minutes below (240 by default).
+    # GitHub Actions expressions have no arithmetic, so this cannot be derived from
+    # the step cap -- if you raise ROSETTA_CI_AGENT_TIMEOUT past 240, raise this too.
+    # The invariant matters: a job that dies on its own timeout kills the `if: always()`
+    # scrub/upload steps with it and no execution trace is published -- runs 33561060628
+    # and 33566733575 were both lost that way, which is why neither could be diagnosed.
+    timeout-minutes: 255
     env:
       # The agent switch. A dispatch input wins; otherwise the repository variable
       # ROSETTA_CI_AGENT; otherwise codex. Every agent-specific step below keys off

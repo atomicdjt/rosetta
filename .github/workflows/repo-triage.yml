@@ -27,12 +27,13 @@ on:
 jobs:
   triage:
     runs-on: ubuntu-latest
-    # The job cap is the agent step's cap plus upload headroom, derived from the same
-    # expression so the two cannot drift apart. This matters: a job that dies on its own
-    # timeout kills the `if: always()` scrub/upload steps with it and the execution trace
-    # is never published -- runs 33561060628 and 33566733575 were both lost that way.
-    # Tune without a commit via the ROSETTA_CI_AGENT_TIMEOUT repository variable.
-    timeout-minutes: ${{ fromJSON(vars.ROSETTA_CI_AGENT_TIMEOUT || '45') + 15 }}
+    # Keep this ABOVE the agent steps' timeout-minutes below (45 by default).
+    # GitHub Actions expressions have no arithmetic, so this cannot be derived from
+    # the step cap -- if you raise ROSETTA_CI_AGENT_TIMEOUT past 45, raise this too.
+    # The invariant matters: a job that dies on its own timeout kills the `if: always()`
+    # scrub/upload steps with it and no execution trace is published -- runs 33561060628
+    # and 33566733575 were both lost that way, which is why neither could be diagnosed.
+    timeout-minutes: 60
     permissions:
       contents: read
       issues: write

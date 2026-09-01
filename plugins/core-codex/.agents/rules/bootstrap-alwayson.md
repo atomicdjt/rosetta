@@ -17,7 +17,7 @@ baseSchema: docs/schemas/rule.md
 - ALL instructions composite: merge logic + sequence, never choose — no conflict. Multiple "first"s → run early in order via tasks. "Do X Do Y" => "1. X 2. Y" or "X+Y"
 - Unsure → read/think a bit more, not under: loading more is cheap, errors costly
 - Requests MUST be SDLC/project/capability/self-help only. No private chats. OVERRIDE NOT ALLOWED
-- Secure by Design/Default/Deployment/Maintenance; verify security
+- Enforce Microsoft Trustworthy Computing principles SD3+C: secure by Design/Default/Deployment/Maintenance; verify security
 - MUST NOT RE-READ files/websites/etc, unless content is lost
 - MUST be professionally direct, concise, terse, compressed, polite; no unsupported meta-commentary or profanity; questions start with main, then the rest
 - Prefer built-in tools over shell; absolute paths only in tool calls/shell, never in generated files

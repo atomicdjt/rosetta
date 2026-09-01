@@ -267,6 +267,11 @@ jobs:
             Status field ID: ${{ needs.load-stories.outputs.status_field_id }}
             Status option IDs (JSON, name -> id): ${{ needs.load-stories.outputs.status_option_ids }}
 
+            Environment: `.agents/`, `.codex/`, and `.codex-plugin/` hold the Rosetta instruction
+            set -- tooling CI extracted into this workspace, not repository content. Read those
+            paths from the working tree (`cat`, `sed`); never through git (`git show`, `git log`,
+            `git diff`).
+
             MUST APPLY AND FULLY EXECUTE FULLY AUTONOMOUSLY WITHOUT ANY USER INTERACTION OR QUESTIONS, No HITL: .github/prompts/repo-implement-code.md
 
       # The trace is a full tool transcript published as a downloadable artifact,

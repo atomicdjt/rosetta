@@ -136,7 +136,13 @@ jobs:
           model: gpt-5.6-sol
           effort: high
           output-file: ${{ runner.temp }}/codex-final-message.md
-          prompt: "MUST APPLY AND FULLY EXECUTE FULLY AUTONOMOUSLY WITHOUT ANY USER INTERACTION OR QUESTIONS, No HITL: .github/prompts/repo-analysis.md"
+          prompt: |
+            Environment: `.agents/`, `.codex/`, and `.codex-plugin/` hold the Rosetta instruction
+            set -- tooling CI extracted into this workspace, not repository content. Read those
+            paths from the working tree (`cat`, `sed`); never through git (`git show`, `git log`,
+            `git diff`).
+
+            MUST APPLY AND FULLY EXECUTE FULLY AUTONOMOUSLY WITHOUT ANY USER INTERACTION OR QUESTIONS, No HITL: .github/prompts/repo-analysis.md
 
       # The trace is a full tool transcript published as a downloadable artifact,
       # outside Actions log masking. Redact credentials before it leaves the runner.

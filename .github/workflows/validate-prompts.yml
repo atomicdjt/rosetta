@@ -219,6 +219,11 @@ jobs:
             printf 'Output file: %s\n' "$ALL_RESULTS_FILE"
             printf 'Diff file: %s\n' "$DIFF_FILE"
             printf 'PR content path: pr\n'
+            printf '\n'
+            printf 'Environment: `.agents/`, `.codex/`, and `.codex-plugin/` hold the Rosetta\n'
+            printf 'instruction set -- tooling CI extracted into this workspace, not repository\n'
+            printf 'content. Read those paths from the working tree (`cat`, `sed`); never through\n'
+            printf 'git (`git show`, `git log`, `git diff`).\n'
           } >> "$CODEX_PROMPT_FILE"
           echo "::notice::Codex prompt assembled: $(wc -l < "$CODEX_PROMPT_FILE") lines"
 

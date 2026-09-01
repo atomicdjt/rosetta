@@ -141,6 +141,34 @@ what you read and what Codex gets:
 appending to `.git/info/exclude`, and `sudo cp`. Anything that *generates* content is
 Python with named arguments.
 
+### The plugin lands in the workspace, and the agent must be told
+
+Codex has no out-of-repo install path for a plugin — the documented install is "extract
+into your repository" — so `codex-setup` unzips `core-codex` at the workspace root. The
+Claude branch does not do this: `claude-code-action` takes `plugin_marketplaces`/`plugins`
+and keeps the instruction set outside the checkout.
+
+That makes the extracted tree *indistinguishable from repo content* on the Codex path, and
+`.agents/` is not even wholly untracked — `.agents/plugins/marketplace.json` is committed,
+so the directory genuinely exists in `HEAD`. A live triage run drew the obvious wrong
+conclusion and reached for the pristine copy:
+
+```
+git show HEAD:.agents/skills/orchestration/SKILL.md
+fatal: path '.agents/skills/orchestration/SKILL.md' exists on disk, but not in 'HEAD'
+```
+
+The read failed, the run's recovery procedure fired, and the triage halted for confirmation
+that a headless run can never get. Nothing was unsafe — the halt was the guardrail doing its
+job — but the trigger was avoidable. Every Codex prompt block therefore carries a one-line
+environment note: `.agents/`, `.codex/`, and `.codex-plugin/` are installed tooling, read
+them from the working tree, never through git.
+
+The alternatives were rejected. Extracting outside `$GITHUB_WORKSPACE` is unverified —
+Codex may then discover nothing, and this branch has already been bitten twice by layers
+that fail silently. A throwaway commit is worse than ugly: it would put plugin files *into*
+`HEAD`, where `repo-analysis` and `repo-triage` would describe them as repository content.
+
 ### Model tiers
 
 The two branches run matched tiers, not arbitrary models. The ladder is not invented

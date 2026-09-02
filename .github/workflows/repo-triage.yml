@@ -106,25 +106,38 @@ jobs:
 
       # Cap the agent for real. Step-level `timeout-minutes` is IGNORED on a step that
       # `uses` a COMPOSITE action, and both agent actions are composite -- run
-      # 33580251849 was dispatched with a 50-minute cap and sailed past it to 60.
+      # 33580251849 was dispatched with a 50-minute cap and sailed past it to 63.
       # The job cap below IS enforced, but a job that hits it is CANCELLED, which kills
       # the `if: always()` scrub/upload steps and loses the execution trace with them.
       # A watchdog avoids both traps: killing the agent process fails the composite step
       # like any other failure, so the job continues and the trace still uploads.
-      # Backgrounded on purpose -- Actions does not reap orphaned processes at step end.
+      # `run-codex-exe[c]` is not a typo -- it stops the pattern from matching the
+      # watchdog's own command line, which contains this very script text.
       - name: Arm agent watchdog
         env:
           AGENT_TIMEOUT_MINUTES: ${{ vars.ROSETTA_CI_AGENT_TIMEOUT || '45' }}
         run: |
           nohup bash -c '
+            # rosetta-watchdog
             sleep $(( AGENT_TIMEOUT_MINUTES * 60 ))
+            echo "=== process table at $(date -u) ==="
+            ps -eo pid,ppid,user,comm,args | grep -i -e codex -e claude
             echo "::error::agent exceeded ${AGENT_TIMEOUT_MINUTES}m; terminating so the trace can upload"
-            pkill -f "main.js run-codex-exec" || true
-            pkill -x codex                    || true
-            pkill -f "claude-code-action"     || true
-            pkill -x claude                   || true
+            pkill -f "main.js run-codex-exe[c]" || true
+            pkill -f "claude-code-actio[n]"     || true
+            echo "=== signalled at $(date -u) ==="
           ' > "$RUNNER_TEMP/watchdog.log" 2>&1 &
           echo "watchdog armed: ${AGENT_TIMEOUT_MINUTES} minutes"
+
+      # A watchdog that dies with the step that armed it is worse than none: it looks
+      # like protection and silently is not. Actions is not documented to reap orphans,
+      # but two capping mechanisms have already turned out to be no-ops here, so verify
+      # rather than assume -- this fails in seconds, with logs, instead of at minute 60.
+      - name: Verify watchdog alive
+        run: |
+          sleep 2
+          pgrep -fa rosetta-watchdog \
+            || { echo "::error::watchdog did not survive the step that armed it"; exit 1; }
 
       # allowed_non_write_users bypasses claude-code-action's own actor-permission
       # gate, which otherwise hard-fails the whole job for any PR/issue/comment

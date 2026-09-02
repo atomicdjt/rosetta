@@ -49,12 +49,7 @@ jobs:
   validate:
     if: github.event_name != 'pull_request_target' || github.event.pull_request.draft != true
     runs-on: ubuntu-latest
-    # Last-resort cap only; the watchdog below is what normally stops the agent.
-    # Keep this ABOVE ROSETTA_CI_AGENT_TIMEOUT: Actions expressions have no arithmetic,
-    # so it cannot be derived. Reaching THIS limit cancels the job, which kills the
-    # `if: always()` scrub/upload steps and loses the execution trace -- runs
-    # 33561060628, 33566733575 and 33575461800 were all lost that way.
-    timeout-minutes: 105
+    timeout-minutes: 90
     permissions:
       contents: read
       pull-requests: write # Required for creating PR comments
@@ -155,41 +150,6 @@ jobs:
           mkdir -p $TMP_DIR/agents
           git -C pr diff "$BASE_REF"...HEAD -- 'instructions/r*/**' > $DIFF_FILE 2>/dev/null || true
           echo "::notice::Diff generated: $(wc -l < $DIFF_FILE) lines"
-
-      # Cap the agent for real. Step-level `timeout-minutes` is IGNORED on a step that
-      # `uses` a COMPOSITE action, and both agent actions are composite -- run
-      # 33580251849 was dispatched with a 50-minute cap and sailed past it to 63.
-      # The job cap below IS enforced, but a job that hits it is CANCELLED, which kills
-      # the `if: always()` scrub/upload steps and loses the execution trace with them.
-      # A watchdog avoids both traps: killing the agent process fails the composite step
-      # like any other failure, so the job continues and the trace still uploads.
-      # `run-codex-exe[c]` is not a typo -- it stops the pattern from matching the
-      # watchdog's own command line, which contains this very script text.
-      - name: Arm agent watchdog
-        env:
-          AGENT_TIMEOUT_MINUTES: ${{ vars.ROSETTA_CI_AGENT_TIMEOUT || '90' }}
-        run: |
-          nohup bash -c '
-            # rosetta-watchdog
-            sleep $(( AGENT_TIMEOUT_MINUTES * 60 ))
-            echo "=== process table at $(date -u) ==="
-            ps -eo pid,ppid,user,comm,args | grep -i -e codex -e claude
-            echo "::error::agent exceeded ${AGENT_TIMEOUT_MINUTES}m; terminating so the trace can upload"
-            pkill -f "main.js run-codex-exe[c]" || true
-            pkill -f "claude-code-actio[n]"     || true
-            echo "=== signalled at $(date -u) ==="
-          ' > "$RUNNER_TEMP/watchdog.log" 2>&1 &
-          echo "watchdog armed: ${AGENT_TIMEOUT_MINUTES} minutes"
-
-      # A watchdog that dies with the step that armed it is worse than none: it looks
-      # like protection and silently is not. Actions is not documented to reap orphans,
-      # but two capping mechanisms have already turned out to be no-ops here, so verify
-      # rather than assume -- this fails in seconds, with logs, instead of at minute 60.
-      - name: Verify watchdog alive
-        run: |
-          sleep 2
-          pgrep -fa rosetta-watchdog \
-            || { echo "::error::watchdog did not survive the step that armed it"; exit 1; }
 
       # allowed_non_write_users bypasses claude-code-action's own actor-permission
       # gate (see repo-triage.yml for the full rationale) -- without it, fork PR
@@ -298,6 +258,15 @@ jobs:
           effort: high
           prompt-file: ${{ env.CODEX_PROMPT_FILE }}
           output-file: ${{ runner.temp }}/codex-final-message.md
+
+      # `openai/codex-action` leaves its responses proxy and `codex exec` tree running
+      # after the step reports success, and a runner cannot finalise a job while those
+      # hold the step's output pipe. Every Codex run that did real work hung because of
+      # it -- triage was cancelled at the job cap, analysis sat until GitHub declared
+      # the runner lost at ~62 minutes. See .github/scripts/reap_agent_processes.sh.
+      - name: Reap leftover agent processes
+        if: always()
+        run: .github/scripts/reap_agent_processes.sh
 
       - name: Check validation result
         id: validate

@@ -41,6 +41,16 @@ on:
         description: 'Minutes the agent step may run before it is cut off'
         type: string
         default: '240'
+      diagnostics:
+        # Samples memory, disk and process table every 30s and uploads the log. Pair it
+        # with a LOWER agent-timeout-minutes than the observed death time -- if the
+        # runner dies, nothing uploads, so the cap is what makes the evidence reachable.
+        description: 'Sample runner CPU/memory/disk during the run and upload the log'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+        default: 'false'
 
 permissions:
   contents: read
@@ -95,6 +105,27 @@ jobs:
       # own step `env:` block shadows job-level env vars.
       - name: Force synchronous subagents
         run: echo "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1" >> "$GITHUB_ENV"
+
+      # Off by default. Two Codex analyses died at 63 and 64 minutes with
+      # "The hosted runner lost communication with the server" -- no logs, no trace,
+      # no post-steps. GitHub names three causes: the runner process dying, CPU/memory
+      # starvation, or blocked network. This samples all three so the next occurrence
+      # is diagnosed from data instead of guessed at. Backgrounded on purpose: Actions
+      # does not reap orphaned processes at step end, so it spans the agent step.
+      # `ps --sort=-rss` is the payload -- it names which process grows.
+      - name: Sample runner resources
+        if: inputs.diagnostics == 'true'
+        run: |
+          nohup bash -c 'while true; do
+            date -u
+            free -m | head -2
+            df -h / | tail -1
+            printf "processes: %s\n" "$(ps -e | wc -l)"
+            ps -eo rss,comm --sort=-rss | head -6
+            echo ---
+            sleep 30
+          done' > "$RUNNER_TEMP/sys.log" 2>&1 &
+          echo "resource sampler started, writing to $RUNNER_TEMP/sys.log"
 
       - name: Run Claude
         if: env.ROSETTA_AGENT == 'claude'
@@ -174,6 +205,15 @@ jobs:
           python3 .github/scripts/scrub_trace.py \
             /home/runner/work/_temp/claude-execution-output.json \
             "${{ steps.codex.outputs.sessions-dir }}"
+
+      - name: Upload runner resource samples
+        if: always() && inputs.diagnostics == 'true'
+        uses: actions/upload-artifact@v6
+        with:
+          name: runner-resource-samples
+          path: ${{ runner.temp }}/sys.log
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Upload Claude execution trace
         if: always() && env.ROSETTA_AGENT == 'claude'

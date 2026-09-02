@@ -31,7 +31,14 @@ sample_once() {
   date -u
   free -m 2>/dev/null | head -2
   df -h / | tail -1
+  printf 'load: %s\n' "$(cut -d' ' -f1-3 /proc/loadavg 2>/dev/null || uptime)"
   printf 'processes: %s\n' "$(ps -e | wc -l)"
+  # Connectivity, because "blocks its network access" is one of the three causes
+  # GitHub names for a lost runner -- and it would explain the whole picture at once:
+  # publishing goes quiet, the agent stalls unable to reach the API, and the runner is
+  # declared lost about an hour later. Cheap to measure, so measure it rather than argue.
+  printf 'dns_github: %s\n' "$( { getent hosts api.github.com || nslookup api.github.com; } >/dev/null 2>&1 && echo ok || echo FAIL)"
+  printf 'https_github: %s\n' "$(curl -s -o /dev/null -m 10 -w '%{http_code}' https://api.github.com 2>/dev/null || echo FAIL)"
   ps -eo rss,user,comm --sort=-rss 2>/dev/null | head -6
   echo ---
 }
@@ -48,7 +55,16 @@ publish() {
     tail -n 25 "$WATCHDOG_LOG" 2>/dev/null | cut -c1-160
     printf '```\n'
   } > "$BODY_FILE"
-  gh issue edit "$issue" --repo "$GITHUB_REPOSITORY" --body-file "$BODY_FILE" >/dev/null 2>&1 || true
+  # Record the outcome INTO the sample log rather than discarding it. The previous
+  # version sent gh's stderr to /dev/null, so when publishing went quiet 2.5 minutes
+  # into run 33649501514 there was no way to tell a dead loop from a failing API call.
+  local err rc
+  err="$(gh issue edit "$issue" --repo "$GITHUB_REPOSITORY" --body-file "$BODY_FILE" 2>&1 >/dev/null)"
+  rc=$?
+  if [ "$rc" -ne 0 ]; then
+    printf 'publish FAILED rc=%s: %s\n' "$rc" "$(echo "$err" | head -2 | cut -c1-160)" >> "$SYS_LOG"
+  fi
+  return 0
 }
 
 start_sampler() {

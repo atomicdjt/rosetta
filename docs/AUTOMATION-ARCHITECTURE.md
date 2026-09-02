@@ -532,13 +532,28 @@ the prompt text is echoed inside the trace via `Read` results, so
 `.github/scripts/check_codex_trace.py` is the Codex counterpart. It parses **two**
 record shapes, because Codex changed which one it emits: `response_item.function_call`
 (JSON `arguments`) and `response_item.custom_tool_call` (`name: "exec"`, with the call
-embedded in a JavaScript snippet, so the object literal is recovered by a balanced-brace
-scan). Handling only the first made it report zero tool calls for a run that executed
-four — a gate that reports nothing is worse than no gate, so keep both paths. It applies the same
-mutating-command vocabulary (imported from `check_trace.py`, so both branches share one
-definition of "did real work") to the shell calls in the rollout JSONL. It has no
-abandoned-subagent check, because Codex has no subagents. Under `--allow-no-op` its only
-remaining job is failing a run that produced no rollout at all.
+embedded in a JavaScript snippet). That snippet is JavaScript, not JSON, and it took three
+passes to read it — each failure silent, each one making the gate under-report, which is
+the one direction it must never fail in:
+
+| Wrapper shape | Symptom before the fix |
+|---|---|
+| `function_call` only | 0 tool calls reported for a run that executed 4 |
+| bare keys, `{cmd:"…"}` | 4 of 5 rollouts read as empty; 12 commands seen out of 124 |
+| template literal, `` cmd:`…` `` | "the run changed nothing" for runs that filed #345–#349 and #350–#357 |
+
+All three are handled now: balanced-brace scan, bare-key requoting, and direct extraction
+of backtick spans. It applies the same mutating-command vocabulary (imported from
+`check_trace.py`, so both branches share one definition of "did real work") to the shell
+calls in the rollout JSONL.
+
+It has no abandoned-subagent check. That was long justified as inapplicable — "Codex has
+no subagents" — but analysis run 33664134418 fanned out to **four**, each with its own
+rollout file and `inter_agent_communication_metadata` records between them. The claim
+survived only because the parser could not read those rollouts. Whether a Codex subagent
+can be backgrounded and stranded the way a Claude one can is untested, so this is a real
+gap, not an inapplicable check. Under `--allow-no-op` the gate's only remaining job is
+failing a run that produced no rollout at all.
 
 `.github/scripts/scrub_trace.py` runs before every trace upload. The trace is a full
 tool transcript published as a downloadable artifact, outside Actions log masking,

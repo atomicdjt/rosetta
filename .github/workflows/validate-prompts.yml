@@ -276,6 +276,41 @@ jobs:
         if: always()
         run: .github/scripts/reap_agent_processes.sh
 
+      # This pipeline was the only one of the five publishing no execution trace, so a
+      # run could be audited for its REPORT but never for its BEHAVIOUR -- what the
+      # agent actually ran, what the sandbox refused, whether it reached past its
+      # brief. Green steps are not evidence of that. The trace is a full tool
+      # transcript published outside Actions log masking, so credentials are redacted
+      # before it leaves the runner.
+      - name: Scrub credentials from execution trace
+        if: always()
+        env:
+          SCRUB_VALUES: |
+            ${{ secrets.GITHUB_TOKEN }}
+            ${{ secrets.BIFROST_API_KEY }}
+        run: |
+          python3 .github/scripts/scrub_trace.py \
+            /home/runner/work/_temp/claude-execution-output.json \
+            "${{ steps.codex.outputs.sessions-dir }}"
+
+      - name: Upload Claude execution trace
+        if: always() && env.ROSETTA_AGENT == 'claude'
+        uses: actions/upload-artifact@v6
+        with:
+          name: claude-execution-trace
+          path: /home/runner/work/_temp/claude-execution-output.json
+          retention-days: 3
+          if-no-files-found: warn
+
+      - name: Upload Codex execution trace
+        if: always() && env.ROSETTA_AGENT == 'codex'
+        uses: actions/upload-artifact@v6
+        with:
+          name: codex-execution-trace
+          path: ${{ steps.codex.outputs.sessions-dir }}
+          retention-days: 3
+          if-no-files-found: warn
+
       - name: Check validation result
         id: validate
         if: steps.changed-files.outputs.count > 0

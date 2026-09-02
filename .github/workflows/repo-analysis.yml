@@ -41,17 +41,6 @@ on:
         description: 'Minutes the agent step may run before it is cut off'
         type: string
         default: '240'
-      diagnostics:
-        # Samples memory, disk and the process table every 30s, and publishes them into
-        # a throwaway `[ci-diagnostics]` GitHub issue as the run proceeds, because a
-        # runner that dies takes every on-runner artifact with it. Leaves that issue
-        # behind -- close it once the run has been read. On by choice, never by default.
-        description: 'Publish runner CPU/memory/disk samples to a throwaway issue'
-        type: choice
-        options:
-          - 'false'
-          - 'true'
-        default: 'false'
 
 permissions:
   contents: read
@@ -111,8 +100,10 @@ jobs:
       # logs 404, the run-level log zip is empty, and `if: always()` upload steps never
       # execute (cancelling mid-step loses them too). So the sampler publishes to a
       # GitHub issue while the runner is still alive -- see .github/scripts/ci_diagnostics.sh.
+      # Switched on by Actions' own debug mode: re-run with "Enable debug logging" ticked,
+      # or set the ACTIONS_STEP_DEBUG repository secret. No second switch to keep in sync.
       - name: Sample runner resources
-        if: inputs.diagnostics == 'true'
+        if: runner.debug == '1'
         env:
           GH_TOKEN: ${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}
         run: .github/scripts/ci_diagnostics.sh start-sampler
@@ -133,7 +124,7 @@ jobs:
       # minute 60 with nothing.
       - name: Verify diagnostics alive
         env:
-          DIAGNOSTICS: ${{ inputs.diagnostics }}
+          DIAGNOSTICS: ${{ runner.debug }}
         run: .github/scripts/ci_diagnostics.sh verify
 
       - name: Run Claude
@@ -214,7 +205,7 @@ jobs:
             "${{ steps.codex.outputs.sessions-dir }}"
 
       - name: Upload runner resource samples
-        if: always() && inputs.diagnostics == 'true'
+        if: always() && runner.debug == '1'
         uses: actions/upload-artifact@v6
         with:
           name: runner-resource-samples

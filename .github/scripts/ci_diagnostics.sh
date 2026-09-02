@@ -144,7 +144,9 @@ verify() {
   else
     echo "watchdog alive"
   fi
-  if [ "${DIAGNOSTICS:-false}" = "true" ]; then
+  # `runner.debug` is "1"; accept "true" as well so a human setting it by hand is not
+  # silently ignored.
+  if [ "${DIAGNOSTICS:-}" = "1" ] || [ "${DIAGNOSTICS:-}" = "true" ]; then
     if ! pgrep -f "$SAMPLER_MARKER" >/dev/null 2>&1; then
       echo "::error::sampler is not running"; rc=1
     else

@@ -123,6 +123,14 @@ jobs:
           GH_TOKEN: ${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}
         with:
           openai-api-key: ${{ secrets.BIFROST_API_KEY }}
+          # openai/codex-action#160: the default `drop-sudo` chmods /run service sockets to
+          # 0700, which kills systemd-resolved and leaves the runner with no DNS. The runner
+          # agent then loses contact and the job dies 52-65 minutes in -- every Codex run here
+          # that lived that long did exactly that. Containment does not depend on drop-sudo:
+          # the action passes --permission-profile separately, so the `rosetta-*` profiles and
+          # the enforced execpolicy in /etc/codex/requirements.toml (which denies `sudo`) still
+          # apply. Override per environment with the ROSETTA_CI_CODEX_SAFETY variable.
+          safety-strategy: ${{ vars.ROSETTA_CI_CODEX_SAFETY || 'unsafe' }}
           # Uncomment to pin the CLI if a floating `latest` ever regresses the beta
           # permission profiles (they need >= 0.138.0). This is the rollback lever.
           # codex-version: "0.142.2"

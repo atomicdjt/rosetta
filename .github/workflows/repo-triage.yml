@@ -171,8 +171,9 @@ jobs:
       #     counterpart of `--disallowedTools`, and it cannot be relaxed by codex-args,
       #     project config, or the model, because the strictest layer wins;
       #   - the job's GITHUB_TOKEN permissions block above, unchanged;
-      #   - `safety-strategy: drop-sudo` (the action's default), which revokes the
-      #     runner's sudo before Codex starts -- a protection the Claude branch lacks.
+      #     (`safety-strategy` used to add a third layer here by revoking the runner's
+      #     sudo, but its `drop-sudo` default breaks the runner outright -- see the
+      #     note on that input below. Codex's own `sudo` deny rule remains.)
       #
       # What genuinely has NO counterpart -- exactly two things:
       #   1. Allow-list semantics. execpolicy is structurally a deny-list: an unmatched

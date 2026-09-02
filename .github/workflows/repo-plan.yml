@@ -217,7 +217,8 @@ jobs:
       #   - No per-tool allow-list. Reach is bounded by the `rosetta-read-net`
       #     permission profile (read-only filesystem, network for `gh`, `/proc` and
       #     `/etc` denied) plus what SELF_AUTOMATION_PROJECTS_TOKEN itself can do.
-      #   - No subagents: the Codex plugin has no Agent tool.
+      #   - Subagents: the Codex plugin does fan out (observed on repo-analysis run
+      #     33664134418 -- four parallel subagents). Unverified for this pipeline.
       #   - `model` is deliberately unset so Codex uses its own default; pin it once
       #     the model identifiers Bifrost exposes on `/openai/v1` are confirmed.
       - name: Plan (Codex) — issue #${{ matrix.issue_number }}

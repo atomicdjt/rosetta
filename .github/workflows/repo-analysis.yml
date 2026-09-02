@@ -110,8 +110,10 @@ jobs:
       #     permission profile (read-only filesystem, network for `gh`) plus what
       #     SELF_AUTOMATION_PROJECTS_TOKEN itself can do. That is coarser than the
       #     Claude branch's `gh`-subcommand allow-list.
-      #   - No subagents: the Codex plugin has no Agent tool, so an analysis run is
-      #     single-threaded where the Claude run fans out.
+      #   - Subagents DO run here: run 33664134418 fanned out to four of them
+      #     (five rollout files, 124 commands, inter-agent records between them).
+      #     An earlier comment claimed otherwise; the trace parser was simply
+      #     blind to those rollouts and reported them as empty.
       #   - `model`/`effort` are set below to the Codex tier paired with the Claude
       #     branch's `--model opus --effort high`; see "Model tiers" in the doc.
       # GH_TOKEN is passed as step env because Codex has no `github_token` input; the

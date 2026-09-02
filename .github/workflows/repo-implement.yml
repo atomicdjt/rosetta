@@ -238,8 +238,8 @@ jobs:
       # stays at the action's `drop-sudo` default, which revokes the runner's sudo
       # before Codex starts -- a protection the Claude branch does not have.
       #
-      # No subagents on Codex: the plugin has no Agent tool, so the coding flow runs
-      # single-threaded here.
+      # Subagents: the Codex plugin does fan out (observed on repo-analysis run
+      # 33664134418 -- four parallel subagents). Unverified for this pipeline.
       - name: Implement (Codex) — issue #${{ matrix.issue_number }}
         if: env.ROSETTA_AGENT == 'codex'
       # Pinned to v1.11 deliberately. `@v1` resolves to v1.12, which introduced BOTH

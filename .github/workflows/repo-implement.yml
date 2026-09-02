@@ -253,6 +253,20 @@ jobs:
         uses: openai/codex-action@v1.11
         env:
           GH_TOKEN: ${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}
+          # `rosetta-workspace-net` grants write to the workspace and nothing else, so
+          # every tool that caches outside it fails with EROFS. On run 33683672006 npm
+          # hit `EROFS: read-only file system, open '/home/runner/.npm/_cacache/tmp/...'`
+          # and the agent improvised `npm_config_cache=/tmp/...` mid-run to get past it.
+          # It worked, but the same install also emitted TAR_ENTRY_ERROR warnings, so
+          # the recovery is not clean -- and a build the agent has to rescue by hand is
+          # a build whose test results cannot be trusted. Point the cache somewhere
+          # writable up front instead of leaving it to improvisation.
+          npm_config_cache: /tmp/rosetta-npm-cache
+          # Same class of failure: the runner's step-summary file is outside the
+          # workspace, so anything writing $GITHUB_STEP_SUMMARY inside the agent's
+          # sandbox errors. Redirect it rather than have tools fail on a side effect
+          # nobody reads -- the job's own summary steps run outside this sandbox.
+          GITHUB_STEP_SUMMARY: /tmp/rosetta-agent-step-summary
         with:
           openai-api-key: ${{ secrets.BIFROST_API_KEY }}
           # Uncomment to pin the CLI if a floating `latest` ever regresses the beta

@@ -12,11 +12,19 @@
 > possible answers to derive 2nd-degree follow-up questions, but keep everything
 > clear and actionable for the human reviewer.
 >
-> **Bash constraint**: only the following commands are allowed: `gh issue view`,
-> `gh issue edit`, `gh issue comment`, `gh pr list`, `gh project item-list`,
-> `gh project item-edit`. Do not attempt any
-> other bash command, and do not attempt any `git` command — no branches, no
-> commits, no pushes in this phase.
+> **Bash constraint**: allowed `gh` commands are `gh issue view`, `gh issue edit`,
+> `gh issue comment`, `gh pr list`, `gh project item-list`, `gh project item-edit`,
+> plus read-only `gh api` GET on this repo's `code-scanning`, `dependabot` and
+> `check-runs` endpoints. Reading the code itself is expected — `sed`, `cat`, `rg`,
+> `wc` and the like. Do not attempt any `git` command — no branches, no commits, no
+> pushes in this phase.
+>
+> The `gh api` grant is not optional detail: without it this prompt contradicts
+> itself. The security section below sets out rules for handling CodeQL and
+> Dependabot data, and a planner that cannot fetch it obeys the allow-list and
+> reports the task as impossible. That is exactly what happened on issue #170
+> ("Analyze and fact check CodeQL"), where the run quoted this list back as the
+> reason it could not do the work.
 >
 > **Subagent constraint**: one-shot headless session. Ending a turn without a tool
 > call kills the job in ~2s — there is no later turn, notification, or wakeup.

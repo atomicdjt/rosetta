@@ -171,9 +171,11 @@ jobs:
       #     counterpart of `--disallowedTools`, and it cannot be relaxed by codex-args,
       #     project config, or the model, because the strictest layer wins;
       #   - the job's GITHUB_TOKEN permissions block above, unchanged;
-      #     (`safety-strategy` used to add a third layer here by revoking the runner's
-      #     sudo, but its `drop-sudo` default breaks the runner outright -- see the
-      #     note on that input below. Codex's own `sudo` deny rule remains.)
+      #   - `safety-strategy: drop-sudo` (the action's default), which revokes the
+      #     runner's sudo before Codex starts -- a protection the Claude branch lacks.
+      #     It is kept precisely because this pipeline is the one ANY GitHub user can
+      #     trigger, on content they wrote; see the version pin below for why keeping
+      #     it no longer costs us the runner.
       #
       # What genuinely has NO counterpart -- exactly two things:
       #   1. Allow-list semantics. execpolicy is structurally a deny-list: an unmatched
@@ -193,7 +195,15 @@ jobs:
       # See docs/AUTOMATION-ARCHITECTURE.md, "Command policy".
       - name: Triage (Codex)
         if: env.ROSETTA_AGENT == 'codex'
-        uses: openai/codex-action@v1
+      # Pinned to v1.11 deliberately. `@v1` resolves to v1.12, which introduced BOTH
+      # of the failures seen here: #160 (drop-sudo chmods /run sockets to 0700, killing
+      # systemd-resolved, so the runner loses DNS and dies 52-65 minutes in -- every
+      # long Codex run in this repo did exactly that) and #150 (the Linux run never
+      # returns after the turn completes). `restrictRootServiceSocket` is absent from
+      # src/dropSudo.ts in v1.11 and earlier. Pinning keeps `safety-strategy` at its
+      # secure `drop-sudo` default rather than trading the sudo revocation away.
+      # Revisit when both are fixed upstream; v1.11 accepts every input used here.
+        uses: openai/codex-action@v1.11
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

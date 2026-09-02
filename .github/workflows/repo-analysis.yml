@@ -42,10 +42,11 @@ on:
         type: string
         default: '240'
       diagnostics:
-        # Samples memory, disk and process table every 30s and uploads the log. Pair it
-        # with a LOWER agent-timeout-minutes than the observed death time -- if the
-        # runner dies, nothing uploads, so the cap is what makes the evidence reachable.
-        description: 'Sample runner CPU/memory/disk during the run and upload the log'
+        # Samples memory, disk and the process table every 30s, and publishes them into
+        # a throwaway `[ci-diagnostics]` GitHub issue as the run proceeds, because a
+        # runner that dies takes every on-runner artifact with it. Leaves that issue
+        # behind -- close it once the run has been read. On by choice, never by default.
+        description: 'Publish runner CPU/memory/disk samples to a throwaway issue'
         type: choice
         options:
           - 'false'
@@ -105,61 +106,35 @@ jobs:
       - name: Force synchronous subagents
         run: echo "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1" >> "$GITHUB_ENV"
 
-      # Off by default. Two Codex analyses died at 63 and 64 minutes with
-      # "The hosted runner lost communication with the server" -- no logs, no trace,
-      # no post-steps. GitHub names three causes: the runner process dying, CPU/memory
-      # starvation, or blocked network. This samples all three so the next occurrence
-      # is diagnosed from data instead of guessed at. Backgrounded on purpose: Actions
-      # does not reap orphaned processes at step end, so it spans the agent step.
-      # `ps --sort=-rss` is the payload -- it names which process grows.
+      # Five Codex analyses died at 61-67 minutes with "the hosted runner lost
+      # communication with the server", and NOTHING on the runner survives that: job
+      # logs 404, the run-level log zip is empty, and `if: always()` upload steps never
+      # execute (cancelling mid-step loses them too). So the sampler publishes to a
+      # GitHub issue while the runner is still alive -- see .github/scripts/ci_diagnostics.sh.
       - name: Sample runner resources
         if: inputs.diagnostics == 'true'
-        run: |
-          nohup bash -c 'while true; do
-            date -u
-            free -m | head -2
-            df -h / | tail -1
-            printf "processes: %s\n" "$(ps -e | wc -l)"
-            ps -eo rss,comm --sort=-rss | head -6
-            echo ---
-            sleep 30
-          done' > "$RUNNER_TEMP/sys.log" 2>&1 &
-          echo "resource sampler started, writing to $RUNNER_TEMP/sys.log"
+        env:
+          GH_TOKEN: ${{ secrets.SELF_AUTOMATION_PROJECTS_TOKEN }}
+        run: .github/scripts/ci_diagnostics.sh start-sampler
 
       # Cap the agent for real. Step-level `timeout-minutes` is IGNORED on a step that
-      # `uses` a COMPOSITE action, and both agent actions are composite -- run
-      # 33580251849 was dispatched with a 50-minute cap and sailed past it to 63.
-      # The job cap below IS enforced, but a job that hits it is CANCELLED, which kills
-      # the `if: always()` scrub/upload steps and loses the execution trace with them.
-      # A watchdog avoids both traps: killing the agent process fails the composite step
-      # like any other failure, so the job continues and the trace still uploads.
-      # `run-codex-exe[c]` is not a typo -- it stops the pattern from matching the
-      # watchdog's own command line, which contains this very script text.
+      # `uses` a COMPOSITE action and both agent actions are composite, so run
+      # 33580251849 sailed past a 50-minute cap. The job cap IS enforced but CANCELS
+      # the job, killing the upload steps. Only killing the agent process does both:
+      # the composite step fails like any other, and the job continues.
       - name: Arm agent watchdog
         env:
           AGENT_TIMEOUT_MINUTES: ${{ inputs.agent-timeout-minutes || vars.ROSETTA_CI_AGENT_TIMEOUT || '240' }}
-        run: |
-          nohup bash -c '
-            # rosetta-watchdog
-            sleep $(( AGENT_TIMEOUT_MINUTES * 60 ))
-            echo "=== process table at $(date -u) ==="
-            ps -eo pid,ppid,user,comm,args | grep -i -e codex -e claude
-            echo "::error::agent exceeded ${AGENT_TIMEOUT_MINUTES}m; terminating so the trace can upload"
-            pkill -f "main.js run-codex-exe[c]" || true
-            pkill -f "claude-code-actio[n]"     || true
-            echo "=== signalled at $(date -u) ==="
-          ' > "$RUNNER_TEMP/watchdog.log" 2>&1 &
-          echo "watchdog armed: ${AGENT_TIMEOUT_MINUTES} minutes"
+        run: .github/scripts/ci_diagnostics.sh start-watchdog
 
-      # A watchdog that dies with the step that armed it is worse than none: it looks
-      # like protection and silently is not. Actions is not documented to reap orphans,
-      # but two capping mechanisms have already turned out to be no-ops here, so verify
-      # rather than assume -- this fails in seconds, with logs, instead of at minute 60.
-      - name: Verify watchdog alive
-        run: |
-          sleep 2
-          pgrep -fa rosetta-watchdog \
-            || { echo "::error::watchdog did not survive the step that armed it"; exit 1; }
+      # A background loop that dies with the step that armed it is worse than none: it
+      # looks like protection and silently is not. Two capping mechanisms here already
+      # turned out to be no-ops, so this fails in seconds, with logs, rather than at
+      # minute 60 with nothing.
+      - name: Verify diagnostics alive
+        env:
+          DIAGNOSTICS: ${{ inputs.diagnostics }}
+        run: .github/scripts/ci_diagnostics.sh verify
 
       - name: Run Claude
         if: env.ROSETTA_AGENT == 'claude'

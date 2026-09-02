@@ -144,6 +144,28 @@ def split_chained(command):
     return [p.strip() for p in parts if p.strip()]
 
 
+# The multi-line commands -- which is to say the interesting ones -- are written as
+# JavaScript TEMPLATE LITERALS, not JSON strings:
+#
+#     tools.exec_command({
+#         cmd: `gh issue create --title "..." \
+#                 --body "..."`,
+#         workdir: "..."})
+#
+# No amount of key-quoting makes that parse as JSON, so the balanced-brace scan skips
+# the whole object. That is how run 33666950023 was reported as having executed no
+# mutations while it was creating issues #350-#357. Pull the backtick spans out
+# directly; for a "did this run mutate anything" gate the raw text is all that is
+# needed, and over-reading a `${...}` placeholder can only cost a false finding, never
+# a false pass.
+_TEMPLATE_CMD = re.compile(r'\b(?:cmd|command)\s*:\s*`([^`]*)`', re.S)
+
+
+def template_literal_commands(text):
+    """Shell commands carried by a JS template literal `cmd:` value."""
+    return [m.group(1) for m in _TEMPLATE_CMD.finditer(text)]
+
+
 def commands_from_args(args):
     """Shell command strings carried by a tool-call argument object."""
     raw = args.get("cmd", args.get("command"))
@@ -205,6 +227,7 @@ def commands(path):
                 if isinstance(src, str):
                     for obj in json_objects(src):
                         out += commands_from_args(obj)
+                    out += template_literal_commands(src)
     return out
 
 

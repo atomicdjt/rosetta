@@ -22,15 +22,15 @@ name: Validate Prompts
 # - Creates a PR comment with all issues by severity
 
 on:
-  # The pull_request_target trigger below is disabled on purpose and temporarily:
-  # the agent run costs more per PR than the current CI budget allows. It is not
-  # broken. Run it by hand via workflow_dispatch until the budget is restored.
-  #pull_request_target:
-  #  types: [opened, synchronize, reopened, ready_for_review]
-  #  paths:
-  #    - "instructions/r*/**"
-  #    - ".github/workflows/validate-prompts.yml"
-  #    - ".github/prompts/prompt-comparison.md"
+  # Re-enabled: the agent run costs more per PR than plain CI, so the `paths` filter
+  # below is what keeps it affordable -- it fires only when the prompts themselves,
+  # or this pipeline, change. Comment it out again if the budget tightens.
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "instructions/r*/**"
+      - ".github/workflows/validate-prompts.yml"
+      - ".github/prompts/prompt-comparison.md"
   workflow_dispatch:
     inputs:
       agent:

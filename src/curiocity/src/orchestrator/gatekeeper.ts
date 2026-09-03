@@ -16,8 +16,12 @@ import type { TrialResult } from '../results/schema';
  * still applies to passed/failed statuses (a `passed`-no-verdict trial counts as a
  * pass), so an all-passed suite passes the pass-rate gate too.
  *
- * Exit codes: gate failure → 1; else any error-status trial → 3; else 0. Gate
- * failure takes precedence over partial-infra (§13).
+ * A non-empty suite whose trials are all `skipped` has no runnable trials and is
+ * a configuration error (§13). Individual skipped trials remain non-errors when
+ * at least one trial is runnable.
+ *
+ * Exit codes: all-skipped suite → 2; gate failure → 1; else any error-status
+ * trial → 3; else 0. Gate failure takes precedence over partial-infra (§13).
  */
 
 export interface GateOutcome {
@@ -37,6 +41,14 @@ function stddev(xs: number[]): number {
 }
 
 export function gatekeeper(trials: TrialResult[], gate: GateConfig): GateOutcome {
+  if (trials.length > 0 && trials.every((t) => t.status === 'skipped')) {
+    return {
+      passed: false,
+      exitCode: ExitCode.CONFIG_ERROR,
+      failures: ['no runnable trials: all selected trials were skipped'],
+    };
+  }
+
   const groups = new Map<string, TrialResult[]>();
   for (const t of trials) {
     const key = `${t.case}::${t.agent}`;

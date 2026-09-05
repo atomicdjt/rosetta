@@ -152,6 +152,21 @@ def test_text_hash_preserves_existing_format(tmp_path: Path):
     )
 
 
+def test_invalid_utf8_text_suffix_uses_binary_content_state(tmp_path: Path):
+    path = tmp_path / "example.md"
+    path.write_bytes(b"\xff---\ntags: [ignored]\n---\nbody")
+    original = DocumentData.from_file(path, workspace_root=tmp_path)
+    path.write_bytes(b"\xfe---\ntags: [ignored]\n---\nbody")
+    replacement = DocumentData.from_file(path, workspace_root=tmp_path)
+
+    assert not original.is_text and not replacement.is_text
+    assert original.content_str is None and replacement.content_str is None
+    assert original.line_count is None and replacement.line_count is None
+    assert original.frontmatter is None and replacement.frontmatter is None
+    assert "ignored" not in original.tags and "ignored" not in replacement.tags
+    assert original.content_hash != replacement.content_hash
+
+
 def test_binary_hash_still_includes_metadata(tmp_path: Path):
     path = tmp_path / "asset.bin"
     path.write_bytes(b"\x00\xff")

@@ -86,7 +86,7 @@ class DocumentData:
             try:
                 content_str = content.decode("utf-8")
             except UnicodeDecodeError:
-                content_str = content.decode("utf-8", errors="ignore")
+                is_text = False
 
         # Count lines platform-independently: \r\n, \n\r, \r, \n all count as separators
         line_count = None

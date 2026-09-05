@@ -111,7 +111,7 @@ class DocumentData:
         doc_title = cls._compute_doc_title(parsed_path, file_path.name)
 
         content_hash = cls._calculate_hash(
-            content_str if content_str is not None else str(len(content)),
+            content_str if content_str is not None else hashlib.sha256(content).hexdigest(),
             tags,
             domain,
             release,

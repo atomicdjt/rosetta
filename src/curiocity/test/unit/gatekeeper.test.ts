@@ -32,6 +32,22 @@ describe('gatekeeper (§13)', () => {
     expect(out.failures).toEqual([]);
   });
 
+  it('all-skipped non-empty suite has no runnable trials → exit 2', () => {
+    const out = gatekeeper([trial({ status: 'skipped' }), trial({ status: 'skipped', repeat: 2 })], GATE);
+    expect(out.passed).toBe(false);
+    expect(out.exitCode).toBe(ExitCode.CONFIG_ERROR);
+    expect(out.failures).toEqual(['no runnable trials: all selected trials were skipped']);
+  });
+
+  it('a skipped trial remains non-fatal when another trial is runnable', () => {
+    const out = gatekeeper(
+      [trial({ case: 'a', status: 'passed' }), trial({ case: 'b', status: 'skipped' })],
+      GATE,
+    );
+    expect(out.exitCode).toBe(ExitCode.OK);
+    expect(out.failures).toEqual([]);
+  });
+
   it('partial infra: a passed (no verdict) group + an error-status trial → exit 3', () => {
     const out = gatekeeper(
       [trial({ case: 'a', status: 'passed' }), trial({ case: 'b', status: 'timeout' })],

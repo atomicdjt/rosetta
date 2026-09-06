@@ -31,11 +31,11 @@ function writeConfig(dir: string): string {
   return path;
 }
 
-function writeCase(sourceDir: string, name: string): void {
+function writeCase(sourceDir: string, name: string, agents: string[] = ['mock']): void {
   const dir = join(sourceDir, name);
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, 'prompt.md'), 'Create out.txt containing hello world.');
-  writeFileSync(join(dir, 'config.json'), JSON.stringify({ agents: ['mock'] }));
+  writeFileSync(join(dir, 'config.json'), JSON.stringify({ agents }));
   writeFileSync(join(dir, 'qna.md'), '# QnA\n- If unsure, abort.');
   writeFileSync(join(dir, 'evaluation.md'), '# Rubric\nout.txt exists.');
   copyFileSync(HELLO_ZIP, join(dir, 'src.zip'));
@@ -96,5 +96,22 @@ describe('cli run (end-to-end, mock agent)', () => {
 
     const code = await runRun({ source, config, out: join(work, 'results') });
     expect(code).toBe(ExitCode.CONFIG_ERROR);
+  });
+
+  it('run --source when every matrix cell resolves to skipped → exit 2', async () => {
+    const work = mkdtempSync(join(tmpdir(), 'curio-cli-skipped-'));
+    const config = writeConfig(work);
+    const source = join(work, 'cases');
+    mkdirSync(source);
+    writeCase(source, 'hello', ['missing-agent']);
+    const out = join(work, 'results');
+
+    const code = await runRun({ source, config, out });
+    expect(code).toBe(ExitCode.CONFIG_ERROR);
+
+    const runDir = readdirRuns(out)[0]!;
+    const loaded = loadRun(runDir);
+    expect(loaded.trials).toHaveLength(1);
+    expect(loaded.trials[0]!.status).toBe('skipped');
   });
 });

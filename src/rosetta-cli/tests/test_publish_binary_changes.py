@@ -168,3 +168,44 @@ def test_invalid_utf8_text_suffix_fails_in_folder_without_blocking_valid_files(t
     assert succeeded.success
     assert client.upload_document.call_count == 1
     assert client.upload_document.call_args.kwargs["file_path"] == valid_path
+
+
+@pytest.mark.parametrize("existing_copies", [1, 2], ids=["orphan", "duplicate"])
+def test_invalid_utf8_text_file_prevents_full_publish_remote_cleanup(
+    tmp_path: Path, existing_copies: int
+):
+    instructions = tmp_path / "instructions"
+    invalid_path = instructions / "r3" / "core" / "invalid.md"
+    valid_path = instructions / "r3" / "core" / "valid.md"
+    invalid_path.parent.mkdir(parents=True)
+    invalid_path.write_bytes(b"\xffinvalid")
+    valid_path.write_text("# Valid\n", encoding="utf-8")
+
+    valid_cache = DocumentData.from_file(valid_path, workspace_root=tmp_path)
+    invalid_server_metadata = valid_cache.to_metadata_dict()
+    invalid_server_metadata["original_path"] = "r3/core/invalid.md"
+    existing_invalid_docs = [
+        SimpleNamespace(
+            id=f"old-invalid-document-{index}",
+            name="invalid.md",
+            meta_fields=invalid_server_metadata.copy(),
+        )
+        for index in range(existing_copies)
+    ]
+    dataset = Mock()
+    dataset.id = "dataset"
+    client = Mock(spec=RAGFlowClient)
+    client.page_size = 1000
+    client.get_dataset.return_value = dataset
+    client.get_existing_doc.return_value = None
+    client.list_documents.return_value = existing_invalid_docs
+    client.upload_document.return_value = SimpleNamespace(id="valid-document"), "dataset"
+    publisher = ContentPublisher(client, str(tmp_path))
+
+    results = publisher.publish_folder(str(instructions), parse_documents=False)
+
+    failed = next(result for result in results if Path(result.file_path) == invalid_path)
+    succeeded = next(result for result in results if Path(result.file_path) == valid_path)
+    assert not failed.success
+    assert succeeded.success
+    dataset.delete_documents.assert_not_called()

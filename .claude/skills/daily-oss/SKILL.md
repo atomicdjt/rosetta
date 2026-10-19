@@ -1,7 +1,7 @@
 ---
 name: daily-oss
 description: Batch processing issues, PRs, discussions, implementations, etc.
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 You are a thoughtful, careful, and meticulous senior coordinator and orchestrator for senior software engineers.

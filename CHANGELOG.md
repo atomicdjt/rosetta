@@ -122,13 +122,13 @@ R3 advances Rosetta from governed assistance to deterministic, self-guarding exe
 
 When Rosetta runs on Gemini, it now uses a more capable model, Gemini 4 Argon, for the architect, planner, requirements-engineer, and prompt-engineer subagents (lightweight profile: architect only). These subagents make the decisions that shape everything built afterwards. Claude and GPT already ran them on Opus and Sol, while Gemini used Flash. On Claude, discovery and research moved to the cheaper Haiku 5.5.
 
-Every model list also moved to new versions for each vendor, and the GPT "Terra" middle tier is gone: its work runs on GPT-6 Luna at higher reasoning effort. Orchestration sizes work by expected code volume and context limits rather than mainly by file count, subagents report what they did not finish, and prompts are authored shorter.
+Every model list also moved to new versions for each vendor. Work that ran on GPT-5.6 Terra now runs on GPT-6 Luna, which matches Terra in capability at about one eighth of the cost. Orchestration sizes work by expected code volume and context limits rather than mainly by file count, subagents report what they did not finish, and prompts are authored shorter.
 
 **Highlights**
 
 - Model versions updated for every vendor: Claude Opus 5.5, Sonnet 5.5, and Haiku 5.5 (were Opus 5, Sonnet 5, Haiku 4.5), GPT-6.1 Sol (was GPT-5.6 Sol), GPT-6 Luna (was GPT-5.6 Luna), Gemini 3.8 Flash (was 3.7), Grok 4.7 (was 4.6); Cursor Composer 2.5 is unchanged
 - Gemini 4 Argon added. When Rosetta runs on Gemini, the architect, planner, requirements-engineer, and prompt-engineer subagents, which make the decisions that shape the rest of the work, now use Argon (lightweight profile: architect only). All other subagents keep Gemini 3.8 Flash, and Claude, GPT, and Grok runs are unaffected. Before, Gemini used Flash for these subagents too
-- GPT "Terra" tier removed: on Codex its work runs on GPT-6 Luna at one step higher reasoning effort, so GPT-based agents now have two tiers (Sol and Luna) instead of three
+- Lower cost on GPT: work that ran on GPT-5.6 Terra, the middle GPT tier, now runs on GPT-6 Luna, which matches Terra in capability at about one eighth of the cost (GPT-6 has no Terra model). In Codex model lists, reasoning effort is raised one step
 - Lower cost on Claude: discoverer and researcher moved from Sonnet to Haiku 5.5, and so did the lightweight profile's engineer, reviewer, and validator
 - Orchestration sizes a task as small, medium, or large from expected lines of code (under 200, under 2,000, more) and areas touched, with file count only a rough hint, and aims to keep each agent under 250K tokens of context (price doubles above 200K)
 - Orchestrators pick a subagent's model and reasoning effort from a written ladder (Strategist, Tactician, Implementer), and the large-work playbook gains a "worker pull" tactic
@@ -144,11 +144,11 @@ Every model list also moved to new versions for each vendor, and the GPT "Terra"
 - **Change.** `[R3]` Every agent and workflow step lists the model to use for each vendor, and each coding agent takes the entry for its own vendor. All entries moved to new versions:
   - Claude: Opus 5 to Opus 5.5, Sonnet 5 to Sonnet 5.5, Haiku 4.5 to Haiku 5.5.
   - OpenAI: GPT-5.6 Sol to GPT-6.1 Sol, GPT-5.6 Luna to GPT-6 Luna.
-  - OpenAI "Terra" (GPT-5.6 Terra, the middle tier) is removed. On Codex its work runs on GPT-6 Luna with reasoning effort one step higher (low to medium, medium to high, high to xhigh). Cursor and Copilot model names carry no effort level, so there Terra and Luna jobs now use the same model.
+  - OpenAI "Terra" (GPT-5.6 Terra, the middle tier): GPT-6 has no Terra model, so its work runs on GPT-6 Luna, which matches Terra in capability at about one eighth of the cost. In Codex model lists, reasoning effort is raised one step (low to medium, medium to high, high to xhigh).
   - Google: Gemini 3.7 Flash to Gemini 3.8 Flash. xAI: Grok 4.6 to Grok 4.7. Cursor Composer 2.5 is unchanged.
 
   The plugin generator translates these entries into each IDE's own model names and keeps older ids as inputs, so a prompt that still names an older model resolves to the current one. (Igor Solomatov, isolomatov-gd)
-- **Why it helps.** Agents run on current models without anyone editing prompts one by one. Two GPT tiers replace three. The extra effort step is meant to make up for Luna sitting in a lower tier than Terra.
+- **Why it helps.** Agents run on current models without anyone editing prompts one by one. Work that ran on Terra costs about one eighth as much, with matching capability.
 
 #### Lower cost: Claude Haiku 5.5 for discovery, research, and the lightweight profile
 

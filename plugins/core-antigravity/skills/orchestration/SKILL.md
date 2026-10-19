@@ -31,7 +31,7 @@ If requested directly `use session-level EXECUTION_CONTROLLER` then (plan ⊃ ph
 
 Complexity may shift one band; re-size as reality changes — discovery, surprises, clarification, target already done.
 
-Request sizing point is to keep all agents/subagents context under 250K tokens. Once above 200K the price is doubled.
+Request sizing point is to keep all agents/subagents context under 250K tokens (reads and tool outputs here are major contributors). Once above 200K the price is doubled.
 
 Optimize for efficient execution reasonably especially if result or impact or effect will be the same. It is not about skipping, it is about organizing and adapting.
 
@@ -52,9 +52,10 @@ Reasoning Efforts:
 4. xhigh - allows to think deeply (gemini models)
 
 Exceptions:
-1. gpt-6-luna-xhigh becomes tactician, while high and below is implementer
+1. gpt-6-luna-xhigh becomes tactician, while `high` and below is implementer
 2. haiku-5.5-low and gpt-6-luna-low can only summarize, search and similar easy activities 
 3. gemini-3.8-flash-high tactician, while medium - implementer
+4. Model generations are smarter vs previous (with one higher reasoning level): gpt-6-luna-xhigh = gpt-5.6-terra-high = gpt-5.5-medium
 
 </model_and_efforts_tiers>
 

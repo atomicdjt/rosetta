@@ -203,9 +203,11 @@ If you learned something new which is reusable, there are process efficiency imp
 - **Verify asymmetric changes before flagging** Model/effort differences across similar items (e.g. one role restored, others not) can be deliberate tuning, not a gap; confirm with the user before calling it out.
 - **Resolve a bare git-log name via `gh pr view`** `gh pr view <n> --json author` returns the contributor's real GitHub display name, avoiding a needless ask when git log shows only a short name.
 - **`.claude/skills/*` changes get a highlight, not a tagged section** Maintainer-internal skill edits (checklist, daily-oss) have only ever appeared as one `(maintainer-internal)` highlight bullet, never a bracket-tagged detailed section.
-- **Highlights state outcomes, not events** Wrote chronology ("moved forward twice", "a day later") and renames. Readers need what they get now: capability, cost, safety. Mechanism belongs in Details only.
+- **Describe effect, not mechanics** Wrote chronology ("moved forward twice"), size ("larger model"), tallies ("two tiers instead of three"). Say what readers get or where their work runs now.
 - **Diff every file, not commit messages** Messages and a deduped line scan hid role-level model changes and a subagent-reporting rule. Compare before/after per file, then check each claim against it.
 - **User wording is an example, not text** Copying a user's sample phrases overstated scope ("Argon for most tasks"). Verify each claim against the diff and write it fresh.
 - **Never present old behavior as new** Wrote "Rosetta now puts the strongest model on key decisions"; Opus and Sol already did. Check each claim against the base state.
 - **Stopping at the diff list is too early** Listed changes but missed meaning: Argon only affects Gemini runs, and its roles make the key decisions. Derive who, when, and the principle across changes.
-- **Describe capability, not size** Wrote "larger model", a property. State what it means for the work (more capable, top tier). Use what you know: Flash costs less than Pro-class models. Hedge only what is truly uncertain.
+- **Unknown reason: search, then ask** Guessed why Terra was dropped ("lower tier", "two tiers"). Real reason: GPT-6 has no Terra, and Luna matches it at about 1/8 the cost. Search the repo; still unclear, ask.
+- **Id format is not a tool limit** Commit said Cursor/Copilot ids carry no effort; I wrote "cannot set effort". Effort is set elsewhere (orchestration). Claim a limit only when verified, else ask.
+- **Use known facts, hedge real doubt** Dropped "Flash costs less" for lack of repo pricing. Flash is cheaper than Pro-class models; common knowledge needs no repo source.

@@ -57,7 +57,7 @@ Exceptions:
 1. gpt-6-luna-xhigh becomes tactician, while `high` and below is implementer
 2. haiku-5.5-low and gpt-6-luna-low can only summarize, search and similar easy activities 
 3. gemini-3.8-flash-high tactician, while medium - implementer
-4. Model generations are smarter vs previous (with one higher reasoning level): gpt-6-luna-xhigh = gpt-5.6-terra-high = gpt-5.5-medium
+4. Model generations are smarter vs previous (with one reasoning step higher): gpt-6-luna-xhigh = gpt-5.6-terra-high = gpt-5.5-medium
 
 </model_and_efforts_tiers>
 

@@ -122,7 +122,7 @@ R3 advances Rosetta from governed assistance to deterministic, self-guarding exe
 
 When Rosetta runs on Gemini, it now uses a more capable model, Gemini 4 Argon, for the architect, planner, requirements-engineer, and prompt-engineer subagents (lightweight profile: architect only). These subagents make the decisions that shape everything built afterwards. Claude and GPT already ran them on Opus and Sol, while Gemini used Flash. On Claude, discovery and research moved to the cheaper Haiku 5.5.
 
-Every model list also moved to new versions for each vendor. Work that ran on GPT-5.6 Terra now runs on GPT-6 Luna, which matches Terra in capability at about one eighth of the cost. Orchestration sizes work by expected code volume and context limits rather than mainly by file count, subagents report what they did not finish, and prompts are authored shorter.
+Every model list also moved to new versions for each vendor. Work that ran on GPT-5.6 Terra now runs on GPT-6 Luna one reasoning step higher, which matches Terra in capability at about one eighth of the cost. Orchestration sizes work by expected code volume and context limits rather than mainly by file count, subagents report what they did not finish, and prompts are authored shorter.
 
 **Highlights**
 

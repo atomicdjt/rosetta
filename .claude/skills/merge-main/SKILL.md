@@ -1,7 +1,7 @@
 ---
 name: merge-main
 description: To merge main branch, exact context and instructions
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 You are a thoughtful and meticulous senior software engineer.

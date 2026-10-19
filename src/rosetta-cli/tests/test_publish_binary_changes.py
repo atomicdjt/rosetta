@@ -5,6 +5,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from rosetta_cli.commands.publish_command import PublishCommand
 from rosetta_cli.ragflow_client import RAGFlowClient
 from rosetta_cli.rosetta_publisher import ContentPublisher
 from rosetta_cli.services.document_data import DocumentData
@@ -209,3 +210,55 @@ def test_invalid_utf8_text_file_prevents_full_publish_remote_cleanup(
     assert not failed.success
     assert succeeded.success
     dataset.delete_documents.assert_not_called()
+
+
+def test_unreadable_file_prevents_full_publish_remote_cleanup_and_fails_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    instructions = tmp_path / "instructions"
+    locked_path = instructions / "r3" / "core" / "locked.md"
+    valid_path = instructions / "r3" / "core" / "valid.md"
+    locked_path.parent.mkdir(parents=True)
+    locked_path.write_text("# Locked\n", encoding="utf-8")
+    valid_path.write_text("# Valid\n", encoding="utf-8")
+
+    valid_cache = DocumentData.from_file(valid_path, workspace_root=tmp_path)
+    locked_server_metadata = valid_cache.to_metadata_dict()
+    locked_server_metadata["original_path"] = "r3/core/locked.md"
+    existing_locked_doc = SimpleNamespace(
+        id="old-locked-document", name="locked.md", meta_fields=locked_server_metadata
+    )
+    dataset = Mock()
+    dataset.id = "dataset"
+    client = Mock(spec=RAGFlowClient)
+    client.page_size = 1000
+    client.get_dataset.return_value = dataset
+    client.get_existing_doc.return_value = None
+    client.list_documents.return_value = [existing_locked_doc]
+    client.upload_document.return_value = SimpleNamespace(id="valid-document"), "dataset"
+    publisher = ContentPublisher(client, str(tmp_path))
+
+    original_read_bytes = Path.read_bytes
+
+    def read_bytes(self: Path) -> bytes:
+        if self == locked_path.resolve():
+            raise PermissionError("permission denied")
+        return original_read_bytes(self)
+
+    monkeypatch.setattr(Path, "read_bytes", read_bytes)
+
+    results = publisher.publish_folder(str(instructions), parse_documents=False)
+
+    failed = next(result for result in results if Path(result.file_path) == locked_path.resolve())
+    succeeded = next(result for result in results if Path(result.file_path) == valid_path.resolve())
+    assert not failed.success
+    assert "permission denied" in failed.error
+    assert succeeded.success
+    dataset.delete_documents.assert_not_called()
+    assert client.upload_document.call_count == 1
+
+    # The same results drive the CLI exit code (publish_command._publish_folder).
+    command = PublishCommand(SimpleNamespace(), SimpleNamespace())
+    stub_publisher = SimpleNamespace(publish_folder=lambda *a, **k: results)
+    args = SimpleNamespace(dry_run=False, force=False, no_parse=True)
+    assert command._publish_folder(stub_publisher, instructions, args) == 1

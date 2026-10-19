@@ -183,7 +183,7 @@ class ContentPublisher:
                 )
                 all_caches.append(cache)
 
-            except InvalidTextEncodingError as e:
+            except Exception as e:
                 read_failures.append(file)
                 print(f"✗ Error reading {file.name}: {e}")
                 results.append(PublishResult(
@@ -193,10 +193,6 @@ class ContentPublisher:
                     tags=[],
                     error=str(e),
                 ))
-            except Exception as e:
-                read_failures.append(file)
-                print(f"✗ Error reading {file.name}: {e}")
-                continue
 
         # Destructive cleanup requires a complete local inventory. If even one
         # file could not be read, preserve remote documents until a full run can

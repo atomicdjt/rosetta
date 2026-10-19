@@ -134,7 +134,7 @@ Every model list also moved to new versions for each vendor. Work that ran on GP
 - Orchestrators pick a subagent's model and reasoning effort from a written ladder (Strategist, Tactician, Implementer), and the large-work playbook gains a "worker pull" tactic
 - Subagent reports now state what was not done, fully or partly, so the orchestrator sees gaps before it accepts a result
 - Prompts are authored shorter: drafts keep only key points and leave decisions to the agent that runs them; `rosettify-prompts` compression follows the same rule
-- Workspace initialization no longer extracts code patterns unless the user asks for it
+- Workspace initialization is much faster and cheaper: it no longer extracts code patterns unless the user asks for it
 - Reference files for each IDE (Claude Code, Cursor, Copilot, Codex, OpenCode, Windsurf) and the agent-launching skill list the new models in each tool's own id format; older entries stay listed
 - Tooling and CI: Cursor and Copilot subagents no longer get a raw model id when a prompt names a Claude model with an effort suffix (for example `claude-sonnet-5-medium`); the `rosettify-prompts` quality judge works on Claude 5.5 models, which reject the `thinking: disabled` setting it used to send; CI jobs use the new models (Codex jobs run GPT-6 Luna at one step higher effort)
 - Routine: maintainer-internal skills tightened (`documentation`, `update-change-log`, `compress-prompt`, `sync-web-site`; the last two can now be invoked by the model, not only by name); weekly GitHub stats snapshot refreshed; last week's changelog entry landed

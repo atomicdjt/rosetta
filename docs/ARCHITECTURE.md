@@ -136,6 +136,8 @@ Each individual solution component follows its own version (except major).
 
 All plugins follow the same version.
 
+Every change bumps each affected component (`src/<component>/**`; `instructions/**` or `plugins/**` → plugins) in the same commit, using `scripts/bump_versions.sh` (covers all components). Prefer patch; minor/major only when warranted. Package publish pipelines fail on an already-published version.
+
 ---
 
 ## Rosettify

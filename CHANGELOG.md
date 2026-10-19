@@ -118,6 +118,63 @@ R3 advances Rosetta from governed assistance to deterministic, self-guarding exe
 
 *Release scope: **R3** is the live, served release. **R2** is the previous release, receiving backports only. Other tags are release-agnostic: **Tooling** (plugin generator, rosettify), **Server** (MCP server, Helm), **Hooks**, **CI**, **Docs**.*
 
+### Week Mon 12.10 – Sun 18.10
+
+When Rosetta runs on Gemini, it now uses a more capable model, Gemini 4 Argon, for the architect, planner, requirements-engineer, and prompt-engineer subagents (lightweight profile: architect only). These subagents make the decisions that shape everything built afterwards. Claude and GPT already ran them on Opus and Sol, while Gemini used Flash. On Claude, discovery and research moved to the cheaper Haiku 5.5.
+
+Every model list also moved to new versions for each vendor, and the GPT "Terra" middle tier is gone: its work runs on GPT-6 Luna at higher reasoning effort. Orchestration sizes work by expected code volume and context limits rather than mainly by file count, subagents report what they did not finish, and prompts are authored shorter.
+
+**Highlights**
+
+- Model versions updated for every vendor: Claude Opus 5.5, Sonnet 5.5, and Haiku 5.5 (were Opus 5, Sonnet 5, Haiku 4.5), GPT-6.1 Sol (was GPT-5.6 Sol), GPT-6 Luna (was GPT-5.6 Luna), Gemini 3.8 Flash (was 3.7), Grok 4.7 (was 4.6); Cursor Composer 2.5 is unchanged
+- Gemini 4 Argon added. When Rosetta runs on Gemini, the architect, planner, requirements-engineer, and prompt-engineer subagents, which make the decisions that shape the rest of the work, now use Argon (lightweight profile: architect only). All other subagents keep Gemini 3.8 Flash, and Claude, GPT, and Grok runs are unaffected. Before, Gemini used Flash for these subagents too
+- GPT "Terra" tier removed: on Codex its work runs on GPT-6 Luna at one step higher reasoning effort, so GPT-based agents now have two tiers (Sol and Luna) instead of three
+- Lower cost on Claude: discoverer and researcher moved from Sonnet to Haiku 5.5, and so did the lightweight profile's engineer, reviewer, and validator
+- Orchestration sizes a task as small, medium, or large from expected lines of code (under 200, under 2,000, more) and areas touched, with file count only a rough hint, and aims to keep each agent under 250K tokens of context (price doubles above 200K)
+- Orchestrators pick a subagent's model and reasoning effort from a written ladder (Strategist, Tactician, Implementer), and the large-work playbook gains a "worker pull" tactic
+- Subagent reports now state what was not done, fully or partly, so the orchestrator sees gaps before it accepts a result
+- Prompts are authored shorter: drafts keep only key points and leave decisions to the agent that runs them; `rosettify-prompts` compression follows the same rule
+- Workspace initialization no longer extracts code patterns unless the user asks for it
+- Reference files for each IDE (Claude Code, Cursor, Copilot, Codex, OpenCode, Windsurf) and the agent-launching skill list the new models in each tool's own id format; older entries stay listed
+- Tooling and CI: Cursor and Copilot subagents no longer get a raw model id when a prompt names a Claude model with an effort suffix (for example `claude-sonnet-5-medium`); the `rosettify-prompts` quality judge works on Claude 5.5 models, which reject the `thinking: disabled` setting it used to send; CI jobs use the new models (Codex jobs run GPT-6 Luna at one step higher effort)
+- Routine: maintainer-internal skills tightened (`documentation`, `update-change-log`, `compress-prompt`, `sync-web-site`; the last two can now be invoked by the model, not only by name); weekly GitHub stats snapshot refreshed; last week's changelog entry landed
+
+#### Model lists moved to new versions for each vendor, GPT Terra tier removed
+
+- **Change.** `[R3]` Every agent and workflow step lists the model to use for each vendor, and each coding agent takes the entry for its own vendor. All entries moved to new versions:
+  - Claude: Opus 5 to Opus 5.5, Sonnet 5 to Sonnet 5.5, Haiku 4.5 to Haiku 5.5.
+  - OpenAI: GPT-5.6 Sol to GPT-6.1 Sol, GPT-5.6 Luna to GPT-6 Luna.
+  - OpenAI "Terra" (GPT-5.6 Terra, the middle tier) is removed. On Codex its work runs on GPT-6 Luna with reasoning effort one step higher (low to medium, medium to high, high to xhigh). Cursor and Copilot model names carry no effort level, so there Terra and Luna jobs now use the same model.
+  - Google: Gemini 3.7 Flash to Gemini 3.8 Flash. xAI: Grok 4.6 to Grok 4.7. Cursor Composer 2.5 is unchanged.
+
+  The plugin generator translates these entries into each IDE's own model names and keeps older ids as inputs, so a prompt that still names an older model resolves to the current one. (Igor Solomatov, isolomatov-gd)
+- **Why it helps.** Agents run on current models without anyone editing prompts one by one. Two GPT tiers replace three. The extra effort step is meant to make up for Luna sitting in a lower tier than Terra.
+
+#### Lower cost: Claude Haiku 5.5 for discovery, research, and the lightweight profile
+
+- **Change.** `[R3]` On Claude, the discoverer and researcher subagents ran Sonnet. They now run Haiku 5.5, the cheaper model, at high effort (the researcher also gains Cursor Composer 2.5 as an option). In the lightweight profile, the engineer, reviewer, and validator moved from Sonnet to Haiku 5.5, and so did the matching steps of the lightweight coding workflow (implementation, review, tests, validation). The light engineer's reasoning effort rose from medium to high, and the light discoverer and researcher now run at medium effort. Architect, planner, requirements-engineer, prompt-engineer, and the full profile's engineer, reviewer, and validator keep their models. (Igor Solomatov, isolomatov-gd)
+- **Why it helps.** Searching, reading, and routine checks run on a cheaper model, so each run costs less. Roles that make design decisions keep the stronger models.
+
+#### Gemini 4 Argon added for the subagents that make the main decisions
+
+- **Change.** `[R3]` Every subagent has a model list with one entry per vendor, and a coding agent takes the entry for its own vendor. Rosetta listed only Gemini Flash, so Gemini runs used Flash for every subagent, including the architect and planner. Gemini 4 Argon, Google's top-tier model in Rosetta's model ladder, is now listed before Gemini 3.8 Flash for the architect, planner, requirements-engineer, and prompt-engineer subagents (lightweight profile: the architect only), and for the workflow steps those subagents run (plus one research step and the workspace documentation step). These subagents make the decisions that shape the rest of the work, and Opus 5.5 and GPT-6.1 Sol already ran them on Claude and GPT. All other subagents keep Gemini 3.8 Flash, which stays in these lists as the next option. Claude, GPT, and Grok runs are unaffected. The plugin generator now maps Argon, and the older Gemini Pro ids, for Cursor and Copilot; before, those ids were dropped there. The agent-launching skill names Argon as Google's complex tier and, if the Gemini CLI rejects the id (Google's rollout is limited), drops the model flag and uses the CLI default. (Igor Solomatov, isolomatov-gd)
+- **Why it helps.** On Gemini, the decisions that shape the rest of the work now run on a more capable model, and the faster, cheaper Flash keeps the rest of the work. A rejected id does not stop a launch.
+
+#### Orchestration: sizing by code volume and context, with a written model ladder
+
+- **Change.** `[R3]` The orchestration skill sized a request from a rough file count, which says little about how much an agent must hold in context. It now sizes by expected lines of code and areas touched: small is under 200 lines in one area, medium is under 2,000 lines in up to three areas, and large is anything bigger. Files stay as a rough hint (about 5, 20, 40 or more). The skill states the goal: keep every agent and subagent under 250K tokens of context, because price doubles above 200K, and treat efficiency as organizing and adapting work, not skipping steps. The team-manager playbook now applies to large requests (it applied to medium before), and the orchestrator reports how it will organize that work. A new section sets a model ladder: Strategist (Opus 5.5, GPT-6.1 Sol, Gemini 4 Argon), Tactician (Sonnet 5.5, Gemini 3.8 Flash, Grok 4.7), Implementer (Haiku 5.5, GPT-6 Luna, Gemini 3.8 Flash, Composer 2.5), with what each reasoning effort allows and a few exceptions, for example Luna at xhigh counts as Tactician. The models above Strategist (Fable, GPT Astra) are not used. The playbook also gains a "worker pull" tactic. (Igor Solomatov, isolomatov-gd)
+- **Why it helps.** Task size follows how much an agent must hold in context, so large work is meant to be split before its price doubles. An orchestrator picks a subagent's model by looking up a tier.
+
+#### Subagents report what they did not finish
+
+- **Change.** `[R3]` When an orchestrator hands work to a subagent, the prompt asks for proof of each claim (links, line ranges, short quotes). It now also asks the subagent to state what it did not do, fully or partly. (Igor Solomatov, isolomatov-gd)
+- **Why it helps.** The orchestrator has the stated gaps in hand when it checks the result.
+
+#### Prompt authoring: shorter prompts, decisions left to the running agent
+
+- **Change.** `[R3]` A prompt that spelled out a decision in full duplicated reasoning the running agent redid anyway, padding every prompt without adding anything it needed to act correctly. The `coding-agents-prompt-authoring` skill's draft and hardening rules now call for compressing a prompt to key points and terse phrases, keeping only "thinking points" rather than decisions, shrinking direction text to one to three words per step without dropping any step, and leaving the decision to whichever agent runs the prompt later. `rosettify-prompts`'s automated compression step and its "value lost" audit carry the same rule; the audit now restores only genuinely missing value, tersely, instead of re-adding verbose direction text. (Igor Solomatov, isolomatov-gd)
+- **Why it helps.** Shorter prompts cost less per call and leave the decision with the agent that has the actual context to make it.
+
 ### Week Mon 28.09 – Sun 04.10
 
 A new `docs/air/INTENT.md` sets out Rosetta Air, a longer-term direction built on an atoms/molecules/organisms skill hierarchy and per-project "software factory" automation. It is a vision document, not a shipped change. The maintainer-internal `checklist` skill is split into two variants, run side by side to find out which produces better completion checks.

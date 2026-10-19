@@ -33,7 +33,7 @@ If requested directly `use session-level EXECUTION_CONTROLLER` then (plan ⊃ ph
 
 Complexity may shift one band; re-size as reality changes — discovery, surprises, clarification, target already done.
 
-Request sizing point is to keep all agents/subagents context under 250K tokens. Once above 200K the price is doubled.
+Request sizing point is to keep all agents/subagents context under 250K tokens (reads and tool outputs here are major contributors). Once above 200K the price is doubled.
 
 Optimize for efficient execution reasonably especially if result or impact or effect will be the same. It is not about skipping, it is about organizing and adapting.
 

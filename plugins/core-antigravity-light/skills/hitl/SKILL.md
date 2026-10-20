@@ -21,7 +21,7 @@ Questioning:
 2. Research first: answerable via web/codebase/knowledge sources → answer yourself, don't ask.
 3. Skip LOW / NIT PICKING. Prioritize: scope > security/privacy > UX > technical.
 4. 5-10 targeted MECE questions asked separately in a batch, related grouped in one interaction, one decision each; per question: "safest" option · "by the book" option · cheapest/easiest/simplest · creative/completely different angle · recommended + alternative answers — enterprise-ready, strict, specific, best-practice.
-5. MUST ask interactively few-in-one in batches via "ask user question answer" tool, otherwise - strictly one-by-one.
+5. MUST ask interactively in manageable batches, unless requested otherwise.
 6. Open questions → todo tasks. Persist Q&A (incl. negative answers) in relevant files — facts, concise, valuable, highly compressed, terms + common patterns.
 7. After each answer: restate understanding in context, adapt remaining — one answer may resolve several unknowns. Unanswered → mark assumption, continue.
 8. Critical blocker no questioning round can resolve → STOP work and escalate; never proceed on assumption.

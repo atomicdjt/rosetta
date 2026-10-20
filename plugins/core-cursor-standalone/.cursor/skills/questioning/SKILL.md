@@ -34,7 +34,7 @@ Output: targeted questions with impact + safe defaults.
 - Interview user relentlessly about every aspect of his task until you reach a full shared understanding
 - Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. 
 - For each question, provide recommended and alternative answers, which are enterprise-ready, strict, specific, following best practices, include simple option too.
-- Ask only few questions at a time. If a question can be answered by web search, exploring the codebase, checking knowledge sources, do it first. 
+- Ask only manageable questions at a time (unless requested otherwise). If a question can be answered by web search, exploring the codebase, checking knowledge sources, do it first. 
 - Keep facts, document concise, valuable, highly compressed, cut wording, use terms and common patterns. 
 - Loop cycles until NO gaps or ambiguities left without nitpicking.
 

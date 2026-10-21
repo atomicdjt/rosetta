@@ -18,7 +18,7 @@ Agents without workspace documentation re-discover facts, repeat mistakes, and m
 - Input: TECHSTACK, CODEMAP, DEPENDENCIES, source code, PATTERNS (if phase 5 ran), state.file_count, state.mode, state.composite
 - Output: CONTEXT.md, ARCHITECTURE.md, IMPLEMENTATION.md, ASSUMPTIONS.md, AGENT MEMORY.md
 - Prerequisite: Phase 3 complete; phase 5 only if it ran
-- Notes: if subagents needed: prefer discoverer subagent or built-in subagent with cheap/fast model (haiku, luna, flash, etc) for reverse engineering, give them manageable sized tasks
+- Notes: if subagents needed: prefer discoverer subagent or built-in subagent with cheap/fast model with high reasoning (haiku, luna, flash, etc) for reverse engineering, give them manageable sized tasks
 </workflow_context>
 
 <phase_steps>

@@ -10,7 +10,7 @@ baseSchema: docs/schemas/phase.md
 <init_workspace_flow_documentation>
 
 <description_and_purpose>
-Agents without workspace documentation re-discover facts, repeat mistakes, and make incorrect assumptions every session. This phase creates the shared understanding layer all subsequent agent work depends on. Proof: five doc files exist and every prepped-workspace skill reads them. Use top tier model, as this documentation will be loaded every signle time in every single user session with AI.
+Agents without workspace documentation re-discover facts, repeat mistakes, and make incorrect assumptions every session. This phase creates the shared understanding layer all subsequent agent work depends on. Proof: five doc files exist and every prepped-workspace skill reads them. Use top tier model, as this documentation will be loaded every single time in every single user session with AI.
 </description_and_purpose>
 
 <workflow_context>
@@ -18,6 +18,7 @@ Agents without workspace documentation re-discover facts, repeat mistakes, and m
 - Input: TECHSTACK, CODEMAP, DEPENDENCIES, source code, PATTERNS (if phase 5 ran), state.file_count, state.mode, state.composite
 - Output: CONTEXT.md, ARCHITECTURE.md, IMPLEMENTATION.md, ASSUMPTIONS.md, AGENT MEMORY.md
 - Prerequisite: Phase 3 complete; phase 5 only if it ran
+- Notes: if subagents needed: prefer discoverer subagent or built-in subagent with cheap/fast model (haiku, luna, flash, etc) for reverse engineering, give them manageable sized tasks
 </workflow_context>
 
 <phase_steps>

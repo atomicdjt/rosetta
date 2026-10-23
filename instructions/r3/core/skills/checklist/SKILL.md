@@ -19,6 +19,7 @@ Key Points:
 - Checklist has items for result verification and evidence/proofs.
 - Precise, non-ambiguous, and temporal wording.
 - Author items to be ranked (0 - not started .. 100 - fully completed) by checklist consumer, do not use binary checkboxes.
+- Goal is to have high coverage by checklist itself.
 
 Adapt the starter to your context:
 

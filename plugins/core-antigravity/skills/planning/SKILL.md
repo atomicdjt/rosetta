@@ -13,7 +13,7 @@ description: "To build execution-ready AI sessions graph with intent/ACs/checkli
 
 If request is to plan for human work breakdown -> STOP and USE SKILL `backlog`, mode `work-breakdown`. This skill plans AI sessions only.
 If request is small or trivial -> SKIP, DO NOTHING.
-If one session only -> merge into `plans/<FEATURE>/<FEATURE>-PLAN.md` and `plans/<FEATURE>/HANDOFF.md`.
+If it fits one session -> just merge into `plans/<FEATURE>/<FEATURE>-PLAN.md` and `plans/<FEATURE>/HANDOFF.md`.
 If used together with tech-specs skill -> do not duplicate content, use references. 
 
 Core flow:
@@ -37,6 +37,7 @@ Hard rules for session files:
    - environment quirks already discovered
 5. Very Terse. Target 20–30 lines for WHAT, 40-50 lines for CHECKLIST.
 6. Structure: # NN — Title, optional Depends on:, ## Do (numbered), ## Subagents (name + responsibility + long-running or short-term), optional ## Rules or ## Notes (only for traps), ## Done when (observable, verifiable outcomes — not "works correctly"), ## Checklist (examples showing aspects: `[ ] Implemented`, `[ ] Unit tests coverage > 85%`, `[ ] PCI compliance`, `[ ] Integration tests coverage > 85%`, `[ ] Edge cases tested`, `[ ] Work protocol adhered`, `[ ] Documents updated`, `[ ] Code ran locally and manually tested by AI`, `[ ] DevOps implemented`, `[ ] SRE covered`, `[ ] Security checked`, etc).
+7. Expect each session to be rather large with orchestration and subagents.
 
 Decomposition:
 
@@ -82,7 +83,7 @@ Pitfalls:
 - Skipping dependencies and predecessors
 - Ambiguous acceptance criteria or checklists
 - Coding instead of planning
-- Sessions too small to be worth a session
+- Sessions too small to be worth a session running with subagents
 
 <output>
 

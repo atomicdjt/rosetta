@@ -19,7 +19,7 @@ Key Points:
 - Mix general ("Build: no warnings, no errors", "Absolutely all unit tests pass") and request-specific items
 - Checklist has items for result verification and evidence/proofs.
 - Precise, non-ambiguous, and temporal wording.
-- Items are ranked (0 - not started .. 100 - fully completed), not binary checkboxes.
+- Author items to be ranked (0 - not started .. 100 - fully completed) by checklist consumer, do not use binary checkboxes.
 
 Adapt the starter to your context:
 

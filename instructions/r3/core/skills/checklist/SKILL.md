@@ -12,8 +12,7 @@ Key Points:
 - Captures source of truth: requirements, acceptance criteria, constraints, non-goals, assumptions, and authoritative references.
 - Covers all relevant internal/external factors.
 - Categories/aspects must be cumulatively exhaustive; items mutually exclusive where practical.
-- Includes only medium+ findings.
-- Calibrates severity from impact, risk, and consequences of omission/failure.
+- Includes only medium+ findings. Calibrates severity from impact, risk, and consequences of omission/failure.
 - Is created before implementation context biases the analysis.
 - Each item contains < 8 words and covers archetype/concept.
 - Mix general ("Build: no warnings, no errors", "Absolutely all unit tests pass") and request-specific items

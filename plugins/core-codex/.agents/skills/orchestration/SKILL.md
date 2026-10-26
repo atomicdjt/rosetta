@@ -71,7 +71,7 @@ Dispatch:
 
 Routing:
 
-4. Parallelize collision-free; make collision-safe: own fileset, git worktree, return-diff-only.
+4. Parallelize collision-free; make collision-safe: own fileset, git worktree, return-diff-only; prefer large tasks to subagents for efficiency; require subagents to read tech specs if available.
 5. TEMP folder for coordination + large I/O.
 
 Quality:

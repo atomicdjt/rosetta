@@ -240,7 +240,7 @@ class DocumentService:
             poll_interval: Seconds between status checks (default: 0.5 for smooth progress)
         
         Returns:
-            Tuple of (success_count, failed_count)
+            Tuple of (success_count, unsuccessful_count); the latter includes\n            documents still pending when the polling deadline expires.
         """
         if not documents:
             return 0, 0
@@ -355,4 +355,8 @@ class DocumentService:
             print("ℹ️  Parsing continues on server. Check RAGFlow UI for status.")
             raise
         
-        return len(completed), len(failed)
+        # A timeout leaves documents unfinished, not successfully parsed. Count
+        # every remaining document as unsuccessful so CLI/automation exits
+        # non-zero rather than treating an incomplete batch as a success.
+        unfinished_count = len(documents) - len(completed) - len(failed)
+        return len(completed), len(failed) + unfinished_count

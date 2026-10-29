@@ -2,7 +2,9 @@
 name: architect
 description: "Architect solution, transform intent into reliable tech specs, etc. Full subagent."
 mode: subagent
-model: GPT-5.6 Sol
+model: Claude Opus 5.5
+effort: high
+color: purple
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

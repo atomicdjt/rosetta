@@ -4,6 +4,7 @@
 - research
 - context-engineering (TBD)
 - planning
+- backlog
 - reasoning
 - questioning
 - tech-specs
@@ -25,6 +26,7 @@
 - requirements-use
 - coding
 - testing
+- harness
 - debugging
 - codemap
 - load-project-context
@@ -50,3 +52,4 @@
 - qa-structure
 - orchestration
 - subagent-directives
+- checklist

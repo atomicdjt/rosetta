@@ -136,6 +136,16 @@ Requests are classified only when the user invokes `/rosetta`; a plain request l
 
 ---
 
+## Versioning
+
+Each individual solution component follows its own version (except major).
+
+All plugins follow the same version.
+
+Every change bumps each affected component (`src/<component>/**`; `instructions/**` or `plugins/**` → plugins) in the same commit, using `scripts/bump_versions.sh` (covers all components). Prefer patch; minor/major only when warranted. Package publish pipelines fail on an already-published version.
+
+---
+
 ## Rosettify
 
 Local CLI/MCP utility for AI coding agents and users. Purpose: deterministic local AI coding workflow execution and single entry point for Rosetta tooling in any project. All data and IP stays local — zero network calls during operation.
@@ -271,7 +281,7 @@ Codex Plugin: only OpenAI `gpt-*` models are supported.
 
 Plugins are the primary delivery mechanism for Rosetta. They deliver instructions directly to the user's profile or repository — no MCP connection or server needed. Instructions are copied at install time, so the agent works entirely from local files.
 
-Each plugin contains core instructions: 38 skills, 10 agents, 13 workflow types, and bootstrap rules. The content is identical across plugins — only the format differs per IDE.
+Each plugin contains core instructions: 42 skills, 10 agents, 17 workflow types, and bootstrap rules. The content is identical across plugins — only the format differs per IDE.
 
 | Plugin | IDE | Mode |
 |---|---|---|
@@ -285,7 +295,7 @@ Each plugin contains core instructions: 38 skills, 10 agents, 13 workflow types,
 
 All plugins are generated from a single source tree (`instructions/r3/core/`) by the plugin generator (`npx -y rosettify-plugins@latest`). The generator's `--release` defaults to `r3`, matching the rosetta-mcp `DEFAULT_VERSION`. Each release descriptor also carries a hook posture: r2 ships SessionStart bootstrap only, while r3 enables the deterministic advisory hooks by default — overridable via `--deterministic-hooks`. **Shipped plugins are built with `false`** (FR-CLI-0012): advisory hooks run before and after every tool call, adding per-call overhead, so they are opt-in and enabled progressively. The generator builds main plugins then derives the standalone variants from them. The generator copies core instructions and adapts them for the target coding agent:
 
-- **Model rewriting** — selects the first model from the frontmatter `model:` comma-separated list and normalizes it to the platform's format. Cursor normalizes to short IDs (e.g. `claude-sonnet-5`, `gpt-5.6-terra`); Copilot to display names (e.g. `Claude Sonnet 5`, `GPT-5.6-terra`); Claude Code to full model IDs (`claude-sonnet-5`, `claude-opus-5`, `claude-haiku-4-5`).
+- **Model rewriting** — selects the first model from the frontmatter `model:` comma-separated list and normalizes it to the platform's format. Cursor normalizes to short IDs (e.g. `claude-sonnet-5-5`, `gpt-6-luna`); Copilot to display names (e.g. `Claude Sonnet 5.5`, `GPT-6 Luna`); Claude Code to full model IDs (`claude-sonnet-5-5`, `claude-opus-5-5`, `claude-haiku-5-5`).
 - **Agent file format** — converts agent markdown to the IDE's expected format (`.agent.md` for Copilot, `.toml` for Codex)
 - **Directory layout** — restructures output to match IDE conventions (`.agents/` and `.codex/` for Codex, runtime configs at root for Copilot). Each target exposes workflows by one of three mechanisms, and reference rewriting differs accordingly:
   - **Manifest pointer (Claude)** — the folder stays `workflows/` on disk; `.claude-plugin/plugin.json` declares `"commands": "./workflows/"`, so Claude Code reads slash commands straight out of it. Nothing is renamed, so no rewrite pair is produced or needed.
@@ -332,7 +342,7 @@ Each hook is bundled separately per IDE via esbuild so each bundle contains only
 
 | Hook | Event | Purpose |
 |---|---|---|
-| `dangerous-actions.js` | PreToolUse | Two-tier deny on dangerous shell/edit/MCP patterns; `# Rosetta-AI-reviewed` marker allows retry on `reconsider` policy; `hard-deny` patterns (e.g. `curl \| sh`) require human review |
+| `dangerous-actions.js` | PreToolUse | Two policy tiers on dangerous patterns: `advise` (non-blocking notice) and `reconsider` (soft-deny, overridable by re-issuing the call with a `# Rosetta-AI-reviewed` marker). Registered on shell and MCP tool calls only. |
 | `loose-files.js` | PostToolUse (Write) | Nudges agent when `.py`/`.js` files are created without a module marker (`__init__.py` / `package.json`) |
 | `md-file-advisory.js` | PostToolUse (Write\|Edit) | Advises on markdown formatting/placement after `.md` edits |
 | `lint-format-advisory.js` | PostToolUse (Write\|Edit) | Suggests a syntax/type/lint/format check step after code edits |

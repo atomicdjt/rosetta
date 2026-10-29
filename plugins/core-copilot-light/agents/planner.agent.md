@@ -2,7 +2,9 @@
 name: planner
 description: "Plan execution: turn approved intent/specs into a sequenced plan scaled to size. Full subagent."
 mode: subagent
-model: GPT-5.6 Sol
+model: GPT-6 Luna
+effort: xhigh
+color: orange
 readonly: false
 tags: ["subagent", "agent", "planning"]
 baseSchema: docs/schemas/agent.md

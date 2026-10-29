@@ -31,10 +31,11 @@ Validation: Each phase produces verifiable outputs; reviewer catches issues befo
 10. If migrate/modernize: implementation phase MUST use tiny batches ONLY (1-3 files), never bulk-read (other phases may); specs/plan enforce; FS-copy RECOMMENDED; no behavior change/new code; mirror source; subagents same; REQUIRED TO log <file> started/completed; Use impl subagents like MAP-REDUCE;
 11. Run architect subagent with required model in the background and consult with it if already supported or prefer advisor if already available
 12. Coding workflow state MUST be saved to `agents/TEMP/<FEATURE>/coding-flow-state.md` file.
+13. If context already contains request for TDD => implement properly red and green adjusting this workflow, including by moving execution of phases `tests` and `review_tests` to be after `user_review_plan` and before `implementation`.
 
 </prerequisites>
 
-<discovery phase="1" applies="if request is non-specific, unclear, ambiguous, or has gaps" subagent="discoverer" role="Context discoverer" subagent_required_model="claude-sonnet-5, gpt-5.6-terra, gemini-3.7-flash, grok-4.6">
+<discovery phase="1" applies="if request is non-specific, unclear, ambiguous, or has gaps" subagent="discoverer" role="Context discoverer" subagent_required_model="claude-sonnet-5-5, gpt-6-luna, gemini-3.8-flash, grok-4.7">
 
 1. Gather project context, affected areas, dependencies, constraints, requirements. SMALL: orchestrator handles inline.
 2. Input: user request + `CONTEXT.md` + `ARCHITECTURE.md` + `IMPLEMENTATION.md`. Output: `discovery-notes.md` in FEATURE PLAN folder.
@@ -47,7 +48,7 @@ Validation: Each phase produces verifiable outputs; reviewer catches issues befo
 
 </discovery>
 
-<design phase="2" applies="ALL" subagent="architect" role="Design architecture requirements and solution" subagent_required_model="claude-opus-5, gpt-5.6-sol, gemini-3.7-flash">
+<design phase="2" applies="ALL" subagent="architect" role="Design architecture requirements and solution" subagent_required_model="claude-opus-5-5, gpt-6.1-sol, gemini-4-argon, gemini-3.8-flash">
 
 1. Step 1: discover affected and related code to design architecture requirements to address user request fully.
 2. Step 2: design 3 best architecture solutions on high level with pro/cons analysis.
@@ -68,7 +69,7 @@ Validation: Each phase produces verifiable outputs; reviewer catches issues befo
 
 </user_review_design>
 
-<tech_plan phase="4" applies="ALL" subagent="architect" role="Senior architect defining specs and plan" subagent_required_model="claude-opus-5, gpt-5.6-sol, gemini-3.7-flash">
+<tech_plan phase="4" applies="ALL" subagent="architect" role="Senior architect defining specs and plan" subagent_required_model="claude-opus-5-5, gpt-6.1-sol, gemini-4-argon, gemini-3.8-flash">
 
 1. MUST USE SKILL `tech-specs` and `planning` together. Split: specs own WHAT, plan owns HOW. Target: 100% clarity.
 2. Input: discovery notes, user request, `ARCHITECTURE.md`. Output: `plans/<FEATURE>/<FEATURE>-SPECS.md` + `plans/<FEATURE>/<FEATURE>-PLAN.md`.
@@ -81,7 +82,7 @@ Validation: Each phase produces verifiable outputs; reviewer catches issues befo
 
 </tech_plan>
 
-<review_plan phase="5" applies="MEDIUM,LARGE" subagent="reviewer" role="Reviewer inspecting specs and plan against intent" subagent_required_model="gpt-5.6-terra, gemini-3.7-flash, claude-sonnet-5, grok-4.6" must-be-subagent>
+<review_plan phase="5" applies="MEDIUM,LARGE" subagent="reviewer" role="Reviewer inspecting specs and plan against intent" subagent_required_model="gpt-6-luna, gemini-3.8-flash, claude-sonnet-5-5, grok-4.7" must-be-subagent>
 
 1. Review specs and plan against user request and discovery notes, do not assume user is in context, give him full information with TLDR.
 2. Input: specs, plan, user request. Output: review findings and recommendations.
@@ -96,7 +97,7 @@ Validation: Each phase produces verifiable outputs; reviewer catches issues befo
 
 </user_review_plan>
 
-<implementation phase="7" applies="ALL" subagent="engineer" role="Senior engineer executing approved plan" subagent_required_model="claude-sonnet-5, gpt-5.6-terra, gemini-3.7-flash, grok-4.6">
+<implementation phase="7" applies="ALL" subagent="engineer" role="Senior engineer executing approved plan" subagent_required_model="claude-sonnet-5-5, gpt-6-luna, gemini-3.8-flash, grok-4.7">
 
 1. Implement approved plan. Build MUST succeed. Tests excluded.
 2. Input: approved specs + plan. Demand subagent to read and execute it fully. Do not repeat contents => reference instead. Output: working code, build passing, update relevant documentation briefly (CONTEXT.md, ARCHITECTURE.md, etc).
@@ -109,7 +110,7 @@ Validation: Each phase produces verifiable outputs; reviewer catches issues befo
 
 </implementation>
 
-<review_code phase="8" applies="ALL" subagent="reviewer" role="Reviewer inspecting implementation against specs" subagent_required_model="gpt-5.6-terra, gemini-3.7-flash, claude-sonnet-5, grok-4.6" must-be-subagent>
+<review_code phase="8" applies="ALL" subagent="reviewer" role="Reviewer inspecting implementation against specs" subagent_required_model="gpt-6-luna, gemini-3.8-flash, claude-sonnet-5-5, grok-4.7" must-be-subagent>
 
 1. Review code changes against approved specs and plan.
 2. Input: implementation diff, specs, plan, check if documentation is updated, brief, and matches the file intent. Output: review findings and recommendations.
@@ -120,7 +121,7 @@ Validation: Each phase produces verifiable outputs; reviewer catches issues befo
 
 </review_code>
 
-<impl_validation phase="9" applies="MEDIUM,LARGE" subagent="validator" role="Validation specialist" subagent_required_model="gpt-5.6-terra, gemini-3.7-flash, claude-sonnet-5, grok-4.6">
+<impl_validation phase="9" applies="MEDIUM,LARGE" subagent="validator" role="Validation specialist" subagent_required_model="gpt-6-luna, gemini-3.8-flash, claude-sonnet-5-5, grok-4.7">
 
 1. Validate implementation against specs: git changes, spec coverage, gaps, perform search and MCP fact-checking.
 2. Then it must run locally and check it actually works if there are no major issues
@@ -139,7 +140,7 @@ Validation: Each phase produces verifiable outputs; reviewer catches issues befo
 
 </user_review_impl>
 
-<tests phase="11" applies="ALL" subagent="engineer" role="Senior engineer writing and running tests" subagent_required_model="claude-sonnet-5, gpt-5.6-terra, gemini-3.7-flash, grok-4.6">
+<tests phase="11" applies="ALL" subagent="engineer" role="Senior engineer writing and running tests" subagent_required_model="claude-sonnet-5-5, gpt-6-luna, gemini-3.8-flash, grok-4.7">
 
 1. Write and execute tests. All MUST succeed, isolated, idempotent.
 2. Input: implementation, specs. Demand subagent to read specs fully. Do not repeat contents => reference instead. Output: passing tests with coverage.
@@ -149,7 +150,7 @@ Validation: Each phase produces verifiable outputs; reviewer catches issues befo
 
 </tests>
 
-<review_tests phase="12" applies="MEDIUM,LARGE" subagent="reviewer" role="Reviewer inspecting test coverage and quality" subagent_required_model="gpt-5.6-terra, gemini-3.7-flash, claude-sonnet-5, grok-4.6" must-be-subagent>
+<review_tests phase="12" applies="MEDIUM,LARGE" subagent="reviewer" role="Reviewer inspecting test coverage and quality" subagent_required_model="gpt-6-luna, gemini-3.8-flash, claude-sonnet-5-5, grok-4.7" must-be-subagent>
 
 1. Review tests against specs: coverage, scenarios, edge cases, mocking correctness.
 2. Input: tests, specs, implementation. Output: review findings and recommendations.
@@ -159,7 +160,7 @@ Validation: Each phase produces verifiable outputs; reviewer catches issues befo
 
 </review_tests>
 
-<final_validation phase="13" applies="MEDIUM,LARGE" subagent="validator" role="Final end-to-end verification" subagent_required_model="gpt-5.6-terra, gemini-3.7-flash, claude-sonnet-5, grok-4.6">
+<final_validation phase="13" applies="MEDIUM,LARGE" subagent="validator" role="Final end-to-end verification" subagent_required_model="gpt-6-luna, gemini-3.8-flash, claude-sonnet-5-5, grok-4.7">
 
 1. Systematic by-dependency validation: databases, APIs, web, mobile. Check logs, clean up.
 2. Additionally systematic "manual QA" by yourself.

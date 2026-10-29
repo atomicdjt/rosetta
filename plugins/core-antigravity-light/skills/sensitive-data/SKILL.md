@@ -1,6 +1,6 @@
 ---
 name: sensitive-data
-description: "CRITICAL. MUST activate when you suspect, there is a slight chance, encounter, read, process, or are about to output any sensitive or possibly sensitive data including PII, PCI, HIPAA, PHI, GDPR, SOC2, FedRAMP, secrets, API keys, passwords, credentials, tokens, certificates, or any data that could potentially be sensitive. Applicable for coding too"
+description: "MUST activate when you suspect, there is a slight chance, encounter, read, process, or are about to output any sensitive or possibly sensitive data including PII, PCI, HIPAA, PHI, GDPR, SOC2, FedRAMP, secrets, API keys, passwords, credentials, tokens, certificates, or any sensitive data. Follow compliance/regulations."
 ---
 
 <sensitive_data>

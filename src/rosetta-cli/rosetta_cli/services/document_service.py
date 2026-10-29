@@ -240,7 +240,8 @@ class DocumentService:
             poll_interval: Seconds between status checks (default: 0.5 for smooth progress)
         
         Returns:
-            Tuple of (success_count, unsuccessful_count); the latter includes\n            documents still pending when the polling deadline expires.
+            Tuple of (success_count, unsuccessful_count); the latter includes
+            documents still pending when the polling deadline expires.
         """
         if not documents:
             return 0, 0

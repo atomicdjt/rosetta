@@ -62,14 +62,14 @@ describe('validateCase', () => {
       const checked = validateCase(caseDir, 'duplicate-agents');
       expect(checked.ok).toBe(false);
       if (!checked.ok) {
-        expect(checked.reason).toMatch(/invalid config\\.json.*agents.*unique/i);
+        expect(checked.reason).toMatch(/invalid config\.json.*agents.*unique/i);
       }
 
       const discovered = discoverCases(source);
       expect(discovered.valid).toEqual([]);
       expect(discovered.skipped).toHaveLength(1);
       expect(discovered.skipped[0]?.name).toBe('duplicate-agents');
-      expect(discovered.skipped[0]?.reason).toMatch(/invalid config\\.json.*agents.*unique/i);
+      expect(discovered.skipped[0]?.reason).toMatch(/invalid config\.json.*agents.*unique/i);
     } finally {
       rmSync(source, { recursive: true, force: true });
     }

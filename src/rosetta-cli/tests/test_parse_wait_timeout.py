@@ -47,7 +47,7 @@ def test_all_pending_at_timeout_are_unsuccessful(monkeypatch):
     ) == (0, 2)
 
 
-def test_timeout_after_partial_completion_counts_pending_without_double_counting(monkeypatch):
+def test_timeout_after_partial_completion_counts_pending_without_double_counting(monkeypatch, capsys):
     assert _wait(
         monkeypatch,
         {
@@ -57,6 +57,8 @@ def test_timeout_after_partial_completion_counts_pending_without_double_counting
         },
         [0.0, 0.1, 2.0, 2.0],
     ) == (1, 2)
+    output = capsys.readouterr().out
+    assert "Completed: 1, Failed: 1, Still pending: 1, Total: 3" in output
 
 
 def test_all_terminal_statuses_keep_original_counts(monkeypatch):

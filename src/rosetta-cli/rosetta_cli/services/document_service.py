@@ -348,7 +348,11 @@ class DocumentService:
             if len(completed) == len(documents):
                 print(f"\n✅ All {len(documents)} documents parsed successfully ({elapsed:.1f}s)")
             else:
-                print(f"\n⚠️  Completed: {len(completed)}, Failed: {len(failed)}, Total: {len(documents)}")
+                remaining = len(documents) - len(completed) - len(failed)
+                print(
+                    f"\n⚠️  Completed: {len(completed)}, Failed: {len(failed)}, "
+                    f"Still pending: {remaining}, Total: {len(documents)}"
+                )
         
         except KeyboardInterrupt:
             pbar.close()

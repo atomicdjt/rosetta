@@ -87,7 +87,7 @@ Rosetta MCP supports two runtime modes:
 | `ROSETTA_OAUTH_EXTRA_SCOPES` | Runtime (HTTP OAuth) | Empty | Space-separated scopes forwarded to IdP authorize endpoint (e.g. `openid email offline_access`) |
 | `ROSETTA_JWT_SIGNING_KEY` | Runtime (HTTP OAuth) | Empty | Secret for signing FastMCP JWTs; if unset, derived from client secret |
 | `FERNET_KEY` | Runtime (HTTP OAuth) | Empty | Fernet key for encrypting OAuth token storage in Redis |
-| `ROSETTA_READ_POLICY` | Runtime (authz) | `all` | `all`, `team`, `none` for project dataset reads |
+| `ROSETTA_READ_POLICY` | Runtime (authz) | `all` | `all` or `none` for non-instruction dataset reads; unsupported values fall back to `all` |
 | `ROSETTA_USER_EMAIL` | Runtime (authz) | `rosetta@example.com` | STDIO identity and HTTP fallback identity |
 | `ROSETTA_MODE` | Runtime (prompts) | `HARD` | Prompt mode selection: `HARD` or `SOFT` |
 | `INSTRUCTION_ROOT_FILTER` | Runtime (instructions query) | Empty | Comma-separated root tags filter |
@@ -164,11 +164,11 @@ OAuth variables for HTTP mode:
 | `ROSETTA_JWT_SIGNING_KEY` | all | Secret for signing FastMCP JWTs |
 | `FERNET_KEY` | both | Fernet key for encrypting token storage in Redis |
 
-Authorization policy variables (dataset-level):
+Authorization policy variables:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `ROSETTA_READ_POLICY` | `all`, `team`, `none` for read access on `project-*` datasets | `all` |
+| `ROSETTA_READ_POLICY` | `all` or `none` for non-instruction dataset reads; unsupported values fall back to `all` | `all` |
 | `ROSETTA_USER_EMAIL` | Fallback user email (used in STDIO, and HTTP fallback) | `rosetta@example.com` |
 
 OAuth callback URL examples:

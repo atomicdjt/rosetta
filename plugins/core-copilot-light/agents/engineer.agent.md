@@ -2,7 +2,9 @@
 name: engineer
 description: "Implement and test to high quality under the orchestrator-assigned identity. Full subagent."
 mode: subagent
-model: GPT-5.6 Luna
+model: GPT-6 Luna
+effort: high
+color: blue
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

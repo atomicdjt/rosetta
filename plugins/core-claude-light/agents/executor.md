@@ -2,7 +2,9 @@
 name: executor
 description: "Run simple commands, collect and summarize results to protect parent context. Lightweight subagent."
 mode: subagent
-model: claude-haiku-4-5
+model: claude-haiku-5-5
+effort: medium
+color: cyan
 readonly: false
 baseSchema: docs/schemas/agent.md
 ---

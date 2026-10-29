@@ -9,6 +9,7 @@ All paths are relative to Rosetta Plugin Path.
 - `commands/code-analysis-flow.md`: "Workflow for reverse-engineering a codebase into grounded architecture docs, requirements capture, etc."
 - `commands/coding-agents-prompting-flow.md`: "Workflow for authoring and adapting AI-agent prompts: skills, agents, workflows, rules, etc."
 - `commands/coding-flow.md`: "Workflow for all coding: features, fixes, refactors, unit tests, etc.; scales small to large."
+- `commands/coding-light-flow.md`: "Light coding workflow: features, fixes, refactors, unit tests, etc.; scales small to large."
 - `commands/external-lib-flow.md`: "Workflow for onboarding an external private library so AI can use it without source access."
 - `commands/help-flow.md`: "Help about Rosetta: explains capabilities and usage."
 - `commands/init-workspace-flow.md`: "Workflow for initializing or upgrading a workspace: context, discovery, documentation, etc."

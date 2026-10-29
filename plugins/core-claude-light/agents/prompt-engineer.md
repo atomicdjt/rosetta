@@ -2,7 +2,9 @@
 name: prompt-engineer
 description: "Author and adapt prompts — discover, draft, deliver — under HITL approvals. Full subagent."
 mode: subagent
-model: claude-opus-5
+model: claude-sonnet-5-5
+effort: xhigh
+color: pink
 readonly: false
 tags: ["subagent", "agent"]
 baseSchema: docs/schemas/agent.md
